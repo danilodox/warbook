@@ -24,7 +24,7 @@ val dataModule = module {
         Room.databaseBuilder(
             get(),
             AppDatabase::class.java,
-            "wartracker-db")
+            "warbook-db")
             .openHelperFactory(factory)
             .build()
     }

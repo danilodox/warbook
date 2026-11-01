@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch {
             val responseText = getHelloFromServer()
-            Log.d("WarTrackerBackend", responseText)
+            Log.d("WarbookBackend", responseText)
         }
     }
 
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
             response.bodyAsText()
         } catch (e: Exception) {
-            Log.e("WarTrackerBackend", "Erro ao conectar: ${e.message}")
+            Log.e("WarbookBackend", "Erro ao conectar: ${e.message}")
             "Erro: ${e.message}"
         }
     }

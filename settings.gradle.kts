@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "War Trackerfor CoC"
+rootProject.name = "Warbook"
 include(":app")
  
