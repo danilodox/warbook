@@ -1,3 +1,7 @@
+# Warbook
+
+Estatísticas e histórico de guerras para Clash of Clans.
+
 💻 `Tech Stack & Arquitetura`
 Este projeto foi construído utilizando um stack moderno e robusto, focado em escalabilidade, manutenibilidade e boas práticas de desenvolvimento Android.
 
