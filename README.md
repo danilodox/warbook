@@ -73,7 +73,7 @@ Siga os passos abaixo para clonar e executar o projeto localmente.
 
 `Clone o repositório:`
 
-git clone (https://github.com/danilodox/Coc-Tracker.git)
+git clone https://github.com/danilodox/warbook.git
 
 `Obtenha uma Chave de API:`
 
