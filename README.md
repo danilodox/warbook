@@ -1,3 +1,7 @@
+# Warbook
+
+Estatísticas e histórico de guerras para Clash of Clans.
+
 💻 `Tech Stack & Arquitetura`
 Este projeto foi construído utilizando um stack moderno e robusto, focado em escalabilidade, manutenibilidade e boas práticas de desenvolvimento Android.
 
@@ -69,7 +73,7 @@ Siga os passos abaixo para clonar e executar o projeto localmente.
 
 `Clone o repositório:`
 
-git clone (https://github.com/danilodox/Coc-Tracker.git)
+git clone https://github.com/danilodox/warbook.git
 
 `Obtenha uma Chave de API:`
 
