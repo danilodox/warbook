@@ -22,7 +22,6 @@ ksp = "1.9.10-1.0.13"
 securityCrypto = "1.1.0"
 owasp = "9.0.9"
 compose-bom = "2024.06.00"
-compose-compiler = "1.5.3"
 
 [libraries]
 # AndroidX & Material (Não-Compose)
