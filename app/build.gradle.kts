@@ -14,11 +14,11 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.battlestats.wartracker"
+    namespace = "io.github.danilodox.warbook"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.battlestats.wartracker"
+        applicationId = "io.github.danilodox.warbook"
         //mis sdk = 24 -> is below safe levels. Recommended at least API 29
         //Which makes it vulnerable to attacks like "StrandHogg 2.0"
         minSdk = 29
