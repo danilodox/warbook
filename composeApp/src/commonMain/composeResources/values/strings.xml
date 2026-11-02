@@ -33,6 +33,7 @@
     <string name="error_war_log_private">This clan\'s war log is private.</string>
     <string name="error_api_maintenance">The game is under maintenance. Try again later.</string>
     <string name="error_rate_limited">Too many searches in a row. Wait a moment and try again.</string>
+    <string name="error_invalid_verify_token">Invalid or expired token. Generate a new one in the game.</string>
     <string name="error_network">No connection to the Warbook server. Check your internet.</string>
     <string name="error_server">The game server did not respond.</string>
 </resources>

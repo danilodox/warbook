@@ -33,6 +33,7 @@
     <string name="error_war_log_private">O registro de guerra deste clã é privado.</string>
     <string name="error_api_maintenance">O jogo está em manutenção. Tente mais tarde.</string>
     <string name="error_rate_limited">Muitas buscas seguidas. Espere um pouco e tente de novo.</string>
+    <string name="error_invalid_verify_token">Token inválido ou expirado. Gere outro no jogo.</string>
     <string name="error_network">Sem conexão com o servidor do Warbook. Confira a internet.</string>
     <string name="error_server">O servidor do jogo não respondeu.</string>
 </resources>

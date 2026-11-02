@@ -3,7 +3,9 @@ package io.github.danilodox.warbook.data
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.api.PlayerDto
+import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -96,6 +98,32 @@ class KtorWarbookRepositoryTest {
         server.offline = true
 
         assertEquals(ApiResult.Failure(AppError.NETWORK), repository.player("2PQ8LV9YC"))
+    }
+
+    @Test
+    fun verificacaoMandaOTokenNoCorpoEDevolveAProva() = runTest {
+        server.body = """{"verificationToken":"prova-assinada"}"""
+
+        val result = repository.verify("#2pq8lv9yc", "  tk-do-jogo ")
+
+        assertEquals(ApiResult.Success("prova-assinada"), result)
+        val request = server.requests.last()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals(ApiRoutes.verify("2PQ8LV9YC"), request.url.encodedPath)
+        assertEquals("""{"token":"tk-do-jogo"}""", request.body.toByteArray().decodeToString())
+    }
+
+    @Test
+    fun verificacaoComTokenVazioNemChamaOServidor() = runTest {
+        assertEquals(ApiResult.Failure(AppError.INVALID_VERIFY_TOKEN), repository.verify("2PQ8LV9YC", "   "))
+        assertTrue(server.requests.isEmpty())
+    }
+
+    @Test
+    fun tokenRecusadoViraInvalidVerifyToken() = runTest {
+        server.error(HttpStatusCode.BadRequest, "INVALID_VERIFY_TOKEN")
+
+        assertEquals(ApiResult.Failure(AppError.INVALID_VERIFY_TOKEN), repository.verify("2PQ8LV9YC", "tk"))
     }
 
     @Test
