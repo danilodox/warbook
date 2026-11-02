@@ -14,9 +14,13 @@ dependencies {
     implementation(project(":composeApp"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
+
+    testImplementation(libs.kotlin.testJunit)
 }
 
 android {
@@ -50,5 +54,6 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
