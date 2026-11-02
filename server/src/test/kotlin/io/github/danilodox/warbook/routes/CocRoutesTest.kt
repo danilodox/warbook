@@ -14,7 +14,9 @@ import io.github.danilodox.warbook.module
 import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
 import io.github.danilodox.warbook.testing.FakeTicker
+import io.github.danilodox.warbook.testing.authorizedClient
 import io.github.danilodox.warbook.testing.testConfig
+import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -35,7 +37,10 @@ class CocRoutesTest {
     private val fake = FakeCoc()
     private val ticker = FakeTicker()
 
-    private fun ApplicationTestBuilder.start() = application { module(testConfig, fake.engine, ticker) }
+    private suspend fun ApplicationTestBuilder.start(): HttpClient {
+        application { module(testConfig, fake.engine, ticker) }
+        return authorizedClient()
+    }
 
     private suspend fun <T> HttpResponse.decode(serializer: KSerializer<T>): T =
         Json.decodeFromString(serializer, bodyAsText())
@@ -44,10 +49,10 @@ class CocRoutesTest {
 
     @Test
     fun jogadorMapeiaParaODtoProprio() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.PLAYER_PATH, body = CocFixtures.player)
 
-        val response = client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        val response = api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
 
         assertEquals(HttpStatusCode.OK, response.status)
         val player = response.decode(PlayerDto.serializer())
@@ -61,10 +66,10 @@ class CocRoutesTest {
 
     @Test
     fun mandaATagCodificadaEAChaveNoCabecalho() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.PLAYER_PATH, body = CocFixtures.player)
 
-        client.get(ApiRoutes.player("2pq8lv9yc"))
+        api.get(ApiRoutes.player("2pq8lv9yc"))
 
         val request = fake.requests.single()
         assertEquals("api.clashofclans.com", request.url.host)
@@ -74,10 +79,10 @@ class CocRoutesTest {
 
     @Test
     fun claMapeiaMembrosELigas() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.CLAN_PATH, body = CocFixtures.clan)
 
-        val clan = client.get(ApiRoutes.clan(CocFixtures.CLAN_TAG)).decode(ClanDto.serializer())
+        val clan = api.get(ApiRoutes.clan(CocFixtures.CLAN_TAG)).decode(ClanDto.serializer())
 
         assertEquals(2, clan.memberCount)
         assertEquals("Crystal League I", clan.warLeague)
@@ -89,10 +94,10 @@ class CocRoutesTest {
 
     @Test
     fun guerraEmAndamentoTrazPlacarHorariosEMapa() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.WAR_PATH, body = CocFixtures.warInWar)
 
-        val war = client.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG)).decode(CurrentWarDto.serializer())
+        val war = api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG)).decode(CurrentWarDto.serializer())
 
         assertEquals(WarState.IN_WAR, war.state)
         assertEquals(1_793_707_200_000L, war.endTime, "2026-11-03T12:00:00Z")
@@ -105,19 +110,19 @@ class CocRoutesTest {
 
     @Test
     fun foraDeGuerraVemSoOEstado() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.WAR_PATH, body = CocFixtures.WAR_NOT_IN_WAR)
 
-        val war = client.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG)).decode(CurrentWarDto.serializer())
+        val war = api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG)).decode(CurrentWarDto.serializer())
 
         assertEquals(CurrentWarDto(state = WarState.NOT_IN_WAR), war)
     }
 
     @Test
     fun tagInvalidaNemChegaNaApi() = testApplication {
-        start()
+        val api = start()
 
-        val response = client.get(ApiRoutes.player("ABC!"))
+        val response = api.get(ApiRoutes.player("ABC!"))
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertEquals(ApiErrorCode.INVALID_TAG, response.error().code)
@@ -126,10 +131,10 @@ class CocRoutesTest {
 
     @Test
     fun naoEncontradoViraNotFound() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.PLAYER_PATH, HttpStatusCode.NotFound, """{"reason":"notFound"}""")
 
-        val response = client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        val response = api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
 
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertEquals(ApiErrorCode.NOT_FOUND, response.error().code)
@@ -137,10 +142,10 @@ class CocRoutesTest {
 
     @Test
     fun registroDeGuerraPrivadoViraWarLogPrivate() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.WAR_PATH, HttpStatusCode.Forbidden, CocFixtures.ERROR_ACCESS_DENIED)
 
-        val response = client.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
+        val response = api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
         assertEquals(ApiErrorCode.WAR_LOG_PRIVATE, response.error().code)
@@ -148,10 +153,10 @@ class CocRoutesTest {
 
     @Test
     fun chaveRecusadaPorIpNaoPareceRegistroPrivado() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.WAR_PATH, HttpStatusCode.Forbidden, CocFixtures.ERROR_INVALID_IP)
 
-        val response = client.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
+        val response = api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
 
         assertEquals(HttpStatusCode.BadGateway, response.status)
         assertEquals(ApiErrorCode.UPSTREAM_ERROR, response.error().code)
@@ -159,10 +164,10 @@ class CocRoutesTest {
 
     @Test
     fun manutencaoViraApiMaintenance() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.CLAN_PATH, HttpStatusCode.ServiceUnavailable, CocFixtures.ERROR_MAINTENANCE)
 
-        val response = client.get(ApiRoutes.clan(CocFixtures.CLAN_TAG))
+        val response = api.get(ApiRoutes.clan(CocFixtures.CLAN_TAG))
 
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
         assertEquals(ApiErrorCode.API_MAINTENANCE, response.error().code)
@@ -170,10 +175,10 @@ class CocRoutesTest {
 
     @Test
     fun limiteDaApiViraRateLimited() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.PLAYER_PATH, HttpStatusCode.TooManyRequests, CocFixtures.ERROR_THROTTLED)
 
-        val response = client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        val response = api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
 
         assertEquals(HttpStatusCode.TooManyRequests, response.status)
         assertEquals(ApiErrorCode.RATE_LIMITED, response.error().code)
@@ -181,37 +186,37 @@ class CocRoutesTest {
 
     @Test
     fun cacheEvitaNovaChamadaAteVencer() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.PLAYER_PATH, body = CocFixtures.player)
 
-        client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
-        client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
         assertEquals(1, fake.requests.size)
 
         ticker.advance(CocService.PLAYER_TTL + 1.seconds)
-        client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
         assertEquals(2, fake.requests.size)
     }
 
     @Test
     fun cacheDaGuerraVenceAntesDoDoJogador() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.WAR_PATH, body = CocFixtures.warInWar)
 
-        client.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
+        api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
         ticker.advance(CocService.WAR_TTL + 1.seconds)
-        client.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
+        api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
 
         assertEquals(2, fake.requests.size)
     }
 
     @Test
     fun erroNaoEntraNoCache() = testApplication {
-        start()
+        val api = start()
         fake.on(CocFixtures.PLAYER_PATH, HttpStatusCode.ServiceUnavailable, CocFixtures.ERROR_MAINTENANCE)
 
-        client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
-        client.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
 
         assertEquals(2, fake.requests.size)
     }

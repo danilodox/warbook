@@ -27,5 +27,9 @@ fun Application.installErrorHandling() {
         exception<ApiException> { call, error ->
             call.respond(error.status, ApiError(error.code, error.message))
         }
+        // O plugin RateLimit responde 429 sem corpo; aqui ganha o formato padrão.
+        status(HttpStatusCode.TooManyRequests) { call, status ->
+            call.respond(status, ApiError(ApiErrorCode.RATE_LIMITED, "Muitas requisições, tente de novo em instantes"))
+        }
     }
 }

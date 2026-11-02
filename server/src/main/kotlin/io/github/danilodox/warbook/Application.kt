@@ -3,6 +3,11 @@ package io.github.danilodox.warbook
 import com.github.benmanes.caffeine.cache.Ticker
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.HealthResponse
+import io.github.danilodox.warbook.api.InstallResponse
+import io.github.danilodox.warbook.auth.InstallTokens
+import io.github.danilodox.warbook.auth.RateLimits
+import io.github.danilodox.warbook.auth.installAuthentication
+import io.github.danilodox.warbook.auth.installRateLimits
 import io.github.danilodox.warbook.coc.CocClient
 import io.github.danilodox.warbook.coc.CocService
 import io.github.danilodox.warbook.config.InvalidConfigException
@@ -15,11 +20,14 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlin.system.exitProcess
 
@@ -40,25 +48,38 @@ private fun loadConfigOrExit(): ServerConfig = try {
     exitProcess(1)
 }
 
-/** [cocEngine] e [ticker] são trocados nos testes (MockEngine e relógio falso do cache). */
+/** [cocEngine], [ticker] e [limits] são trocados nos testes (MockEngine, relógio do cache, limites baixos). */
 fun Application.module(
     config: ServerConfig,
     cocEngine: HttpClientEngine = CIO.create(),
     ticker: Ticker = Ticker.systemTicker(),
+    limits: RateLimits = RateLimits(),
 ) {
     val cocClient = CocClient(cocEngine, apiKey = config.cocApiKey, baseUrl = config.cocBaseUrl)
     monitor.subscribe(ApplicationStopped) { cocClient.close() }
     val cocService = CocService(cocClient, ticker)
+    val installTokens = InstallTokens(config.jwtSecret)
 
     install(ContentNegotiation) {
         json()
     }
     installErrorHandling()
+    installAuthentication(installTokens)
+    installRateLimits(limits)
     routing {
         get(ApiRoutes.HEALTH) {
             call.respond(HealthResponse(status = HealthResponse.STATUS_OK, version = ServerInfo.version))
         }
-        cocRoutes(cocService)
+        rateLimit(RateLimits.INSTALLS) {
+            post(ApiRoutes.INSTALLS) { call.respond(InstallResponse(installTokens.issue())) }
+        }
+        rateLimit(RateLimits.PER_IP) {
+            authenticate(InstallTokens.AUTH_NAME) {
+                rateLimit(RateLimits.PER_INSTALL) {
+                    cocRoutes(cocService)
+                }
+            }
+        }
     }
 }
 
