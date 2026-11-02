@@ -1,0 +1,140 @@
+package io.github.danilodox.warbook.coc
+
+import io.github.danilodox.warbook.api.ClanDto
+import io.github.danilodox.warbook.api.ClanMemberDto
+import io.github.danilodox.warbook.api.ClanRole
+import io.github.danilodox.warbook.api.ClanSummaryDto
+import io.github.danilodox.warbook.api.CurrentWarDto
+import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.UnitLevelDto
+import io.github.danilodox.warbook.api.WarAttackDto
+import io.github.danilodox.warbook.api.WarClanDto
+import io.github.danilodox.warbook.api.WarFrequency
+import io.github.danilodox.warbook.api.WarMemberDto
+import io.github.danilodox.warbook.api.WarState
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
+// Converte o formato da Supercell para os DTOs próprios. Tags saem sem `#`.
+
+private val cocTimeFormat = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSS'Z'")
+
+/** "20261102T120000.000Z" → milissegundos desde a época; `null` se vier vazio ou fora do formato. */
+internal fun parseCocTime(value: String?): Long? = value
+    ?.let { runCatching { LocalDateTime.parse(it, cocTimeFormat) }.getOrNull() }
+    ?.toInstant(ZoneOffset.UTC)
+    ?.toEpochMilli()
+
+private fun String.withoutHash(): String = removePrefix("#")
+
+internal fun cocRole(value: String?): ClanRole? = when (value) {
+    "member" -> ClanRole.MEMBER
+    "admin" -> ClanRole.ELDER
+    "coLeader" -> ClanRole.CO_LEADER
+    "leader" -> ClanRole.LEADER
+    else -> null
+}
+
+internal fun cocWarFrequency(value: String?): WarFrequency = when (value) {
+    "always" -> WarFrequency.ALWAYS
+    "moreThanOncePerWeek" -> WarFrequency.MORE_THAN_ONCE_PER_WEEK
+    "oncePerWeek" -> WarFrequency.ONCE_PER_WEEK
+    "lessThanOncePerWeek" -> WarFrequency.LESS_THAN_ONCE_PER_WEEK
+    "never" -> WarFrequency.NEVER
+    else -> WarFrequency.UNKNOWN
+}
+
+internal fun cocWarState(value: String): WarState = when (value) {
+    "preparation" -> WarState.PREPARATION
+    "inWar" -> WarState.IN_WAR
+    "warEnded" -> WarState.WAR_ENDED
+    "inMatchmaking", "enterWar", "matched" -> WarState.MATCHMAKING
+    else -> WarState.NOT_IN_WAR
+}
+
+private fun List<CocUnit>.homeVillage(): List<UnitLevelDto> =
+    filter { it.village == CocUnit.VILLAGE_HOME }.map { UnitLevelDto(it.name, it.level, it.maxLevel) }
+
+internal fun CocPlayer.toDto() = PlayerDto(
+    tag = tag.withoutHash(),
+    name = name,
+    townHallLevel = townHallLevel,
+    expLevel = expLevel,
+    trophies = trophies,
+    warStars = warStars,
+    attackWins = attackWins,
+    donations = donations,
+    donationsReceived = donationsReceived,
+    clan = clan?.let { ClanSummaryDto(it.tag.withoutHash(), it.name, it.badgeUrls?.medium) },
+    role = cocRole(role),
+    heroes = heroes.homeVillage(),
+    troops = troops.homeVillage(),
+    spells = spells.homeVillage(),
+)
+
+internal fun CocClan.toDto() = ClanDto(
+    tag = tag.withoutHash(),
+    name = name,
+    badgeUrl = badgeUrls?.medium,
+    clanLevel = clanLevel,
+    memberCount = members,
+    description = description.orEmpty(),
+    warLeague = warLeague?.name,
+    capitalLeague = capitalLeague?.name,
+    warWins = warWins,
+    warWinStreak = warWinStreak,
+    isWarLogPublic = isWarLogPublic,
+    warFrequency = cocWarFrequency(warFrequency),
+    requiredTrophies = requiredTrophies,
+    requiredTownHallLevel = requiredTownhallLevel,
+    location = location?.name,
+    members = memberList.map {
+        ClanMemberDto(
+            tag = it.tag.withoutHash(),
+            name = it.name,
+            role = cocRole(it.role) ?: ClanRole.MEMBER,
+            townHallLevel = it.townHallLevel,
+            trophies = it.trophies,
+            donations = it.donations,
+            donationsReceived = it.donationsReceived,
+            clanRank = it.clanRank,
+        )
+    },
+)
+
+internal fun CocWar.toDto(): CurrentWarDto {
+    val warState = cocWarState(state)
+    if (warState == WarState.NOT_IN_WAR || warState == WarState.MATCHMAKING) return CurrentWarDto(state = warState)
+    return CurrentWarDto(
+        state = warState,
+        teamSize = teamSize,
+        attacksPerMember = attacksPerMember,
+        preparationStartTime = parseCocTime(preparationStartTime),
+        startTime = parseCocTime(startTime),
+        endTime = parseCocTime(endTime),
+        clan = clan?.toDto(),
+        opponent = opponent?.toDto(),
+    )
+}
+
+private fun CocWarClan.toDto() = WarClanDto(
+    tag = tag.orEmpty().withoutHash(),
+    name = name.orEmpty(),
+    badgeUrl = badgeUrls?.medium,
+    clanLevel = clanLevel,
+    stars = stars,
+    destructionPercentage = destructionPercentage,
+    attacks = attacks,
+    members = members.sortedBy { it.mapPosition }.map { member ->
+        WarMemberDto(
+            tag = member.tag.withoutHash(),
+            name = member.name,
+            townHallLevel = member.townhallLevel,
+            mapPosition = member.mapPosition,
+            attacks = member.attacks.map {
+                WarAttackDto(it.defenderTag.withoutHash(), it.stars, it.destructionPercentage, it.order)
+            },
+        )
+    },
+)

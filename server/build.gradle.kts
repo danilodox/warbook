@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 group = "io.github.danilodox.warbook"
@@ -46,6 +47,12 @@ dependencies {
     implementation(libs.ktor.serverNetty)
     implementation(libs.ktor.serverContentNegotiation)
     implementation(libs.ktor.serializationKotlinxJson)
+    implementation(libs.ktor.serverStatusPages)
+    implementation(libs.ktor.clientCore)
+    implementation(libs.ktor.clientCio)
+    implementation(libs.ktor.clientContentNegotiation)
+    implementation(libs.caffeine)
     testImplementation(libs.ktor.serverTestHost)
+    testImplementation(libs.ktor.clientMock)
     testImplementation(libs.kotlin.testJunit)
 }
