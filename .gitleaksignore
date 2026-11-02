@@ -1,0 +1,4 @@
+# Falsos positivos já no histórico: segredos de teste escritos como texto fixo (trocados por "teste".repeat(8)).
+# Formato: commit:arquivo:regra:linha
+ab3fa256a1f884481d09826f607d1042d125b7de:server/src/test/kotlin/io/github/danilodox/warbook/config/ServerConfigTest.kt:generic-api-key:12
+703d797dbbe41f793038beb1b0a957c7c83f7d63:server/src/test/kotlin/io/github/danilodox/warbook/testing/FakeCoc.kt:generic-api-key:15
