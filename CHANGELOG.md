@@ -4,6 +4,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.2.0] - 2026-11-02
+
 ### Adicionado
 
 - Servidor proxy para a API oficial do Clash of Clans (a chave é presa a IP e não pode ir no app):
@@ -38,5 +40,6 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.1.0...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/danilodox/warbook/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/danilodox/warbook/releases/tag/v0.1.0
