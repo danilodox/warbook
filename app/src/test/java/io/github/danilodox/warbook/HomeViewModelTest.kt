@@ -42,11 +42,12 @@ class HomeViewModelTest {
         secureTokenProvider = mockk()
 
 
-        // Simulate SavedStateHandle providing the playerTag
+        // Simulate SecureTokenProvider providing the playerTag
         every { secureTokenProvider.getSavedTag() } returns testPlayerTag
+    }
 
-
-        // Instantiate the ViewModel with correct dependencies
+    // The ViewModel loads data in init, so mocks must be configured before creating it
+    private fun createViewModel() {
         viewModel = HomeViewModel(
             getPlayerProfileUseCase = getPlayerProfileUseCase,
             secureTokenProvider = secureTokenProvider,
@@ -82,8 +83,9 @@ class HomeViewModelTest {
         coEvery { getPlayerProfileUseCase(testPlayerTag) } returns Result.Success(profileData)
 
         // Act
-        // Data loading happens in ViewModel's init block during setup(),
-        // so we just need to wait for coroutines to finish.
+        // Data loading happens in ViewModel's init block,
+        // so we create it and wait for coroutines to finish.
+        createViewModel()
         advanceUntilIdle()
 
         // Assert
@@ -104,6 +106,7 @@ class HomeViewModelTest {
         coEvery { getPlayerProfileUseCase(testPlayerTag) } returns Result.Error(errorMessage)
 
         // Act
+        createViewModel()
         advanceUntilIdle() // Wait for init block coroutine
 
         // Assert
@@ -117,13 +120,11 @@ class HomeViewModelTest {
     @Test
     fun `init should update uiState with error if playerTag is missing`() = runTest {
 
-        // Override the setup mock for SavedStateHandle to return null
+        // Override the setup mock for SecureTokenProvider to return null
         every { secureTokenProvider.getSavedTag() } returns null
 
-        // Re-initialize ViewModel with the failing SavedStateHandle
-        viewModel = HomeViewModel(getPlayerProfileUseCase, secureTokenProvider)
-
         // Act
+        createViewModel()
         advanceUntilIdle()
 
         // Assert
