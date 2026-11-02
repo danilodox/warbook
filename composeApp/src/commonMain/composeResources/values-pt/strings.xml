@@ -8,4 +8,31 @@
     <string name="back">Voltar</string>
     <string name="coming_soon">Em breve</string>
     <string name="settings_version">Versão %1$s</string>
+
+    <string name="search_tag_label">Tag do jogador</string>
+    <string name="search_button">Buscar</string>
+    <string name="search_hint">Digite a tag de um jogador para testar a conexão com o servidor.</string>
+    <string name="search_loading">Buscando…</string>
+    <string name="retry">Tentar de novo</string>
+
+    <string name="player_tag">#%1$s</string>
+    <string name="player_clan_role">%1$s · %2$s</string>
+    <string name="player_no_clan">Sem clã</string>
+    <string name="player_town_hall">CV</string>
+    <string name="player_level">Nível</string>
+    <string name="player_trophies">Troféus</string>
+    <string name="player_war_stars">Estrelas</string>
+
+    <string name="role_member">Membro</string>
+    <string name="role_elder">Ancião</string>
+    <string name="role_co_leader">Colíder</string>
+    <string name="role_leader">Líder</string>
+
+    <string name="error_invalid_tag">Essa tag não é válida. Tags só usam os caracteres 0289PYLQGRJCUV.</string>
+    <string name="error_not_found">Nenhum jogador encontrado com essa tag.</string>
+    <string name="error_war_log_private">O registro de guerra deste clã é privado.</string>
+    <string name="error_api_maintenance">O jogo está em manutenção. Tente mais tarde.</string>
+    <string name="error_rate_limited">Muitas buscas seguidas. Espere um pouco e tente de novo.</string>
+    <string name="error_network">Sem conexão com o servidor do Warbook. Confira a internet.</string>
+    <string name="error_server">O servidor do jogo não respondeu.</string>
 </resources>

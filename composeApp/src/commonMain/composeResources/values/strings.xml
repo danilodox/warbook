@@ -8,4 +8,31 @@
     <string name="back">Back</string>
     <string name="coming_soon">Coming soon</string>
     <string name="settings_version">Version %1$s</string>
+
+    <string name="search_tag_label">Player tag</string>
+    <string name="search_button">Search</string>
+    <string name="search_hint">Type a player tag to test the connection to the server.</string>
+    <string name="search_loading">Searching…</string>
+    <string name="retry">Try again</string>
+
+    <string name="player_tag">#%1$s</string>
+    <string name="player_clan_role">%1$s · %2$s</string>
+    <string name="player_no_clan">No clan</string>
+    <string name="player_town_hall">TH</string>
+    <string name="player_level">Level</string>
+    <string name="player_trophies">Trophies</string>
+    <string name="player_war_stars">Stars</string>
+
+    <string name="role_member">Member</string>
+    <string name="role_elder">Elder</string>
+    <string name="role_co_leader">Co-leader</string>
+    <string name="role_leader">Leader</string>
+
+    <string name="error_invalid_tag">This tag is not valid. Tags only use the characters 0289PYLQGRJCUV.</string>
+    <string name="error_not_found">No player found with this tag.</string>
+    <string name="error_war_log_private">This clan\'s war log is private.</string>
+    <string name="error_api_maintenance">The game is under maintenance. Try again later.</string>
+    <string name="error_rate_limited">Too many searches in a row. Wait a moment and try again.</string>
+    <string name="error_network">No connection to the Warbook server. Check your internet.</string>
+    <string name="error_server">The game server did not respond.</string>
 </resources>

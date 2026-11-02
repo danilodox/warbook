@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination
@@ -21,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import io.github.danilodox.warbook.data.WarbookHttpClients
 import io.github.danilodox.warbook.navigation.Route
 import io.github.danilodox.warbook.navigation.TopLevelTab
 import io.github.danilodox.warbook.resources.Res
@@ -31,16 +33,21 @@ import io.github.danilodox.warbook.resources.ic_settings
 import io.github.danilodox.warbook.resources.settings
 import io.github.danilodox.warbook.resources.tab_clan
 import io.github.danilodox.warbook.resources.tab_me
-import io.github.danilodox.warbook.resources.tab_search
 import io.github.danilodox.warbook.resources.tab_war
 import io.github.danilodox.warbook.ui.screens.PlaceholderScreen
 import io.github.danilodox.warbook.ui.screens.SettingsScreen
+import io.github.danilodox.warbook.ui.search.SearchRoute
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @Composable
 fun App() {
+    val httpClients: WarbookHttpClients = koinInject()
+    // Primeira abertura: já pede o token da instalação, sem esperar a primeira busca.
+    LaunchedEffect(Unit) { httpClients.tokens.warmUp() }
+
     WarbookTheme {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -80,7 +87,7 @@ fun App() {
                 composable<Route.Me> { PlaceholderScreen(Res.string.tab_me) }
                 composable<Route.Clan> { PlaceholderScreen(Res.string.tab_clan) }
                 composable<Route.War> { PlaceholderScreen(Res.string.tab_war) }
-                composable<Route.Search> { PlaceholderScreen(Res.string.tab_search) }
+                composable<Route.Search> { SearchRoute() }
                 composable<Route.Settings> { SettingsScreen() }
             }
         }

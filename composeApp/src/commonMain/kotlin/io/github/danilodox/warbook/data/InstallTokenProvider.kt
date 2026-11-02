@@ -8,6 +8,7 @@ import io.ktor.client.request.post
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.io.IOException
 
 /** `POST /v1/installs` respondeu com erro. */
 class InstallTokenException(val status: Int) : Exception("POST /v1/installs respondeu $status")
@@ -24,6 +25,17 @@ class InstallTokenProvider(private val client: HttpClient, private val store: In
     /** O servidor recusou [rejected]; se outra chamada já trocou o token, usa o novo em vez de pedir outro. */
     suspend fun renew(rejected: String?): String = mutex.withLock {
         store.get()?.takeIf { it != rejected } ?: requestNew()
+    }
+
+    /** Pede o token na abertura do app. Se falhar (sem rede, servidor fora), a primeira chamada tenta de novo. */
+    suspend fun warmUp() {
+        try {
+            current()
+        } catch (_: IOException) {
+            // Sem rede agora; a primeira busca tenta de novo.
+        } catch (_: InstallTokenException) {
+            // Servidor recusou agora; a primeira busca tenta de novo.
+        }
     }
 
     private suspend fun requestNew(): String {
