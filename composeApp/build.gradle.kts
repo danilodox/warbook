@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room3)
 }
 
 kotlin {
@@ -37,6 +39,10 @@ kotlin {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
     }
+    // O Room KMP usa `expect object` para o construtor do banco.
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
@@ -65,6 +71,8 @@ kotlin {
             implementation(libs.ktor.clientAuth)
             implementation(libs.ktor.serializationKotlinxJsonKmp)
             implementation(libs.datastore.preferencesCore)
+            implementation(libs.room3.runtime)
+            implementation(libs.sqlite.bundled)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -85,4 +93,13 @@ dependencies {
 compose.resources {
     packageOfResClass = "io.github.danilodox.warbook.resources"
     publicResClass = false
+}
+
+// Schemas do Room versionados no git: servem para validar e gerar migrações.
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    listOf("kspAndroid", "kspIosArm64", "kspIosSimulatorArm64").forEach { add(it, libs.room3.compiler) }
 }
