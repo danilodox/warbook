@@ -9,7 +9,9 @@ import kotlin.test.assertTrue
 class ServerConfigTest {
 
     private val apiKey = "chave-de-teste"
-    private val jwtSecret = "segredo-de-teste-com-mais-de-32-caracteres"
+
+    // Montado com repeat para não parecer chave real ao Gitleaks.
+    private val jwtSecret = "teste".repeat(8)
 
     @Test
     fun leAsDuasVariaveis() {

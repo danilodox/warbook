@@ -12,7 +12,8 @@ import kotlin.time.Duration
 
 val testConfig = ServerConfig(
     cocApiKey = "chave-de-teste-coc",
-    jwtSecret = "segredo-de-teste-com-mais-de-32-caracteres",
+    // Montado com repeat para não parecer chave real ao Gitleaks.
+    jwtSecret = "teste".repeat(8),
     cocBaseUrl = "https://api.clashofclans.com/v1",
 )
 

@@ -70,7 +70,7 @@ class InstallAuthTest {
     @Test
     fun tokenAssinadoComOutroSegredoERecusado() = testApplication {
         start()
-        val forged = InstallTokens("outro-segredo-qualquer-com-mais-de-32-caracteres").issue()
+        val forged = InstallTokens("outro".repeat(8)).issue()
 
         val response = clientWith(forged).get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
 
