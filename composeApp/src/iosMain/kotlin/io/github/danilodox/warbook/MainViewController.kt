@@ -11,7 +11,8 @@ import platform.UIKit.UIViewController
 fun MainViewController(): UIViewController {
     if (KoinPlatformTools.defaultContext().getOrNull() == null) {
         val version = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
-        initKoin(AppInfo(versionName = version ?: "dev"))
+        // Simulador acessa o servidor do Mac por localhost; produção entra no deploy (v0.9).
+        initKoin(AppInfo(versionName = version ?: "dev", serverUrl = "http://localhost:8080"))
     }
     return ComposeUIViewController { App() }
 }

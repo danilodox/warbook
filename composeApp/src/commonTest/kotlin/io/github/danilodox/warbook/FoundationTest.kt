@@ -26,7 +26,7 @@ class FoundationTest {
 
     @Test
     fun koinEntregaAppInfo() {
-        val koin = initKoin(AppInfo(versionName = "0.1.0")).koin
+        val koin = initKoin(AppInfo(versionName = "0.1.0", serverUrl = "http://localhost:8080")).koin
 
         assertEquals("0.1.0", koin.get<AppInfo>().versionName)
     }

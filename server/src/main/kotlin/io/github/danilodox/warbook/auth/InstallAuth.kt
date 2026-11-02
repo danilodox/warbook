@@ -5,11 +5,13 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import java.time.Instant
 import java.util.UUID
@@ -54,6 +56,8 @@ fun Application.installAuthentication(tokens: InstallTokens) {
             verifier(tokens.verifier)
             validate { credential -> credential.payload.subject?.let(::InstallPrincipal) }
             challenge { _, _ ->
+                // Com este cabeçalho o plugin Auth do app pede um token novo e repete a chamada.
+                call.response.header(HttpHeaders.WWWAuthenticate, "Bearer realm=\"warbook\"")
                 call.respond(
                     HttpStatusCode.Unauthorized,
                     ApiError(ApiErrorCode.UNAUTHORIZED, "Token da instalação ausente ou inválido"),
