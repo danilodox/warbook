@@ -8,7 +8,7 @@ import org.koin.android.ext.koin.androidContext
 class WarbookApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        initKoin(AppInfo(versionName = BuildConfig.VERSION_NAME)) {
+        initKoin(AppInfo(versionName = BuildConfig.VERSION_NAME, serverUrl = BuildConfig.SERVER_URL)) {
             androidContext(this@WarbookApplication)
         }
     }

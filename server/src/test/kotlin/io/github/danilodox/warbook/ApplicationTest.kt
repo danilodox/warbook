@@ -2,6 +2,8 @@ package io.github.danilodox.warbook
 
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.HealthResponse
+import io.github.danilodox.warbook.testing.FakeCoc
+import io.github.danilodox.warbook.testing.testConfig
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -17,7 +19,7 @@ class ApplicationTest {
 
     @Test
     fun healthRespondeOkEmJson() = testApplication {
-        application { module() }
+        application { module(testConfig, FakeCoc().engine) }
 
         val response = client.get(ApiRoutes.HEALTH)
 

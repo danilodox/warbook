@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -23,6 +24,16 @@ dependencies {
     testImplementation(libs.kotlin.testJunit)
 }
 
+// URL do servidor no build debug: emulador por padrão; para o celular, ponha no local.properties
+// `warbook.serverUrl=http://<IP do PC na rede>:8080`.
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.isFile }?.inputStream()?.use { load(it) }
+}
+val debugServerUrl = localProperties.getProperty("warbook.serverUrl") ?: "http://10.0.2.2:8080"
+
+// Ainda não há servidor publicado; o endereço de produção entra no deploy (v0.9).
+val releaseServerUrl = "https://warbook.invalid"
+
 android {
     namespace = "io.github.danilodox.warbook"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -41,7 +52,11 @@ android {
         }
     }
     buildTypes {
+        debug {
+            buildConfigField("String", "SERVER_URL", "\"$debugServerUrl\"")
+        }
         release {
+            buildConfigField("String", "SERVER_URL", "\"$releaseServerUrl\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

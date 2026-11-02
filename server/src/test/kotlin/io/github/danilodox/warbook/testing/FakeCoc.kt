@@ -1,0 +1,44 @@
+package io.github.danilodox.warbook.testing
+
+import com.github.benmanes.caffeine.cache.Ticker
+import io.github.danilodox.warbook.config.ServerConfig
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.request.HttpRequestData
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import kotlin.time.Duration
+
+val testConfig = ServerConfig(
+    cocApiKey = "chave-de-teste-coc",
+    jwtSecret = "segredo-de-teste-com-mais-de-32-caracteres",
+    cocBaseUrl = "https://api.clashofclans.com/v1",
+)
+
+/** API do jogo simulada: responde pelo caminho codificado (ex.: `/v1/players/%232PQ8LV9YC`). */
+class FakeCoc {
+    val requests = mutableListOf<HttpRequestData>()
+    private val routes = mutableMapOf<String, Pair<HttpStatusCode, String>>()
+
+    fun on(encodedPath: String, status: HttpStatusCode = HttpStatusCode.OK, body: String) {
+        routes[encodedPath] = status to body
+    }
+
+    val engine = MockEngine { request ->
+        requests += request
+        val (status, body) = routes[request.url.encodedPath] ?: (HttpStatusCode.NotFound to """{"reason":"notFound"}""")
+        respond(body, status, headersOf(HttpHeaders.ContentType, "application/json"))
+    }
+}
+
+/** Relógio do cache controlado pelo teste. */
+class FakeTicker : Ticker {
+    private var nanos = 0L
+
+    fun advance(duration: Duration) {
+        nanos += duration.inWholeNanoseconds
+    }
+
+    override fun read(): Long = nanos
+}
