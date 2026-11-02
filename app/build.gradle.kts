@@ -108,12 +108,6 @@ dependencies {
 
     ksp(libs.room.compiler)
 
-    // Ktor Client (Core)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-
 
 
 
