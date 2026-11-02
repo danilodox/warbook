@@ -17,6 +17,30 @@ plugins {
     alias(libs.plugins.ktlint) apply false
 }
 
+// Versão derivada da última tag vX.Y.Z:
+// - no commit da tag: "0.1.0"; depois dela: "0.1.0-dev.3" (3 commits à frente);
+// - sem tag ou sem git: "0.0.0-dev".
+// versionCode = X * 10000 + Y * 100 + Z (sem tag: 1).
+val gitDescribe: String = runCatching {
+    providers.exec {
+        commandLine("git", "describe", "--tags", "--long", "--match", "v[0-9]*.[0-9]*.[0-9]*")
+        isIgnoreExitValue = true
+    }.standardOutput.asText.get().trim()
+}.getOrDefault("")
+
+val versionMatch = Regex("""^v(\d+)\.(\d+)\.(\d+)-(\d+)-g[0-9a-f]+$""").matchEntire(gitDescribe)
+
+val appVersionName: String = versionMatch?.destructured?.let { (major, minor, patch, ahead) ->
+    if (ahead == "0") "$major.$minor.$patch" else "$major.$minor.$patch-dev.$ahead"
+} ?: "0.0.0-dev"
+
+val appVersionCode: Int = versionMatch?.destructured?.let { (major, minor, patch) ->
+    major.toInt() * 10000 + minor.toInt() * 100 + patch.toInt()
+} ?: 1
+
+extra["warbook.versionName"] = appVersionName
+extra["warbook.versionCode"] = appVersionCode
+
 // Kotlin com que o Detekt 1.23.x foi compilado; ele roda isolado com essa versão.
 val detektKotlinVersion = "2.0.21"
 

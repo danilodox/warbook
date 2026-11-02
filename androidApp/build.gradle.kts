@@ -31,8 +31,9 @@ android {
         applicationId = "io.github.danilodox.warbook"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        // Derivados da tag git no build.gradle.kts da raiz.
+        versionCode = rootProject.extra["warbook.versionCode"] as Int
+        versionName = rootProject.extra["warbook.versionName"] as String
     }
     packaging {
         resources {

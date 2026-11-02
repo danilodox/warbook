@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.danilodox.warbook"
-version = "1.0.0"
+version = rootProject.extra["warbook.versionName"] as String
 application {
     mainClass = "io.github.danilodox.warbook.ApplicationKt"
 }
