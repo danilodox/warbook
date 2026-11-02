@@ -13,12 +13,12 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Shared"
+            baseName = "ComposeApp"
             isStatic = true
         }
     }
     android {
-       namespace = "io.github.danilodox.warbook.app.shared"
+       namespace = "io.github.danilodox.warbook.composeapp"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
        compilerOptions {
@@ -42,7 +42,7 @@ kotlin {
             implementation(libs.compose.uiTooling)
         }
         commonMain.dependencies {
-            api(project(":core"))
+            api(project(":shared"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -63,4 +63,8 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
+}
+compose.resources {
+    packageOfResClass = "io.github.danilodox.warbook.resources"
+    publicResClass = false
 }

@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.1"
+agp = "9.5.0"
 android-compileSdk = "37"
 android-minSdk = "24"
 android-targetSdk = "37"
@@ -13,7 +13,7 @@ androidx-testRunner = "1.7.0"
 composeMultiplatform = "1.12.2"
 junit = "4.13.2"
 kotlin = "2.4.21"
-ktor = "3.6.0"
+ktor = "3.6.1"
 logback = "1.6.6"
 material3 = "1.12.0-alpha03"
 

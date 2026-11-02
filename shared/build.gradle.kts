@@ -10,7 +10,7 @@ kotlin {
     iosSimulatorArm64()
     jvm()
     android {
-       namespace = "io.github.danilodox.warbook.core"
+       namespace = "io.github.danilodox.warbook.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
        compilerOptions {
