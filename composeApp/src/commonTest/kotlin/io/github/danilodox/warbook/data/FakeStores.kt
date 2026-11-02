@@ -79,6 +79,14 @@ class FakeWarbookRepository : WarbookRepository {
     }
 }
 
+class FakeAppPreferences(explore: Boolean = false) : AppPreferences {
+    override val exploreMode = MutableStateFlow(explore)
+
+    override suspend fun setExploreMode(enabled: Boolean) {
+        exploreMode.value = enabled
+    }
+}
+
 fun testPlayer(tag: String = "2PQ8LV9YC", name: String = "Dantas", townHall: Int = 15, clan: String? = "Picuí Raiz") =
     PlayerDto(
         tag = tag,

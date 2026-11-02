@@ -172,7 +172,7 @@ private fun ErrorCard(error: AppError, onRetry: () -> Unit) {
     }
 }
 
-private val ClanRole.label: StringResource
+internal val ClanRole.label: StringResource
     get() = when (this) {
         ClanRole.MEMBER -> Res.string.role_member
         ClanRole.ELDER -> Res.string.role_elder

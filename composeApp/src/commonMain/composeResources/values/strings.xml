@@ -36,4 +36,32 @@
     <string name="error_invalid_verify_token">Invalid or expired token. Generate a new one in the game.</string>
     <string name="error_network">No connection to the Warbook server. Check your internet.</string>
     <string name="error_server">The game server did not respond.</string>
+
+    <string name="onboarding_tagline">Your clan\'s stats and wars</string>
+    <string name="onboarding_tag_question">What is your player tag?</string>
+    <string name="onboarding_tag_hint">It is on your profile, below your name.</string>
+    <string name="onboarding_help_title">Where do I find my tag?</string>
+    <string name="onboarding_help_body">In the game, tap your name (top left corner). The tag starts with #. Tap it to copy.</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_explore">Just explore, no account</string>
+    <string name="onboarding_confirm_title">Is this you?</string>
+    <string name="onboarding_confirm_yes">Yes, that\'s me</string>
+    <string name="onboarding_confirm_no">No, change the tag</string>
+
+    <string name="verify_title">Verify account</string>
+    <string name="verify_skip">Skip</string>
+    <string name="verify_intro">Verifying proves the account is yours. You need it to turn on clan tracking. You can do it later in Settings.</string>
+    <string name="verify_steps_title">How to get the API token</string>
+    <string name="verify_step_1">In the game, open Settings (gear).</string>
+    <string name="verify_step_2">Tap More Settings.</string>
+    <string name="verify_step_3">Scroll to API Token and tap Show.</string>
+    <string name="verify_step_4">Tap Copy and come back here.</string>
+    <string name="verify_token_label">Paste token</string>
+    <string name="verify_token_note">The token works once and expires in a few minutes. Warbook does not store it.</string>
+    <string name="verify_button">Verify</string>
+    <string name="verify_not_now">Not now</string>
+
+    <string name="me_no_account_title">No account yet</string>
+    <string name="me_no_account_body">Add your account to see your profile here.</string>
+    <string name="me_add_account">Add account</string>
 </resources>

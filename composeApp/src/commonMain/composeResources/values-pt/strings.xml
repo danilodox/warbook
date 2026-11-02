@@ -36,4 +36,32 @@
     <string name="error_invalid_verify_token">Token inválido ou expirado. Gere outro no jogo.</string>
     <string name="error_network">Sem conexão com o servidor do Warbook. Confira a internet.</string>
     <string name="error_server">O servidor do jogo não respondeu.</string>
+
+    <string name="onboarding_tagline">Estatísticas e guerras do seu clã</string>
+    <string name="onboarding_tag_question">Qual é a tag do seu jogador?</string>
+    <string name="onboarding_tag_hint">Fica no seu perfil, embaixo do nome.</string>
+    <string name="onboarding_help_title">Onde acho minha tag?</string>
+    <string name="onboarding_help_body">No jogo: toque no seu nome (canto superior esquerdo). A tag começa com #. Toque nela para copiar.</string>
+    <string name="onboarding_continue">Continuar</string>
+    <string name="onboarding_explore">Só explorar, sem conta</string>
+    <string name="onboarding_confirm_title">É você?</string>
+    <string name="onboarding_confirm_yes">Sim, sou eu</string>
+    <string name="onboarding_confirm_no">Não, trocar a tag</string>
+
+    <string name="verify_title">Verificar conta</string>
+    <string name="verify_skip">Pular</string>
+    <string name="verify_intro">Verificar prova que a conta é sua. Serve para ativar o monitoramento do clã. Dá para fazer depois, em Configurações.</string>
+    <string name="verify_steps_title">Como pegar o token da API</string>
+    <string name="verify_step_1">No jogo, abra Configurações (engrenagem).</string>
+    <string name="verify_step_2">Toque em Mais configurações.</string>
+    <string name="verify_step_3">Role até Token da API e toque em Mostrar.</string>
+    <string name="verify_step_4">Toque em Copiar e volte aqui.</string>
+    <string name="verify_token_label">Colar token</string>
+    <string name="verify_token_note">O token vale uma vez e expira em poucos minutos. O Warbook não guarda o token.</string>
+    <string name="verify_button">Verificar</string>
+    <string name="verify_not_now">Agora não</string>
+
+    <string name="me_no_account_title">Nenhuma conta ainda</string>
+    <string name="me_no_account_body">Adicione sua conta para ver seu perfil aqui.</string>
+    <string name="me_add_account">Adicionar conta</string>
 </resources>
