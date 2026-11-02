@@ -9,8 +9,10 @@ import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
 import io.github.danilodox.warbook.testing.clientWith
 import io.github.danilodox.warbook.testing.issueToken
+import io.github.danilodox.warbook.testing.postVerify
 import io.github.danilodox.warbook.testing.testConfig
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import org.slf4j.LoggerFactory
@@ -42,6 +44,7 @@ class LogSecretsTest {
         val fake = FakeCoc().apply {
             on(CocFixtures.PLAYER_PATH, body = CocFixtures.player)
             on(CocFixtures.WAR_PATH, HttpStatusCode.Forbidden, CocFixtures.ERROR_INVALID_IP)
+            on(CocFixtures.VERIFY_PATH, body = CocFixtures.verifyOk)
         }
         application { module(testConfig, fake.engine) }
         val token = issueToken()
@@ -50,6 +53,11 @@ class LogSecretsTest {
         api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
         api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG))
         clientWith("$token-alterado").get(ApiRoutes.player(CocFixtures.PLAYER_TAG))
+        val proof = api.postVerify().bodyAsText()
+        fake.on(CocFixtures.VERIFY_PATH, HttpStatusCode.BadGateway, CocFixtures.verifyOk)
+        api.postVerify()
+        fake.on(CocFixtures.VERIFY_PATH, body = "resposta quebrada ${CocFixtures.gameToken}")
+        api.postVerify()
 
         val logs = appender.list.joinToString("\n") { event ->
             event.formattedMessage + event.throwableProxy?.let { "\n" + ThrowableProxyUtil.asString(it) }.orEmpty()
@@ -58,5 +66,7 @@ class LogSecretsTest {
         assertFalse(testConfig.cocApiKey in logs, "chave da API no log")
         assertFalse(testConfig.jwtSecret in logs, "segredo do JWT no log")
         assertFalse(token in logs, "token da instalação no log")
+        assertFalse(CocFixtures.gameToken in logs, "token de verificação do jogo no log")
+        assertFalse(proof.substringAfter("\":\"").substringBefore("\"") in logs, "prova de verificação no log")
     }
 }

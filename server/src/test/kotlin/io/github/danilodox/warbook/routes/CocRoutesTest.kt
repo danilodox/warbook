@@ -7,6 +7,7 @@ import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.UnitLevelDto
 import io.github.danilodox.warbook.api.WarFrequency
 import io.github.danilodox.warbook.api.WarState
 import io.github.danilodox.warbook.coc.CocService
@@ -62,6 +63,23 @@ class CocRoutesTest {
         assertEquals(CocFixtures.CLAN_TAG, player.clan?.tag)
         assertEquals("https://img/m.png", player.clan?.badgeUrl)
         assertEquals(listOf("Barbarian King"), player.heroes.map { it.name }, "heróis da base do construtor ficam fora")
+        assertEquals("Legend League", player.league)
+        assertEquals(1240, player.donations)
+        assertEquals(47, player.attackWins)
+    }
+
+    @Test
+    fun tropasSeparamPetsMaquinasESemSupertropas() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.PLAYER_PATH, body = CocFixtures.player)
+
+        val player = api.get(ApiRoutes.player(CocFixtures.PLAYER_TAG)).decode(PlayerDto.serializer())
+
+        assertEquals(listOf("Barbarian"), player.troops.map { it.name }, "sem supertropas e sem base do construtor")
+        assertEquals(listOf("Wall Wrecker"), player.siegeMachines.map { it.name })
+        assertEquals(listOf("L.A.S.S.I"), player.pets.map { it.name })
+        assertEquals(listOf("Lightning Spell"), player.spells.map { it.name })
+        assertEquals(UnitLevelDto("Earthquake Boots", 15, 18), player.heroEquipment.single())
     }
 
     @Test

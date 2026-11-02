@@ -18,10 +18,27 @@ internal data class CocPlayer(
     val donationsReceived: Int = 0,
     val clan: CocClanRef? = null,
     val role: String? = null,
+    val league: CocNamed? = null,
     val heroes: List<CocUnit> = emptyList(),
+    /** Na API, `troops` também traz pets, máquinas de cerco e supertropas. */
     val troops: List<CocUnit> = emptyList(),
     val spells: List<CocUnit> = emptyList(),
+    val heroEquipment: List<CocUnit> = emptyList(),
 )
+
+/** Corpo de `POST /players/{tag}/verifytoken`. */
+@Serializable
+internal data class CocVerifyTokenRequest(val token: String) {
+    override fun toString(): String = "CocVerifyTokenRequest(token=***)"
+}
+
+/** A resposta também repete a tag e o token; só o [status] é lido (o resto é ignorado e descartado). */
+@Serializable
+internal data class CocVerifyTokenResponse(val status: String) {
+    companion object {
+        const val STATUS_OK = "ok"
+    }
+}
 
 @Serializable
 internal data class CocClanRef(val tag: String, val name: String, val badgeUrls: CocBadgeUrls? = null)

@@ -6,6 +6,7 @@ import io.github.danilodox.warbook.api.HealthResponse
 import io.github.danilodox.warbook.api.InstallResponse
 import io.github.danilodox.warbook.auth.InstallTokens
 import io.github.danilodox.warbook.auth.RateLimits
+import io.github.danilodox.warbook.auth.VerificationTokens
 import io.github.danilodox.warbook.auth.installAuthentication
 import io.github.danilodox.warbook.auth.installRateLimits
 import io.github.danilodox.warbook.coc.CocClient
@@ -14,6 +15,7 @@ import io.github.danilodox.warbook.config.InvalidConfigException
 import io.github.danilodox.warbook.config.ServerConfig
 import io.github.danilodox.warbook.errors.installErrorHandling
 import io.github.danilodox.warbook.routes.cocRoutes
+import io.github.danilodox.warbook.routes.verifyRoutes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.serialization.kotlinx.json.json
@@ -59,6 +61,7 @@ fun Application.module(
     monitor.subscribe(ApplicationStopped) { cocClient.close() }
     val cocService = CocService(cocClient, ticker)
     val installTokens = InstallTokens(config.jwtSecret)
+    val verificationTokens = VerificationTokens(config.jwtSecret)
 
     install(ContentNegotiation) {
         json()
@@ -77,6 +80,11 @@ fun Application.module(
             authenticate(InstallTokens.AUTH_NAME) {
                 rateLimit(RateLimits.PER_INSTALL) {
                     cocRoutes(cocService)
+                    rateLimit(RateLimits.VERIFY_PER_IP) {
+                        rateLimit(RateLimits.VERIFY_PER_INSTALL) {
+                            verifyRoutes(cocService, verificationTokens)
+                        }
+                    }
                 }
             }
         }

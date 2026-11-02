@@ -14,11 +14,16 @@ data class RateLimits(
     val installsPerHourPerIp: Int = 10,
     val perMinutePerInstall: Int = 60,
     val perMinutePerIp: Int = 120,
+    /** A verificação é rara (uma vez por conta) e o alvo óbvio de quem tenta adivinhar tokens. */
+    val verifyPerHourPerInstall: Int = 5,
+    val verifyPerHourPerIp: Int = 10,
 ) {
     companion object {
         val INSTALLS = RateLimitName("installs-por-ip")
         val PER_IP = RateLimitName("api-por-ip")
         val PER_INSTALL = RateLimitName("api-por-instalacao")
+        val VERIFY_PER_IP = RateLimitName("verify-por-ip")
+        val VERIFY_PER_INSTALL = RateLimitName("verify-por-instalacao")
     }
 }
 
@@ -34,6 +39,14 @@ fun Application.installRateLimits(limits: RateLimits) {
         }
         register(RateLimits.PER_INSTALL) {
             rateLimiter(limit = limits.perMinutePerInstall, refillPeriod = 1.minutes)
+            requestKey { call -> call.principal<InstallPrincipal>()?.installId ?: call.request.origin.remoteHost }
+        }
+        register(RateLimits.VERIFY_PER_IP) {
+            rateLimiter(limit = limits.verifyPerHourPerIp, refillPeriod = 1.hours)
+            requestKey { call -> call.request.origin.remoteHost }
+        }
+        register(RateLimits.VERIFY_PER_INSTALL) {
+            rateLimiter(limit = limits.verifyPerHourPerInstall, refillPeriod = 1.hours)
             requestKey { call -> call.principal<InstallPrincipal>()?.installId ?: call.request.origin.remoteHost }
         }
     }

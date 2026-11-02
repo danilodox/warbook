@@ -6,7 +6,6 @@ import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.api.ClanSummaryDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.PlayerDto
-import io.github.danilodox.warbook.api.UnitLevelDto
 import io.github.danilodox.warbook.api.WarAttackDto
 import io.github.danilodox.warbook.api.WarClanDto
 import io.github.danilodox.warbook.api.WarFrequency
@@ -53,25 +52,31 @@ internal fun cocWarState(value: String): WarState = when (value) {
     else -> WarState.NOT_IN_WAR
 }
 
-private fun List<CocUnit>.homeVillage(): List<UnitLevelDto> =
-    filter { it.village == CocUnit.VILLAGE_HOME }.map { UnitLevelDto(it.name, it.level, it.maxLevel) }
-
-internal fun CocPlayer.toDto() = PlayerDto(
-    tag = tag.withoutHash(),
-    name = name,
-    townHallLevel = townHallLevel,
-    expLevel = expLevel,
-    trophies = trophies,
-    warStars = warStars,
-    attackWins = attackWins,
-    donations = donations,
-    donationsReceived = donationsReceived,
-    clan = clan?.let { ClanSummaryDto(it.tag.withoutHash(), it.name, it.badgeUrls?.medium) },
-    role = cocRole(role),
-    heroes = heroes.homeVillage(),
-    troops = troops.homeVillage(),
-    spells = spells.homeVillage(),
-)
+internal fun CocPlayer.toDto(): PlayerDto {
+    val homeTroops = troops.homeVillage().filterNot { CocUnits.isSuperTroop(it.name) }
+    val (pets, nonPets) = homeTroops.partition { it.name in CocUnits.PETS }
+    val (siegeMachines, regularTroops) = nonPets.partition { it.name in CocUnits.SIEGE_MACHINES }
+    return PlayerDto(
+        tag = tag.withoutHash(),
+        name = name,
+        townHallLevel = townHallLevel,
+        expLevel = expLevel,
+        trophies = trophies,
+        warStars = warStars,
+        attackWins = attackWins,
+        donations = donations,
+        donationsReceived = donationsReceived,
+        clan = clan?.let { ClanSummaryDto(it.tag.withoutHash(), it.name, it.badgeUrls?.medium) },
+        role = cocRole(role),
+        league = league?.name,
+        heroes = heroes.homeVillage().toDtos(),
+        troops = regularTroops.toDtos(),
+        spells = spells.homeVillage().toDtos(),
+        siegeMachines = siegeMachines.toDtos(),
+        pets = pets.toDtos(),
+        heroEquipment = heroEquipment.homeVillage().toDtos(),
+    )
+}
 
 internal fun CocClan.toDto() = ClanDto(
     tag = tag.withoutHash(),
