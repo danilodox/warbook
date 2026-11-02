@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Warbook</string>
+    <string name="tab_me">Eu</string>
+    <string name="tab_clan">Clã</string>
+    <string name="tab_war">Guerra</string>
+    <string name="tab_search">Buscar</string>
+    <string name="settings">Configurações</string>
+    <string name="back">Voltar</string>
+    <string name="coming_soon">Em breve</string>
+    <string name="settings_version">Versão %1$s</string>
+</resources>
