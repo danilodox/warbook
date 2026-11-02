@@ -23,6 +23,22 @@ sourceSets.main {
     resources.srcDir(generateVersionResource)
 }
 
+// Passa as linhas CHAVE=valor do server/.env (fora do git) como variáveis de ambiente do `run`.
+// O arquivo só é lido na execução, para os valores não irem para o cache de configuração.
+tasks.named<JavaExec>("run") {
+    val envFile = layout.projectDirectory.file(".env").asFile
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
+    doFirst {
+        val task = this as JavaExec
+        if (envFile.isFile) {
+            envFile.readLines()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") && "=" in it }
+                .forEach { task.environment(it.substringBefore("=").trim(), it.substringAfter("=").trim()) }
+        }
+    }
+}
+
 dependencies {
     api(project(":shared"))
     implementation(libs.logback)
