@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.data.remote
 
 
+import io.github.danilodox.warbook.BuildConfig
 import io.github.danilodox.warbook.data.datastore.SecureTokenProvider
 import io.github.danilodox.warbook.data.remote.interceptor.AuthInterceptor
 import okhttp3.OkHttpClient
@@ -22,7 +23,12 @@ class RetrofitService(private val tokenProvider: SecureTokenProvider) {
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .apply {
                         val logging = HttpLoggingInterceptor()
-                        logging.level = HttpLoggingInterceptor.Level.BODY
+                        logging.level = if (BuildConfig.DEBUG) {
+                            HttpLoggingInterceptor.Level.BODY
+                        } else {
+                            HttpLoggingInterceptor.Level.NONE
+                        }
+                        logging.redactHeader("Authorization")
                         addInterceptor(AuthInterceptor(tokenProvider = tokenProvider))
                         addInterceptor(logging)
                     }.build()
