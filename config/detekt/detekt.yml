@@ -1,0 +1,15 @@
+# Só o que muda em relação à configuração padrão do Detekt.
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+
+complexity:
+  LongParameterList:
+    ignoreAnnotated: ['Composable']

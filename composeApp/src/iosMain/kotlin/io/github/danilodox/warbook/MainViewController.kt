@@ -7,7 +7,7 @@ import org.koin.mp.KoinPlatformTools
 import platform.Foundation.NSBundle
 import platform.UIKit.UIViewController
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "ktlint:standard:function-naming")
 fun MainViewController(): UIViewController {
     if (KoinPlatformTools.defaultContext().getOrNull() == null) {
         val version = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
