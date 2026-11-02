@@ -119,8 +119,7 @@ private fun WarbookTopBar(
     )
 }
 
-private fun NavDestination?.isIn(route: Route): Boolean =
-    this?.hierarchy?.any { it.hasRoute(route::class) } == true
+private fun NavDestination?.isIn(route: Route): Boolean = this?.hierarchy?.any { it.hasRoute(route::class) } == true
 
 /** Troca de aba mantendo o estado de cada uma e sem empilhar abas repetidas. */
 private fun NavHostController.navigateToTab(tab: TopLevelTab) {

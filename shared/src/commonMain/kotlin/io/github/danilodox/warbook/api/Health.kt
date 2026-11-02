@@ -9,10 +9,7 @@ object ApiRoutes {
 
 /** Resposta de `GET /health`. */
 @Serializable
-data class HealthResponse(
-    val status: String,
-    val version: String,
-) {
+data class HealthResponse(val status: String, val version: String) {
     companion object {
         const val STATUS_OK = "ok"
     }

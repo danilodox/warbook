@@ -32,11 +32,7 @@ sealed interface Route {
 }
 
 /** Abas da barra inferior, na ordem em que aparecem. */
-enum class TopLevelTab(
-    val route: Route,
-    val label: StringResource,
-    val icon: DrawableResource,
-) {
+enum class TopLevelTab(val route: Route, val label: StringResource, val icon: DrawableResource) {
     ME(Route.Me, Res.string.tab_me, Res.drawable.ic_tab_me),
     CLAN(Route.Clan, Res.string.tab_clan, Res.drawable.ic_tab_clan),
     WAR(Route.War, Res.string.tab_war, Res.drawable.ic_tab_war),
