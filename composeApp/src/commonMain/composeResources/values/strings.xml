@@ -64,4 +64,42 @@
     <string name="me_no_account_title">No account yet</string>
     <string name="me_no_account_body">Add your account to see your profile here.</string>
     <string name="me_add_account">Add account</string>
+    <string name="me_switch_account">Switch account</string>
+    <string name="me_verified">Verified</string>
+    <string name="me_verify_account">Verify account</string>
+    <string name="me_heroes">Heroes</string>
+    <string name="me_equipment">Hero equipment</string>
+    <string name="me_troops">Troops</string>
+    <string name="me_spells">Spells</string>
+    <string name="me_sieges">Siege machines</string>
+    <string name="me_pets">Pets</string>
+    <string name="me_season">Season</string>
+    <string name="me_donations">Donated</string>
+    <string name="me_received">Received</string>
+    <string name="me_attack_wins">Attacks won</string>
+    <string name="unit_level">%1$d/%2$d</string>
+
+    <string name="accounts_title">Your accounts</string>
+    <string name="accounts_active">active</string>
+    <string name="accounts_summary">TH %1$d · %2$s</string>
+    <string name="accounts_hold_hint">Tap to switch. Press and hold to remove.</string>
+    <string name="accounts_remove">Remove</string>
+    <string name="accounts_remove_title">Remove %1$s?</string>
+    <string name="accounts_remove_body">The account and its saved profile leave this device. You can add it again later.</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="offline_no_connection">No connection.</string>
+    <string name="offline_title">No internet</string>
+    <string name="offline_body">Check your Wi-Fi or mobile data.</string>
+    <string name="updated_just_now">Updated just now.</string>
+    <string name="updated_minutes">Updated %1$d min ago.</string>
+    <string name="updated_hours">Updated %1$d h ago.</string>
+    <string name="updated_days">Updated %1$d days ago.</string>
+
+    <string name="settings_accounts">Accounts</string>
+    <string name="settings_manage_accounts">Manage accounts</string>
+    <string name="settings_verify_active">Verify active account</string>
+    <string name="settings_active_verified">Active account is verified</string>
+    <string name="settings_about">About</string>
+    <string name="settings_fan_notice">This material is unofficial and is not endorsed by Supercell. For more information see Supercell\'s Fan Content Policy: www.supercell.com/fan-content-policy.</string>
 </resources>

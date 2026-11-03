@@ -54,8 +54,8 @@ import io.github.danilodox.warbook.ui.onboarding.OnboardingViewModel
 import io.github.danilodox.warbook.ui.onboarding.TagEvent
 import io.github.danilodox.warbook.ui.onboarding.TagScreen
 import io.github.danilodox.warbook.ui.screens.PlaceholderScreen
-import io.github.danilodox.warbook.ui.screens.SettingsScreen
 import io.github.danilodox.warbook.ui.search.SearchRoute
+import io.github.danilodox.warbook.ui.settings.SettingsRoute
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
 import org.jetbrains.compose.resources.painterResource
@@ -121,18 +121,44 @@ private fun WarbookNavigation(startRoute: Route) {
             startDestination = startRoute,
             modifier = Modifier.padding(padding),
         ) {
-            navigation<Route.Main>(startDestination = Route.Me) {
-                composable<Route.Me> { MeRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
-                composable<Route.Clan> { PlaceholderScreen(Res.string.tab_clan) }
-                composable<Route.War> { PlaceholderScreen(Res.string.tab_war) }
-                composable<Route.Search> { SearchRoute() }
-            }
-            composable<Route.Settings> { SettingsScreen() }
+            mainGraph(navController)
             onboardingGraph(navController)
             verifyDestination(navController)
         }
     }
 }
+
+/** As abas e as Configurações. */
+private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
+    navigation<Route.Main>(startDestination = Route.Me) {
+        composable<Route.Me> { entry ->
+            val openAccounts by entry.savedStateHandle.getStateFlow(OPEN_ACCOUNTS, false)
+                .collectAsStateWithLifecycle()
+            MeRoute(
+                openAccounts = openAccounts,
+                onAccountsOpened = { entry.savedStateHandle[OPEN_ACCOUNTS] = false },
+                onAddAccount = { navController.navigate(Route.Onboarding) },
+                onVerify = { tag -> navController.navigate(Route.Verify(tag, fromOnboarding = false)) },
+            )
+        }
+        composable<Route.Clan> { PlaceholderScreen(Res.string.tab_clan) }
+        composable<Route.War> { PlaceholderScreen(Res.string.tab_war) }
+        composable<Route.Search> { SearchRoute() }
+    }
+    composable<Route.Settings> {
+        SettingsRoute(
+            // A lista de contas mora na aba Eu: volta para ela já com a lista aberta.
+            onManageAccounts = {
+                navController.getBackStackEntry<Route.Me>().savedStateHandle[OPEN_ACCOUNTS] = true
+                navController.navigateToTab(TopLevelTab.ME)
+            },
+            onVerify = { tag -> navController.navigate(Route.Verify(tag, fromOnboarding = false)) },
+            onAddAccount = { navController.navigate(Route.Onboarding) },
+        )
+    }
+}
+
+private const val OPEN_ACCOUNTS = "open_accounts"
 
 private fun NavGraphBuilder.verifyDestination(navController: NavHostController) {
     composable<Route.Verify> { entry ->

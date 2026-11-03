@@ -64,4 +64,42 @@
     <string name="me_no_account_title">Nenhuma conta ainda</string>
     <string name="me_no_account_body">Adicione sua conta para ver seu perfil aqui.</string>
     <string name="me_add_account">Adicionar conta</string>
+    <string name="me_switch_account">Trocar de conta</string>
+    <string name="me_verified">Verificado</string>
+    <string name="me_verify_account">Verificar conta</string>
+    <string name="me_heroes">Heróis</string>
+    <string name="me_equipment">Equipamentos de herói</string>
+    <string name="me_troops">Tropas</string>
+    <string name="me_spells">Feitiços</string>
+    <string name="me_sieges">Máquinas de cerco</string>
+    <string name="me_pets">Pets</string>
+    <string name="me_season">Temporada</string>
+    <string name="me_donations">Doadas</string>
+    <string name="me_received">Recebidas</string>
+    <string name="me_attack_wins">Ataques vencidos</string>
+    <string name="unit_level">%1$d/%2$d</string>
+
+    <string name="accounts_title">Suas contas</string>
+    <string name="accounts_active">ativa</string>
+    <string name="accounts_summary">CV %1$d · %2$s</string>
+    <string name="accounts_hold_hint">Toque para trocar. Segure para remover.</string>
+    <string name="accounts_remove">Remover</string>
+    <string name="accounts_remove_title">Remover %1$s?</string>
+    <string name="accounts_remove_body">A conta e o perfil salvo saem deste aparelho. Dá para adicionar de novo depois.</string>
+    <string name="cancel">Cancelar</string>
+
+    <string name="offline_no_connection">Sem conexão.</string>
+    <string name="offline_title">Sem internet</string>
+    <string name="offline_body">Confira o Wi-Fi ou os dados móveis.</string>
+    <string name="updated_just_now">Atualizado agora há pouco.</string>
+    <string name="updated_minutes">Atualizado há %1$d min.</string>
+    <string name="updated_hours">Atualizado há %1$d h.</string>
+    <string name="updated_days">Atualizado há %1$d dias.</string>
+
+    <string name="settings_accounts">Contas</string>
+    <string name="settings_manage_accounts">Gerenciar contas</string>
+    <string name="settings_verify_active">Verificar conta ativa</string>
+    <string name="settings_active_verified">Conta ativa verificada</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_fan_notice">Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a Política de Conteúdo de Fãs da Supercell: www.supercell.com/fan-content-policy.</string>
 </resources>
