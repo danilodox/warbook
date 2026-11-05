@@ -4,6 +4,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.3.0] - 2026-11-04
+
+### Adicionado
+
+- Servidor: `POST /v1/players/{tag}/verify` confere o token da API do jogo (`verifytoken`) e devolve uma prova de verificação (JWT com a tag e a instalação). O token do jogo não é guardado nem logado; o limite é próprio: 5 por hora por instalação e 10 por hora por IP.
+- Jogador no contrato com liga, máquinas de cerco, pets e equipamentos de herói; super tropas e tropas da vila do construtor ficam de fora.
+- App: Room 3 com as contas do aparelho e o último perfil de cada uma, para abrir sem internet.
+- Onboarding: tag com ajuda "Onde acho minha tag?" → "É você?" → verificação opcional com passo a passo. "Só explorar, sem conta" abre a Buscar.
+- Primeira tela: sem conta e sem "Só explorar" abre o onboarding; senão, a aba Eu.
+- Aba Eu: perfil da conta ativa com heróis, equipamentos, tropas, feitiços, máquinas e pets em texto com barra de progresso, e os números da temporada. Puxar para atualizar, skeleton na primeira carga e faixa "Sem conexão" com o horário do perfil salvo.
+- Troca de conta numa lista de baixo: tocar troca, segurar remove, e "Adicionar conta" reabre o onboarding. Selo "Verificado" na conta verificada.
+- Configurações: gerenciar contas, verificar a conta ativa, versão e o aviso de conteúdo de fã da Supercell.
+- Textos novos em português e inglês.
+
+### Segurança
+
+- O campo do token usa teclado de senha e o token não vai para o estado salvo da tela.
+- Teste garante que o token do jogo e a prova não aparecem nos logs do servidor.
+
 ## [0.2.0] - 2026-11-02
 
 ### Adicionado
@@ -40,6 +59,7 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.2.0...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/danilodox/warbook/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/danilodox/warbook/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/danilodox/warbook/releases/tag/v0.1.0
