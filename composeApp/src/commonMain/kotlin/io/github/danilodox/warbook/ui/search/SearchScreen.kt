@@ -34,6 +34,7 @@ import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.error_api_maintenance
 import io.github.danilodox.warbook.resources.error_invalid_tag
+import io.github.danilodox.warbook.resources.error_invalid_verify_token
 import io.github.danilodox.warbook.resources.error_network
 import io.github.danilodox.warbook.resources.error_not_found
 import io.github.danilodox.warbook.resources.error_rate_limited
@@ -171,7 +172,7 @@ private fun ErrorCard(error: AppError, onRetry: () -> Unit) {
     }
 }
 
-private val ClanRole.label: StringResource
+internal val ClanRole.label: StringResource
     get() = when (this) {
         ClanRole.MEMBER -> Res.string.role_member
         ClanRole.ELDER -> Res.string.role_elder
@@ -186,6 +187,7 @@ internal val AppError.message: StringResource
         AppError.WAR_LOG_PRIVATE -> Res.string.error_war_log_private
         AppError.API_MAINTENANCE -> Res.string.error_api_maintenance
         AppError.RATE_LIMITED -> Res.string.error_rate_limited
+        AppError.INVALID_VERIFY_TOKEN -> Res.string.error_invalid_verify_token
         AppError.NETWORK -> Res.string.error_network
         AppError.SERVER -> Res.string.error_server
     }

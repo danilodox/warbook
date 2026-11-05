@@ -28,6 +28,9 @@ enum class ApiErrorCode {
 
     /** Outra falha da API do jogo (chave, IP, erro interno). HTTP 502. */
     UPSTREAM_ERROR,
+
+    /** Token de verificação do jogo inválido, vencido ou de outra conta. HTTP 400. */
+    INVALID_VERIFY_TOKEN,
 }
 
 /** Resposta de `POST /v1/installs`: token que o app manda em `Authorization: Bearer`. */

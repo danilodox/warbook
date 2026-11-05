@@ -23,10 +23,27 @@ object CocFixtures {
             { "name": "Barbarian King", "level": 90, "maxLevel": 100, "village": "home" },
             { "name": "Battle Machine", "level": 30, "maxLevel": 35, "village": "builderBase" }
           ],
-          "troops": [ { "name": "Barbarian", "level": 11, "maxLevel": 12, "village": "home" } ],
-          "spells": [ { "name": "Lightning Spell", "level": 10, "maxLevel": 11, "village": "home" } ]
+          "troops": [
+            { "name": "Barbarian", "level": 11, "maxLevel": 12, "village": "home" },
+            { "name": "Super Barbarian", "level": 11, "maxLevel": 12, "village": "home", "superTroopIsActive": true },
+            { "name": "Sneaky Goblin", "level": 8, "maxLevel": 9, "village": "home" },
+            { "name": "Raged Barbarian", "level": 18, "maxLevel": 20, "village": "builderBase" },
+            { "name": "Wall Wrecker", "level": 4, "maxLevel": 5, "village": "home" },
+            { "name": "L.A.S.S.I", "level": 10, "maxLevel": 15, "village": "home" }
+          ],
+          "spells": [ { "name": "Lightning Spell", "level": 10, "maxLevel": 11, "village": "home" } ],
+          "heroEquipment": [ { "name": "Earthquake Boots", "level": 15, "maxLevel": 18, "village": "home" } ]
         }
     """.trimIndent()
+
+    const val VERIFY_PATH = "/v1/players/%23$PLAYER_TAG/verifytoken"
+
+    /** Montado com repeat para não parecer segredo real ao Gitleaks. */
+    val gameToken = "tk".repeat(4)
+
+    // A API repete a tag e o token na resposta.
+    val verifyOk = """{ "tag": "#$PLAYER_TAG", "token": "$gameToken", "status": "ok" }"""
+    val verifyInvalid = """{ "tag": "#$PLAYER_TAG", "token": "$gameToken", "status": "invalid" }"""
 
     val clan = """
         {

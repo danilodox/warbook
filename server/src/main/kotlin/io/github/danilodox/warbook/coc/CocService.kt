@@ -26,6 +26,9 @@ class CocService(private val client: CocClient, ticker: Ticker = Ticker.systemTi
     suspend fun currentWar(clanTag: String): CurrentWarDto =
         wars.getOrFetch(clanTag) { client.currentWar(clanTag).toDto() }
 
+    /** Sempre consulta a API: o token do jogo vale uma vez só. */
+    suspend fun verifyToken(tag: String, token: String): Boolean = client.verifyToken(tag, token)
+
     private suspend fun <T : Any> Cache<String, T>.getOrFetch(key: String, fetch: suspend () -> T): T =
         getIfPresent(key) ?: fetch().also { put(key, it) }
 

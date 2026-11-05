@@ -8,6 +8,7 @@ import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
 import io.github.danilodox.warbook.testing.clientWith
 import io.github.danilodox.warbook.testing.issueToken
+import io.github.danilodox.warbook.testing.postVerify
 import io.github.danilodox.warbook.testing.testConfig
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -51,6 +52,29 @@ class RateLimitsTest {
         assertEquals(HttpStatusCode.OK, second.get(path).status)
 
         assertEquals(HttpStatusCode.TooManyRequests, second.get(path).status)
+    }
+
+    @Test
+    fun verifyTemLimiteProprioMaisApertado() = testApplication {
+        fake.on(CocFixtures.VERIFY_PATH, body = CocFixtures.verifyInvalid)
+        start(RateLimits(verifyPerHourPerInstall = 2, verifyPerHourPerIp = 100))
+        val api = clientWith(issueToken())
+
+        repeat(2) { assertEquals(HttpStatusCode.BadRequest, api.postVerify().status) }
+
+        assertEquals(HttpStatusCode.TooManyRequests, api.postVerify().status)
+        assertEquals(HttpStatusCode.OK, api.get(path).status, "o resto da API continua liberado")
+        assertEquals(HttpStatusCode.BadRequest, clientWith(issueToken()).postVerify().status, "outra instalação")
+    }
+
+    @Test
+    fun verifyPorIpSomaTodasAsInstalacoes() = testApplication {
+        fake.on(CocFixtures.VERIFY_PATH, body = CocFixtures.verifyInvalid)
+        start(RateLimits(verifyPerHourPerInstall = 100, verifyPerHourPerIp = 2))
+
+        repeat(2) { clientWith(issueToken()).postVerify() }
+
+        assertEquals(HttpStatusCode.TooManyRequests, clientWith(issueToken()).postVerify().status)
     }
 
     @Test

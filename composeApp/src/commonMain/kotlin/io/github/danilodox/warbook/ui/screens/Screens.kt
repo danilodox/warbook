@@ -9,16 +9,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.danilodox.warbook.di.AppInfo
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.coming_soon
-import io.github.danilodox.warbook.resources.settings_version
 import io.github.danilodox.warbook.ui.theme.Spacing
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
-/** Tela vazia das abas; o conteúdo real começa na v0.2.0. */
+/** Tela vazia das abas que ainda não têm conteúdo (Clã e Guerra). */
 @Composable
 fun PlaceholderScreen(title: StringResource, modifier: Modifier = Modifier) {
     Column(
@@ -28,19 +25,5 @@ fun PlaceholderScreen(title: StringResource, modifier: Modifier = Modifier) {
     ) {
         Text(stringResource(title), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(Res.string.coming_soon), style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-@Composable
-fun SettingsScreen(modifier: Modifier = Modifier, appInfo: AppInfo = koinInject()) {
-    Column(
-        modifier = modifier.fillMaxSize().padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.small),
-    ) {
-        Text(stringResource(Res.string.coming_soon), style = MaterialTheme.typography.bodyLarge)
-        Text(
-            stringResource(Res.string.settings_version, appInfo.versionName),
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
 }
