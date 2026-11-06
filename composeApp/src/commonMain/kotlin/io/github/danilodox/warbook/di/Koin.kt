@@ -9,6 +9,8 @@ import io.github.danilodox.warbook.data.KtorWarbookRepository
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.RoomAccountsRepository
 import io.github.danilodox.warbook.data.RoomProfileRepository
+import io.github.danilodox.warbook.data.RoomWarRepository
+import io.github.danilodox.warbook.data.WarRepository
 import io.github.danilodox.warbook.data.WarbookHttpClients
 import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.data.local.WarbookDatabase
@@ -28,6 +30,8 @@ fun appModule(appInfo: AppInfo): Module = module {
     single { get<WarbookDatabase>().playerCache() }
     single<ProfileRepository> { RoomProfileRepository(cache = get(), accounts = get(), api = get()) }
     single<AccountsRepository> { RoomAccountsRepository(dao = get(), profiles = get(), api = get()) }
+    single { get<WarbookDatabase>().warCache() }
+    single<WarRepository> { RoomWarRepository(cache = get(), api = get()) }
 }
 
 /** Inicia o Koin. Chamado uma vez por plataforma (Application no Android, MainViewController no iOS). */

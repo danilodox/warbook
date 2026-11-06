@@ -2,6 +2,7 @@ package io.github.danilodox.warbook.ui.search
 
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.CurrentWarDto
+import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.data.ApiResult
 import io.github.danilodox.warbook.data.AppError
@@ -45,6 +46,8 @@ class SearchViewModelTest {
         override suspend fun clan(rawTag: String): ApiResult<ClanDto> = error("não usado")
 
         override suspend fun currentWar(rawClanTag: String): ApiResult<CurrentWarDto> = error("não usado")
+
+        override suspend fun currentCwl(rawClanTag: String): ApiResult<CwlDto> = error("não usado")
 
         override suspend fun verify(rawTag: String, gameToken: String): ApiResult<String> = error("não usado")
     }
