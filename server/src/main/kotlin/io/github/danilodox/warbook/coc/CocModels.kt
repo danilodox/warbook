@@ -133,6 +133,27 @@ internal data class CocWarAttack(
     val order: Int,
 )
 
+/** `clans/{tag}/currentwar/leaguegroup`: o grupo da CWL. As guerras de cada rodada vêm por `warTags`. */
+@Serializable
+internal data class CocLeagueGroup(
+    val state: String,
+    val season: String? = null,
+    val clans: List<CocLeagueClan> = emptyList(),
+    val rounds: List<CocLeagueRound> = emptyList(),
+)
+
+@Serializable
+internal data class CocLeagueClan(
+    val tag: String,
+    val name: String,
+    val clanLevel: Int = 0,
+    val badgeUrls: CocBadgeUrls? = null,
+)
+
+/** Rodada ainda não sorteada vem com `#0` em todas as posições. */
+@Serializable
+internal data class CocLeagueRound(val warTags: List<String> = emptyList())
+
 /** Corpo de erro da API oficial. */
 @Serializable
 internal data class CocClientError(val reason: String? = null, val message: String? = null)

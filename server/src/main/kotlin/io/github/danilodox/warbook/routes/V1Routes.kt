@@ -17,11 +17,12 @@ import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 
-/** Jogador, clã e guerra atual. A tag é validada antes de chamar a API do jogo. */
+/** Jogador, clã, guerra atual e CWL. A tag é validada antes de chamar a API do jogo. */
 fun Route.cocRoutes(service: CocService) {
     get(ApiRoutes.PLAYER) { call.respond(service.player(call.tag())) }
     get(ApiRoutes.CLAN) { call.respond(service.clan(call.tag())) }
     get(ApiRoutes.CURRENT_WAR) { call.respond(service.currentWar(call.tag())) }
+    get(ApiRoutes.CURRENT_CWL) { call.respond(service.currentCwl(call.tag())) }
 }
 
 /** Verificação de conta. O token do jogo só passa adiante para a API; nunca é guardado nem logado. */

@@ -8,6 +8,8 @@ import io.github.danilodox.warbook.api.WarState
 
 // Guerra da Supercell → DTOs próprios. Tags saem sem `#`.
 
+private const val CWL_ATTACKS_PER_MEMBER = 1
+
 internal fun cocWarState(value: String): WarState = when (value) {
     "preparation" -> WarState.PREPARATION
     "inWar" -> WarState.IN_WAR
@@ -16,13 +18,15 @@ internal fun cocWarState(value: String): WarState = when (value) {
     else -> WarState.NOT_IN_WAR
 }
 
-internal fun CocWar.toDto(): CurrentWarDto {
+/** Na CWL ([isCwl]) a API não manda `attacksPerMember`: é sempre 1. */
+internal fun CocWar.toDto(isCwl: Boolean = false): CurrentWarDto {
     val warState = cocWarState(state)
     if (warState == WarState.NOT_IN_WAR || warState == WarState.MATCHMAKING) return CurrentWarDto(state = warState)
     return CurrentWarDto(
         state = warState,
         teamSize = teamSize,
-        attacksPerMember = attacksPerMember,
+        attacksPerMember = if (isCwl) CWL_ATTACKS_PER_MEMBER else attacksPerMember,
+        isCwl = isCwl,
         preparationStartTime = parseCocTime(preparationStartTime),
         startTime = parseCocTime(startTime),
         endTime = parseCocTime(endTime),
