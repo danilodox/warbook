@@ -74,15 +74,26 @@ object CocFixtures {
             "tag": "#$CLAN_TAG", "name": "Picuí Raiz", "clanLevel": 18, "attacks": 24, "stars": 31,
             "destructionPercentage": 78.4,
             "members": [
-              { "tag": "#$PLAYER_TAG", "name": "Dantas", "townhallLevel": 15, "mapPosition": 2,
-                "attacks": [ { "attackerTag": "#$PLAYER_TAG", "defenderTag": "#DEF", "stars": 3,
-                               "destructionPercentage": 100, "order": 5, "duration": 120 } ] },
+              { "tag": "#$PLAYER_TAG", "name": "Dantas", "townhallLevel": 15, "mapPosition": 3,
+                "attacks": [
+                  { "attackerTag": "#$PLAYER_TAG", "defenderTag": "#DEF", "stars": 3,
+                    "destructionPercentage": 100, "order": 9, "duration": 120 },
+                  { "attackerTag": "#$PLAYER_TAG", "defenderTag": "#OPP1", "stars": 2,
+                    "destructionPercentage": 88, "order": 5, "duration": 150 }
+                ],
+                "opponentAttacks": 2,
+                "bestOpponentAttack": { "attackerTag": "#DEF", "defenderTag": "#$PLAYER_TAG", "stars": 2,
+                                        "destructionPercentage": 91, "order": 7, "duration": 170 } },
               { "tag": "#ABC", "name": "Maré Alta", "townhallLevel": 16, "mapPosition": 1 }
             ]
           },
           "opponent": {
             "tag": "#OPP", "name": "Os Mito", "clanLevel": 20, "attacks": 27, "stars": 28,
-            "destructionPercentage": 71.0, "members": []
+            "destructionPercentage": 71.0,
+            "members": [
+              { "tag": "#DEF", "name": "Brabo", "townhallLevel": 16, "mapPosition": 2 },
+              { "tag": "#OPP1", "name": "Mito01", "townhallLevel": 16, "mapPosition": 1 }
+            ]
           }
         }
     """.trimIndent()

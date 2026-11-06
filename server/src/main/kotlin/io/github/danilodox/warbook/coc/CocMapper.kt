@@ -4,13 +4,8 @@ import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanMemberDto
 import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.api.ClanSummaryDto
-import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.PlayerDto
-import io.github.danilodox.warbook.api.WarAttackDto
-import io.github.danilodox.warbook.api.WarClanDto
 import io.github.danilodox.warbook.api.WarFrequency
-import io.github.danilodox.warbook.api.WarMemberDto
-import io.github.danilodox.warbook.api.WarState
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -25,7 +20,7 @@ internal fun parseCocTime(value: String?): Long? = value
     ?.toInstant(ZoneOffset.UTC)
     ?.toEpochMilli()
 
-private fun String.withoutHash(): String = removePrefix("#")
+internal fun String.withoutHash(): String = removePrefix("#")
 
 internal fun cocRole(value: String?): ClanRole? = when (value) {
     "member" -> ClanRole.MEMBER
@@ -42,14 +37,6 @@ internal fun cocWarFrequency(value: String?): WarFrequency = when (value) {
     "lessThanOncePerWeek" -> WarFrequency.LESS_THAN_ONCE_PER_WEEK
     "never" -> WarFrequency.NEVER
     else -> WarFrequency.UNKNOWN
-}
-
-internal fun cocWarState(value: String): WarState = when (value) {
-    "preparation" -> WarState.PREPARATION
-    "inWar" -> WarState.IN_WAR
-    "warEnded" -> WarState.WAR_ENDED
-    "inMatchmaking", "enterWar", "matched" -> WarState.MATCHMAKING
-    else -> WarState.NOT_IN_WAR
 }
 
 internal fun CocPlayer.toDto(): PlayerDto {
@@ -104,42 +91,6 @@ internal fun CocClan.toDto() = ClanDto(
             donations = it.donations,
             donationsReceived = it.donationsReceived,
             clanRank = it.clanRank,
-        )
-    },
-)
-
-internal fun CocWar.toDto(): CurrentWarDto {
-    val warState = cocWarState(state)
-    if (warState == WarState.NOT_IN_WAR || warState == WarState.MATCHMAKING) return CurrentWarDto(state = warState)
-    return CurrentWarDto(
-        state = warState,
-        teamSize = teamSize,
-        attacksPerMember = attacksPerMember,
-        preparationStartTime = parseCocTime(preparationStartTime),
-        startTime = parseCocTime(startTime),
-        endTime = parseCocTime(endTime),
-        clan = clan?.toDto(),
-        opponent = opponent?.toDto(),
-    )
-}
-
-private fun CocWarClan.toDto() = WarClanDto(
-    tag = tag.orEmpty().withoutHash(),
-    name = name.orEmpty(),
-    badgeUrl = badgeUrls?.medium,
-    clanLevel = clanLevel,
-    stars = stars,
-    destructionPercentage = destructionPercentage,
-    attacks = attacks,
-    members = members.sortedBy { it.mapPosition }.map { member ->
-        WarMemberDto(
-            tag = member.tag.withoutHash(),
-            name = member.name,
-            townHallLevel = member.townhallLevel,
-            mapPosition = member.mapPosition,
-            attacks = member.attacks.map {
-                WarAttackDto(it.defenderTag.withoutHash(), it.stars, it.destructionPercentage, it.order)
-            },
         )
     },
 )

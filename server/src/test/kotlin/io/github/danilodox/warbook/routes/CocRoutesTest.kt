@@ -8,6 +8,7 @@ import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.UnitLevelDto
+import io.github.danilodox.warbook.api.WarAttackDto
 import io.github.danilodox.warbook.api.WarFrequency
 import io.github.danilodox.warbook.api.WarState
 import io.github.danilodox.warbook.coc.CocService
@@ -121,9 +122,33 @@ class CocRoutesTest {
         assertEquals(1_793_707_200_000L, war.endTime, "2026-11-03T12:00:00Z")
         val clan = assertNotNull(war.clan)
         assertEquals(31, clan.stars)
-        assertEquals(listOf(1, 2), clan.members.map { it.mapPosition }, "mapa ordenado pela posição")
-        assertEquals("DEF", clan.members[1].attacks.single().defenderTag)
+        assertEquals(listOf(1, 2), clan.members.map { it.mapPosition }, "mapa ordenado e sem buracos")
+        assertEquals(listOf("OPP1", "DEF"), clan.members[1].attacks.map { it.defenderTag }, "ataques pela ordem")
         assertEquals("Os Mito", war.opponent?.name)
+        assertEquals(false, war.isCwl)
+    }
+
+    @Test
+    fun ataquesTrazemPosicaoDoAlvoEMelhorAtaqueSofrido() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.WAR_PATH, body = CocFixtures.warInWar)
+
+        val war = api.get(ApiRoutes.currentWar(CocFixtures.CLAN_TAG)).decode(CurrentWarDto.serializer())
+
+        val me = assertNotNull(war.clan).members.single { it.tag == CocFixtures.PLAYER_TAG }
+        assertEquals(
+            WarAttackDto("OPP1", stars = 2, destructionPercentage = 88, order = 5, CocFixtures.PLAYER_TAG, 1),
+            me.attacks.first(),
+        )
+        assertEquals(2, me.attacks.last().defenderPosition)
+        assertEquals(2, me.opponentAttacks)
+        assertEquals(
+            WarAttackDto(CocFixtures.PLAYER_TAG, stars = 2, destructionPercentage = 91, order = 7, "DEF", 2),
+            me.bestOpponentAttack,
+            "alvo do ataque sofrido é a própria posição",
+        )
+        assertEquals(listOf("OPP1", "DEF"), assertNotNull(war.opponent).members.map { it.tag })
+        assertEquals(0, war.clan?.members?.first()?.opponentAttacks, "sem ataques sofridos")
     }
 
     @Test

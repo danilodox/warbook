@@ -120,10 +120,13 @@ internal data class CocWarMember(
     val townhallLevel: Int,
     val mapPosition: Int,
     val attacks: List<CocWarAttack> = emptyList(),
+    val opponentAttacks: Int = 0,
+    val bestOpponentAttack: CocWarAttack? = null,
 )
 
 @Serializable
 internal data class CocWarAttack(
+    val attackerTag: String = "",
     val defenderTag: String,
     val stars: Int,
     val destructionPercentage: Int,
