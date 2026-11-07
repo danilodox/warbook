@@ -41,7 +41,8 @@ object WarSummary {
         val ours = war.clan
         val theirs = war.opponent
         if (ours == null || theirs == null) return null
-        val header = "*${ours.name} × ${theirs.name}* (${war.teamSize} × ${war.teamSize})"
+        val header = "*${WhatsAppText.safeName(ours.name)} × ${WhatsAppText.safeName(theirs.name)}* " +
+            "(${war.teamSize} × ${war.teamSize})"
         val body = when (war.state) {
             WarState.PREPARATION -> preparation(war, now, texts, options)
             WarState.IN_WAR -> listOf(
@@ -127,7 +128,8 @@ object WarSummary {
         }
         // Com 1 ataque por membro (CWL) o "(1)" de cada nome não diz nada.
         return listOf(title) + pending.map {
-            if (war.attacksPerMember > 1) "• ${it.name} (${it.remaining})" else "• ${it.name}"
+            val name = WhatsAppText.safeName(it.name)
+            if (war.attacksPerMember > 1) "• $name (${it.remaining})" else "• $name"
         }
     }
 }
