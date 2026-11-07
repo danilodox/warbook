@@ -4,6 +4,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.4.0] - 2026-11-06
+
+### Adicionado
+
+- Servidor: guerra atual completa, com posição do alvo e ordem de cada ataque, quantas vezes cada membro foi atacado e o melhor ataque sofrido. As posições do mapa vão de 1 a N, sem buracos.
+- Servidor: `GET /v1/clans/{tag}/cwl/current` junta o grupo da CWL (`currentwar/leaguegroup`) e a guerra de cada rodada (`clanwarleagues/wars/{warTag}`) num DTO próprio: rodadas com a guerra do clã sempre do lado `clan`, rodada atual e classificação do grupo (estrelas + 10 por vitória e destruição somada). Rodadas não sorteadas (`#0`) não geram chamada. Fora da CWL responde com o estado `NOT_IN_CWL`; registro privado vira `WAR_LOG_PRIVATE`.
+- Servidor: cache da CWL de 1 minuto, guerras de rodadas encerradas guardadas por 24 horas e até 4 buscas de rodada ao mesmo tempo.
+- App: aba Guerra com as sub-abas Guerra atual e CWL, sempre do clã da conta ativa. Estados: convite sem conta, sem clã, registro privado com passo a passo, sem guerra, procurando adversário, preparação, em guerra, encerrada e fora da CWL.
+- Ataques pendentes em destaque (nome e quantos faltam, com "você" marcado) e, na guerra encerrada, quem não atacou.
+- Comparação de força na preparação só por CV: CV médio, CV máximo e quantos de cada CV.
+- CWL: fichas das rodadas, guerra da rodada escolhida e classificação do grupo.
+- Resumo para o WhatsApp com modelo fixo (placar, tempo restante e quem falta atacar; força por CV na preparação; rodada na CWL), em português e inglês. Botões Copiar e Compartilhar (share sheet do Android; no iOS só Copiar).
+- Atualiza só ao abrir a aba e ao puxar. Skeleton na primeira carga, faixa "Sem conexão" e o último resultado salvo no Room (banco na versão 2, com migração automática).
+- Textos novos em português e inglês.
+
 ## [0.3.0] - 2026-11-04
 
 ### Adicionado
