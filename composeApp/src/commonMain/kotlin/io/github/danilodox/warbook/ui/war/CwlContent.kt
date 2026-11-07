@@ -60,7 +60,7 @@ fun CwlContent(
         if (war == null) {
             Text(stringResource(Res.string.cwl_round_not_drawn), style = MaterialTheme.typography.bodyMedium)
         } else {
-            WarDetails(war, WarSummary.cwl(cwl, selected, context.now, context.texts), context)
+            WarDetails(war, WarSummary.cwl(cwl, selected, context.now, context.texts, context.summaryOptions), context)
         }
         GroupTable(cwl.clans, ownTag = war?.clan?.tag ?: cwl.rounds.firstNotNullOfOrNull { it.war?.clan?.tag })
     }

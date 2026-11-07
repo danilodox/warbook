@@ -49,6 +49,7 @@ import io.github.danilodox.warbook.war.WarSummary
 import io.github.danilodox.warbook.war.pendingAttackers
 import io.github.danilodox.warbook.war.result
 import io.github.danilodox.warbook.war.strength
+import io.github.danilodox.warbook.war.summaryPartsFor
 import org.jetbrains.compose.resources.stringResource
 
 /** Sub-aba Guerra atual: G1 (em guerra), G2 (preparação), encerrada e G4 (sem guerra). */
@@ -60,7 +61,7 @@ fun CurrentWarContent(war: CurrentWarDto, context: WarContext, modifier: Modifie
         else -> Column(
             modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.medium),
-        ) { WarDetails(war, WarSummary.war(war, context.now, context.texts), context) }
+        ) { WarDetails(war, WarSummary.war(war, context.now, context.texts, context.summaryOptions), context) }
     }
 }
 
@@ -74,7 +75,15 @@ internal fun WarDetails(war: CurrentWarDto, summary: String?, context: WarContex
         WarState.WAR_ENDED -> AttackersCard(war.pendingAttackers(), war, context, ended = true)
         WarState.NOT_IN_WAR, WarState.MATCHMAKING -> Unit
     }
-    if (summary != null) SummaryActions(summary)
+    if (summary != null) {
+        SummaryActions(
+            summary = summary,
+            parts = summaryPartsFor(war.state),
+            options = context.summaryOptions,
+            ended = war.state == WarState.WAR_ENDED,
+            onToggle = context.onToggleSummaryPart,
+        )
+    }
     WarMap(war, context.accountTag)
 }
 

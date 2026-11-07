@@ -8,11 +8,14 @@ import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.ApiResult
 import io.github.danilodox.warbook.data.AppError
+import io.github.danilodox.warbook.data.AppPreferences
 import io.github.danilodox.warbook.data.Cached
 import io.github.danilodox.warbook.data.CachedProfile
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.WarRepository
 import io.github.danilodox.warbook.ui.me.activeOrFirst
+import io.github.danilodox.warbook.war.SummaryOptions
+import io.github.danilodox.warbook.war.SummaryPart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +51,8 @@ data class WarUiState(
     val cwl: Section<CwlDto> = Section(),
     /** Rodada da CWL escolhida nas fichas; `null` = a que o servidor indica. */
     val selectedRound: Int? = null,
+    /** Partes do resumo do WhatsApp, salvas no aparelho. */
+    val summaryOptions: SummaryOptions = SummaryOptions(),
 ) {
     val round: Int? get() = selectedRound ?: cwl.cached?.value?.currentRound
 }
@@ -73,6 +78,7 @@ class WarViewModel(
     private val accounts: AccountsRepository,
     private val profiles: ProfileRepository,
     private val wars: WarRepository,
+    private val preferences: AppPreferences,
 ) : ViewModel() {
     private val selection = MutableStateFlow(Selection())
     private val loads = MutableStateFlow(Loads())
@@ -110,7 +116,8 @@ class WarViewModel(
             cwl = Section(cwl, cwlLoad?.running == true, cwlLoad?.error),
             selectedRound = sel.round,
         )
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, WarUiState())
+    }.combine(preferences.summaryOptions) { state, options -> state.copy(summaryOptions = options) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, WarUiState())
 
     /** A aba ficou visível: atualiza a sub-aba aberta. */
     fun onOpen() {
@@ -126,6 +133,11 @@ class WarViewModel(
 
     fun selectRound(round: Int) {
         selection.update { it.copy(round = round) }
+    }
+
+    /** Liga ou desliga uma parte do resumo; a escolha fica salva para a próxima guerra. */
+    fun toggleSummaryPart(part: SummaryPart) {
+        viewModelScope.launch { preferences.updateSummaryOptions { it.toggle(part) } }
     }
 
     /** Puxar para atualizar. */

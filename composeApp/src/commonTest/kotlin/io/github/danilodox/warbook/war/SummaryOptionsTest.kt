@@ -159,6 +159,14 @@ class SummaryOptionsTest {
     }
 
     @Test
+    fun fichasSoDoQueMudaOTextoEmCadaEstado() {
+        assertEquals(listOf(SummaryPart.TIME, SummaryPart.STRENGTH), summaryPartsFor(WarState.PREPARATION))
+        assertEquals(false, SummaryPart.TIME in summaryPartsFor(WarState.WAR_ENDED), "encerrada não tem tempo")
+        assertEquals(false, SummaryPart.STRENGTH in summaryPartsFor(WarState.IN_WAR))
+        assertEquals(emptyList(), summaryPartsFor(WarState.NOT_IN_WAR))
+    }
+
+    @Test
     fun toggleLigaEDesliga() {
         val on = SummaryOptions().toggle(SummaryPart.BEST_ATTACKS)
         assertEquals(true, SummaryPart.BEST_ATTACKS in on)

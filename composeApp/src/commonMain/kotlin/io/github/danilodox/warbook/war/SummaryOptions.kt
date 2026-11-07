@@ -1,5 +1,7 @@
 package io.github.danilodox.warbook.war
 
+import io.github.danilodox.warbook.api.WarState
+
 /** Partes do resumo do WhatsApp que o usuário liga e desliga. O cabeçalho (e a rodada na CWL) sempre vai. */
 enum class SummaryPart {
     /** Placar; na guerra encerrada, também o resultado. */
@@ -19,6 +21,25 @@ enum class SummaryPart {
 
     /** Ataques de 0 ou 1 estrela. */
     WEAK_ATTACKS,
+}
+
+/** Partes que mudam o texto em cada estado, na ordem em que aparecem; as outras nem viram ficha. */
+fun summaryPartsFor(state: WarState): List<SummaryPart> = when (state) {
+    WarState.PREPARATION -> listOf(SummaryPart.TIME, SummaryPart.STRENGTH)
+    WarState.IN_WAR -> listOf(
+        SummaryPart.SCORE,
+        SummaryPart.TIME,
+        SummaryPart.ATTACKERS,
+        SummaryPart.BEST_ATTACKS,
+        SummaryPart.WEAK_ATTACKS,
+    )
+    WarState.WAR_ENDED -> listOf(
+        SummaryPart.SCORE,
+        SummaryPart.ATTACKERS,
+        SummaryPart.BEST_ATTACKS,
+        SummaryPart.WEAK_ATTACKS,
+    )
+    WarState.NOT_IN_WAR, WarState.MATCHMAKING -> emptyList()
 }
 
 data class SummaryOptions(val parts: Set<SummaryPart> = DEFAULT_PARTS) {
