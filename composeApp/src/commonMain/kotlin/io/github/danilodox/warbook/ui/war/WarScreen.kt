@@ -121,7 +121,7 @@ private const val CLOCK_TICK_MS = 30_000L
 fun WarScreen(state: WarUiState, actions: WarActions, modifier: Modifier = Modifier) {
     when {
         !state.loaded -> Unit
-        state.accountTag == null -> Message(
+        state.accountTag == null && !state.fixedClan -> Message(
             title = Res.string.war_invite_title,
             body = Res.string.war_invite_body,
             modifier = modifier,

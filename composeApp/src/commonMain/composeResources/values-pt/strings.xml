@@ -162,4 +162,50 @@
     <string name="cwl_not_in_body">A Liga de Guerra de Clãs acontece no começo de cada mês. Quando o clã entrar, as rodadas aparecem aqui.</string>
 
     <string name="settings_fan_notice">Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a Política de Conteúdo de Fãs da Supercell: www.supercell.com/fan-content-policy.</string>
+
+    <!-- v0.5.0: telas Jogador e Clã -->
+    <string name="screen_player">Jogador</string>
+    <string name="screen_clan">Clã</string>
+    <string name="follow">Seguir</string>
+    <string name="following">Seguindo</string>
+    <string name="follow_limit">Você já segue 50. Deixe de seguir alguém para seguir mais.</string>
+    <string name="player_clan_open">%1$s ›</string>
+    <string name="clan_tab_info">Info</string>
+    <string name="clan_tab_members">Membros</string>
+    <string name="clan_tab_war">Guerra</string>
+    <string name="clan_level_members">Nível %1$d · %2$d/50 membros</string>
+    <string name="clan_war_league">Liga da CWL</string>
+    <string name="clan_capital_league">Liga da capital</string>
+    <string name="clan_war_wins">Guerras vencidas</string>
+    <string name="clan_win_streak">Sequência</string>
+    <string name="clan_war_log">Registro de guerra</string>
+    <string name="clan_war_log_public">Público</string>
+    <string name="clan_war_log_private">Privado</string>
+    <string name="clan_war_log_private_hint">O registro de guerra deste clã é privado, então a guerra dele não aparece no Warbook.</string>
+    <string name="clan_war_frequency">Frequência de guerra</string>
+    <string name="clan_frequency_always">Sempre</string>
+    <string name="clan_frequency_more_than_once">Mais de uma vez por semana</string>
+    <string name="clan_frequency_once">Uma vez por semana</string>
+    <string name="clan_frequency_less_than_once">Menos de uma vez por semana</string>
+    <string name="clan_frequency_never">Nunca</string>
+    <string name="clan_requirements">Requisitos</string>
+    <string name="clan_requirements_trophies">%1$d troféus</string>
+    <string name="clan_requirements_town_hall">%1$d troféus · CV %2$d</string>
+    <string name="clan_join">Entrada</string>
+    <string name="clan_join_open">Aberta</string>
+    <string name="clan_join_invite_only">Só com convite</string>
+    <string name="clan_join_closed">Fechada</string>
+    <string name="clan_location">Local</string>
+    <string name="clan_unknown_value">—</string>
+    <string name="clan_open_war">Ver guerra atual ›</string>
+    <string name="clan_members_season">Doações da temporada atual</string>
+    <string name="clan_members_legend">Número de cima: doadas. ↓ recebidas.</string>
+    <string name="clan_sort_position">Posição</string>
+    <string name="clan_sort_town_hall">CV</string>
+    <string name="clan_sort_trophies">Troféus</string>
+    <string name="clan_sort_donations">Doações</string>
+    <string name="clan_member_line">%1$s · CV %2$d · nível %3$d</string>
+    <string name="clan_member_trophies">%1$d troféus</string>
+    <string name="clan_member_received">↓ %1$d</string>
+    <string name="clan_member_you">você</string>
 </resources>

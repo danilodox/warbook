@@ -129,9 +129,7 @@ fun MeScreen(
                     if (error != null) StaleBanner(error, profile.fetchedAt)
                     ProfileContent(
                         player = profile.player,
-                        account = active,
-                        onOpenAccounts = onOpenAccounts,
-                        onVerify = { onVerify(active.tag) },
+                        header = { AccountHeader(profile.player, active, onOpenAccounts) { onVerify(active.tag) } },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -204,7 +202,7 @@ internal fun OfflineCard(error: AppError, onRetry: () -> Unit) {
 /** Formato do perfil enquanto a primeira busca não volta. Os números são só o tamanho dos blocos. */
 @Suppress("MagicNumber")
 @Composable
-private fun ProfileSkeleton() {
+internal fun ProfileSkeleton() {
     val color = MaterialTheme.colorScheme.surfaceVariant
     val shape = RoundedCornerShape(8.dp)
     Column(
