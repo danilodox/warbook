@@ -52,15 +52,15 @@ import io.github.danilodox.warbook.resources.ic_settings
 import io.github.danilodox.warbook.resources.screen_clan
 import io.github.danilodox.warbook.resources.screen_player
 import io.github.danilodox.warbook.resources.settings
-import io.github.danilodox.warbook.resources.tab_clan
 import io.github.danilodox.warbook.ui.clan.ClanDetailRoute
+import io.github.danilodox.warbook.ui.clan.ClanTabActions
+import io.github.danilodox.warbook.ui.clan.ClanTabRoute
 import io.github.danilodox.warbook.ui.me.MeRoute
 import io.github.danilodox.warbook.ui.onboarding.ConfirmScreen
 import io.github.danilodox.warbook.ui.onboarding.OnboardingViewModel
 import io.github.danilodox.warbook.ui.onboarding.TagEvent
 import io.github.danilodox.warbook.ui.onboarding.TagScreen
 import io.github.danilodox.warbook.ui.player.PlayerRoute
-import io.github.danilodox.warbook.ui.screens.PlaceholderScreen
 import io.github.danilodox.warbook.ui.search.SearchRoute
 import io.github.danilodox.warbook.ui.settings.SettingsRoute
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
@@ -175,7 +175,20 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 onVerify = { tag -> navController.navigate(Route.Verify(tag, fromOnboarding = false)) },
             )
         }
-        composable<Route.Clan> { PlaceholderScreen(Res.string.tab_clan) }
+        composable<Route.Clan> {
+            ClanTabRoute(
+                ClanTabActions(
+                    onAddAccount = { navController.navigate(Route.Onboarding) },
+                    onSearchClans = {
+                        navController.navigateToTab(TopLevelTab.SEARCH)
+                        // A aba Buscar abre já no modo Clã.
+                        navController.currentBackStackEntry?.savedStateHandle?.set(SEARCH_CLANS, true)
+                    },
+                    onOpenWar = { navController.navigateToTab(TopLevelTab.WAR) },
+                    onOpenMember = { playerTag -> navController.navigate(Route.Player(playerTag)) },
+                ),
+            )
+        }
         composable<Route.War> { WarRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
         composable<Route.Search> { SearchRoute() }
         composable<Route.Player> { entry ->
@@ -209,6 +222,9 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
 }
 
 private const val OPEN_ACCOUNTS = "open_accounts"
+
+/** Pedido para a aba Buscar abrir no modo Clã (lido pela busca no lote 6). */
+private const val SEARCH_CLANS = "search_clans"
 
 private fun NavGraphBuilder.verifyDestination(navController: NavHostController) {
     composable<Route.Verify> { entry ->

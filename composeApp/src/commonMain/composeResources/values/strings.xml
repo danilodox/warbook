@@ -208,4 +208,9 @@
     <string name="clan_member_trophies">%1$d trophies</string>
     <string name="clan_member_received">↓ %1$d</string>
     <string name="clan_member_you">you</string>
+    <string name="clan_invite_title">Add your account to see your clan</string>
+    <string name="clan_invite_body">The Clan tab shows the info and members of your account\'s clan.</string>
+    <string name="clan_no_clan_title">Your account is not in a clan</string>
+    <string name="clan_no_clan_body">Join a clan in the game and it shows up here. Meanwhile, you can search for clans.</string>
+    <string name="clan_search_clans">Search clans</string>
 </resources>
