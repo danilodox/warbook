@@ -20,6 +20,7 @@ data class PlayerDto(
     val clan: ClanSummaryDto? = null,
     val role: ClanRole? = null,
     val league: String? = null,
+    val leagueIconUrl: String? = null,
     val heroes: List<UnitLevelDto> = emptyList(),
     val troops: List<UnitLevelDto> = emptyList(),
     val spells: List<UnitLevelDto> = emptyList(),

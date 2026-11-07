@@ -33,6 +33,7 @@ import io.github.danilodox.warbook.data.AppError
 import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.error_api_maintenance
+import io.github.danilodox.warbook.resources.error_invalid_query
 import io.github.danilodox.warbook.resources.error_invalid_tag
 import io.github.danilodox.warbook.resources.error_invalid_verify_token
 import io.github.danilodox.warbook.resources.error_network
@@ -188,6 +189,7 @@ internal val AppError.message: StringResource
         AppError.API_MAINTENANCE -> Res.string.error_api_maintenance
         AppError.RATE_LIMITED -> Res.string.error_rate_limited
         AppError.INVALID_VERIFY_TOKEN -> Res.string.error_invalid_verify_token
+        AppError.INVALID_QUERY -> Res.string.error_invalid_query
         AppError.NETWORK -> Res.string.error_network
         AppError.SERVER -> Res.string.error_server
     }

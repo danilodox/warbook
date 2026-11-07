@@ -18,7 +18,7 @@ object CocFixtures {
             "tag": "#$CLAN_TAG", "name": "Picuí Raiz", "clanLevel": 18,
             "badgeUrls": { "small": "https://img/s.png", "medium": "https://img/m.png", "large": "https://img/l.png" }
           },
-          "league": { "id": 29000022, "name": "Legend League" },
+          "league": { "id": 29000022, "name": "Legend League", "iconUrls": { "medium": "https://img/legend-m.png" } },
           "heroes": [
             { "name": "Barbarian King", "level": 90, "maxLevel": 100, "village": "home" },
             { "name": "Battle Machine", "level": 30, "maxLevel": 35, "village": "builderBase" }
@@ -56,13 +56,33 @@ object CocFixtures {
           "warLeague": { "id": 48000015, "name": "Crystal League I" },
           "capitalLeague": { "id": 85000015, "name": "Master League II" },
           "memberList": [
-            { "tag": "#ABC", "name": "Maré Alta", "role": "leader", "townHallLevel": 16, "trophies": 5100,
-              "clanRank": 1, "donations": 3412, "donationsReceived": 980 },
-            { "tag": "#$PLAYER_TAG", "name": "Dantas", "role": "coLeader", "townHallLevel": 15, "trophies": 4812,
-              "clanRank": 2, "donations": 1240, "donationsReceived": 860 }
+            { "tag": "#ABC", "name": "Maré Alta", "role": "leader", "townHallLevel": 16, "expLevel": 250,
+              "trophies": 5100, "clanRank": 1, "donations": 3412, "donationsReceived": 980,
+              "league": { "id": 29000022, "name": "Legend League",
+                          "iconUrls": { "small": "https://img/legend-s.png", "medium": "https://img/legend-m.png" } },
+              "leagueTier": { "id": 105000034, "name": "Legend I",
+                              "iconUrls": { "small": "https://img/tier-s.png", "large": "https://img/tier-l.png" } } },
+            { "tag": "#$PLAYER_TAG", "name": "Dantas", "role": "coLeader", "townHallLevel": 15, "expLevel": 212,
+              "trophies": 4812, "clanRank": 2, "donations": 1240, "donationsReceived": 860,
+              "league": { "id": 29000021, "name": "Titan League I", "iconUrls": { "small": "https://img/titan-s.png" } } }
           ]
         }
     """.trimIndent()
+
+    const val CLAN_SEARCH_PATH = "/v1/clans"
+
+    val clanSearch = """
+        {
+          "items": [
+            { "tag": "#$CLAN_TAG", "name": "Picuí Raiz", "type": "inviteOnly", "clanLevel": 18, "members": 47,
+              "location": { "id": 32000038, "name": "Brazil" }, "badgeUrls": { "medium": "https://img/m.png" } },
+            { "tag": "#OPP", "name": "Picuí Base", "type": "open", "clanLevel": 5, "members": 12 }
+          ],
+          "paging": { "cursors": {} }
+        }
+    """.trimIndent()
+
+    const val CLAN_SEARCH_EMPTY = """{ "items": [], "paging": { "cursors": {} } }"""
 
     val warInWar = """
         {

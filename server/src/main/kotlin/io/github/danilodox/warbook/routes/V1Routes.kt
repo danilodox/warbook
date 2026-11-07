@@ -2,6 +2,7 @@ package io.github.danilodox.warbook.routes
 
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
+import io.github.danilodox.warbook.api.ClanSearch
 import io.github.danilodox.warbook.api.TagNormalizer
 import io.github.danilodox.warbook.api.VerifyRequest
 import io.github.danilodox.warbook.api.VerifyResponse
@@ -20,6 +21,11 @@ import io.ktor.server.routing.post
 /** Jogador, clã, guerra atual e CWL. A tag é validada antes de chamar a API do jogo. */
 fun Route.cocRoutes(service: CocService) {
     get(ApiRoutes.PLAYER) { call.respond(service.player(call.tag())) }
+    get(ApiRoutes.CLAN_SEARCH) {
+        val name = ClanSearch.normalize(call.request.queryParameters[ApiRoutes.PARAM_NAME].orEmpty())
+            ?: throw ApiException(ApiErrorCode.INVALID_QUERY, "Nome com 3 a 50 letras")
+        call.respond(service.searchClans(name))
+    }
     get(ApiRoutes.CLAN) { call.respond(service.clan(call.tag())) }
     get(ApiRoutes.CURRENT_WAR) { call.respond(service.currentWar(call.tag())) }
     get(ApiRoutes.CURRENT_CWL) { call.respond(service.currentCwl(call.tag())) }

@@ -41,6 +41,9 @@ enum class AppError {
     /** Token de verificação do jogo inválido ou vencido. */
     INVALID_VERIFY_TOKEN,
 
+    /** Nome da busca de clã curto ou longo demais. */
+    INVALID_QUERY,
+
     /** Sem internet ou servidor fora do ar. */
     NETWORK,
 
@@ -121,6 +124,7 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
             ApiErrorCode.API_MAINTENANCE -> AppError.API_MAINTENANCE
             ApiErrorCode.RATE_LIMITED -> AppError.RATE_LIMITED
             ApiErrorCode.INVALID_VERIFY_TOKEN -> AppError.INVALID_VERIFY_TOKEN
+            ApiErrorCode.INVALID_QUERY -> AppError.INVALID_QUERY
             ApiErrorCode.UNAUTHORIZED, ApiErrorCode.UPSTREAM_ERROR -> AppError.SERVER
             // Corpo fora do formato (proxy, servidor antigo): decide pelo status.
             null -> if (status == HttpStatusCode.TooManyRequests) AppError.RATE_LIMITED else AppError.SERVER

@@ -29,6 +29,7 @@
     <string name="role_leader">Líder</string>
 
     <string name="error_invalid_tag">Essa tag não é válida. Tags só usam os caracteres 0289PYLQGRJCUV.</string>
+    <string name="error_invalid_query">Digite de 3 a 50 letras do nome do clã.</string>
     <string name="error_not_found">Nenhum jogador encontrado com essa tag.</string>
     <string name="error_war_log_private">O registro de guerra deste clã é privado.</string>
     <string name="error_api_maintenance">O jogo está em manutenção. Tente mais tarde.</string>

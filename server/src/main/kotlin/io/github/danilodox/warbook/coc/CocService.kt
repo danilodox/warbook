@@ -5,6 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Ticker
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ClanDto
+import io.github.danilodox.warbook.api.ClanSearch
+import io.github.danilodox.warbook.api.ClanSearchResponse
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.CwlState
@@ -28,6 +30,7 @@ import kotlin.time.toJavaDuration
 class CocService(private val client: CocClient, ticker: Ticker = Ticker.systemTicker()) {
     private val players = cache<PlayerDto>(PLAYER_TTL, ticker)
     private val clans = cache<ClanDto>(CLAN_TTL, ticker)
+    private val clanSearches = cache<ClanSearchResponse>(CLAN_TTL, ticker)
     private val wars = cache<CurrentWarDto>(WAR_TTL, ticker)
     private val cwls = cache<CwlDto>(WAR_TTL, ticker)
 
@@ -38,6 +41,11 @@ class CocService(private val client: CocClient, ticker: Ticker = Ticker.systemTi
     suspend fun player(tag: String): PlayerDto = players.getOrFetch(tag) { client.player(tag).toDto() }
 
     suspend fun clan(tag: String): ClanDto = clans.getOrFetch(tag) { client.clan(tag).toDto() }
+
+    /** [name] já validado por [ClanSearch.normalize]. Maiúsculas e minúsculas dividem o mesmo cache. */
+    suspend fun searchClans(name: String): ClanSearchResponse = clanSearches.getOrFetch(name.lowercase()) {
+        ClanSearchResponse(client.searchClans(name, ClanSearch.MAX_RESULTS).items.map { it.toSearchResult() })
+    }
 
     suspend fun currentWar(clanTag: String): CurrentWarDto =
         wars.getOrFetch(clanTag) { client.currentWar(clanTag).toDto() }
