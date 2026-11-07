@@ -142,6 +142,16 @@
     <string name="war_copy">Copy</string>
     <string name="war_copied">Copied</string>
     <string name="war_share">Share</string>
+    <string name="war_customize">Customize</string>
+    <string name="war_customize_done">Done</string>
+    <string name="war_preview">Text preview</string>
+    <string name="summary_part_score">Score</string>
+    <string name="summary_part_time">Time</string>
+    <string name="summary_part_pending">Who still has to attack</string>
+    <string name="summary_part_missed">Who missed attacks</string>
+    <string name="summary_part_strength">Strength by TH</string>
+    <string name="summary_part_best">Best attacks</string>
+    <string name="summary_part_weak">Weak attacks</string>
     <string name="cwl_round_of">Round %1$d of %2$d</string>
     <string name="cwl_round_chip">R%1$d</string>
     <string name="cwl_round_not_drawn">This round has not been drawn yet.</string>

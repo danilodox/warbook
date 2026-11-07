@@ -11,9 +11,11 @@ import io.github.danilodox.warbook.data.local.PlayerCacheDao
 import io.github.danilodox.warbook.data.local.PlayerCacheEntity
 import io.github.danilodox.warbook.data.local.WarCacheDao
 import io.github.danilodox.warbook.data.local.WarCacheEntity
+import io.github.danilodox.warbook.war.SummaryOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
 /** [AccountDao] em memória. As funções com corpo (`addAndActivate`, `removeAndPickNext`) são as reais. */
 class FakeAccountDao : AccountDao {
@@ -106,9 +108,14 @@ class FakeWarbookRepository : WarbookRepository {
 
 class FakeAppPreferences(explore: Boolean = false) : AppPreferences {
     override val exploreMode = MutableStateFlow(explore)
+    override val summaryOptions = MutableStateFlow(SummaryOptions())
 
     override suspend fun setExploreMode(enabled: Boolean) {
         exploreMode.value = enabled
+    }
+
+    override suspend fun updateSummaryOptions(transform: (SummaryOptions) -> SummaryOptions) {
+        summaryOptions.update(transform)
     }
 }
 

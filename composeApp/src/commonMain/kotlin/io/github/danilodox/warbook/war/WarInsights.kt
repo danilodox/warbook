@@ -17,6 +17,51 @@ fun CurrentWarDto.pendingAttackers(): List<PendingAttacker> = clan?.members.orEm
     .filter { it.remaining > 0 }
     .sortedBy { it.mapPosition }
 
+/** Um ataque do clã com o alvo já identificado ([defenderPosition] e [defenderTownHall] `null` se o alvo não veio). */
+data class AttackLine(
+    val attackerName: String,
+    val defenderPosition: Int?,
+    val defenderTownHall: Int?,
+    val stars: Int,
+    val destructionPercentage: Int,
+    val order: Int,
+)
+
+/** Todos os ataques do clã, na ordem em que aconteceram. */
+fun CurrentWarDto.ourAttacks(): List<AttackLine> {
+    val defenders = opponent?.members.orEmpty().associateBy { it.tag }
+    return clan?.members.orEmpty()
+        .flatMap { member ->
+            member.attacks.map {
+                AttackLine(
+                    attackerName = member.name,
+                    defenderPosition = it.defenderPosition,
+                    defenderTownHall = defenders[it.defenderTag]?.townHallLevel,
+                    stars = it.stars,
+                    destructionPercentage = it.destructionPercentage,
+                    order = it.order,
+                )
+            }
+        }
+        .sortedBy { it.order }
+}
+
+private const val THREE_STARS = 3
+private const val WEAK_MAX_STARS = 1
+private const val BEST_FALLBACK = 3
+
+/** Os 3 estrelas, na ordem; sem nenhum, os [BEST_FALLBACK] melhores por estrelas e destruição. */
+fun CurrentWarDto.bestAttacks(): List<AttackLine> {
+    val attacks = ourAttacks()
+    return attacks.filter { it.stars == THREE_STARS }.ifEmpty {
+        attacks.sortedWith(compareByDescending<AttackLine> { it.stars }.thenByDescending { it.destructionPercentage })
+            .take(BEST_FALLBACK)
+    }
+}
+
+/** Ataques de 0 ou 1 estrela, na ordem. */
+fun CurrentWarDto.weakAttacks(): List<AttackLine> = ourAttacks().filter { it.stars <= WEAK_MAX_STARS }
+
 enum class WarResult { WIN, LOSS, DRAW }
 
 /** Pelas regras do jogo: mais estrelas vence; empate em estrelas decide pela destruição. */

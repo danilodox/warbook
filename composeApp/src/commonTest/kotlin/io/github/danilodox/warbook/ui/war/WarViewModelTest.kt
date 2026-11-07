@@ -7,6 +7,7 @@ import io.github.danilodox.warbook.api.WarState
 import io.github.danilodox.warbook.data.ApiResult
 import io.github.danilodox.warbook.data.AppError
 import io.github.danilodox.warbook.data.FakeAccountDao
+import io.github.danilodox.warbook.data.FakeAppPreferences
 import io.github.danilodox.warbook.data.FakePlayerCacheDao
 import io.github.danilodox.warbook.data.FakeWarCacheDao
 import io.github.danilodox.warbook.data.FakeWarbookRepository
@@ -14,6 +15,8 @@ import io.github.danilodox.warbook.data.RoomAccountsRepository
 import io.github.danilodox.warbook.data.RoomProfileRepository
 import io.github.danilodox.warbook.data.RoomWarRepository
 import io.github.danilodox.warbook.data.testPlayer
+import io.github.danilodox.warbook.war.SummaryOptions
+import io.github.danilodox.warbook.war.SummaryPart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -40,6 +43,7 @@ class WarViewModelTest {
     private val profiles = RoomProfileRepository(FakePlayerCacheDao(), accountDao, api) { now }
     private val accounts = RoomAccountsRepository(accountDao, profiles, api) { now++ }
     private val wars = RoomWarRepository(FakeWarCacheDao(), api) { now }
+    private val preferences = FakeAppPreferences()
 
     private val player = testPlayer()
     private val clanTag = "2YQUC8J0P"
@@ -56,7 +60,7 @@ class WarViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun TestScope.opened(): WarViewModel = WarViewModel(accounts, profiles, wars).also {
+    private fun TestScope.opened(): WarViewModel = WarViewModel(accounts, profiles, wars, preferences).also {
         it.onOpen()
         advanceUntilIdle()
     }
@@ -163,5 +167,19 @@ class WarViewModelTest {
         advanceUntilIdle()
 
         assertNull(viewModel.state.value.selectedRound)
+    }
+
+    @Test
+    fun ligarUmaParteDoResumoFicaSalva() = runTest(dispatcher) {
+        val viewModel = opened()
+        assertEquals(SummaryOptions(), viewModel.state.value.summaryOptions)
+
+        viewModel.toggleSummaryPart(SummaryPart.BEST_ATTACKS)
+        viewModel.toggleSummaryPart(SummaryPart.SCORE)
+        advanceUntilIdle()
+
+        val expected = SummaryOptions(SummaryOptions.DEFAULT_PARTS - SummaryPart.SCORE + SummaryPart.BEST_ATTACKS)
+        assertEquals(expected, preferences.summaryOptions.value, "dois toques seguidos não se perdem")
+        assertEquals(expected, viewModel.state.value.summaryOptions)
     }
 }

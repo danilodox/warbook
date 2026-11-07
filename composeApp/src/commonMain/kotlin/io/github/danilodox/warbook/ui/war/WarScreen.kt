@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.AppError
+import io.github.danilodox.warbook.data.AppPreferences
 import io.github.danilodox.warbook.data.Cached
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.WarRepository
@@ -59,6 +60,8 @@ import io.github.danilodox.warbook.resources.war_tab_cwl
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.StaleBanner
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.war.SummaryOptions
+import io.github.danilodox.warbook.war.SummaryPart
 import io.github.danilodox.warbook.war.SummaryTexts
 import io.github.danilodox.warbook.war.summaryTextsFor
 import kotlinx.coroutines.delay
@@ -72,7 +75,8 @@ fun WarRoute(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
     val accounts: AccountsRepository = koinInject()
     val profiles: ProfileRepository = koinInject()
     val wars: WarRepository = koinInject()
-    val viewModel = viewModel { WarViewModel(accounts, profiles, wars) }
+    val preferences: AppPreferences = koinInject()
+    val viewModel = viewModel { WarViewModel(accounts, profiles, wars, preferences) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     // Roda a cada vez que a aba entra na tela (voltar de outra aba também conta como abrir).
     LaunchedEffect(viewModel) { viewModel.onOpen() }
@@ -84,6 +88,7 @@ fun WarRoute(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
             onSelectRound = viewModel::selectRound,
             onRefresh = viewModel::refresh,
             onAddAccount = onAddAccount,
+            onToggleSummaryPart = viewModel::toggleSummaryPart,
         ),
         modifier = modifier,
     )
@@ -94,10 +99,20 @@ data class WarActions(
     val onSelectRound: (Int) -> Unit,
     val onRefresh: () -> Unit,
     val onAddAccount: () -> Unit,
+    val onToggleSummaryPart: (SummaryPart) -> Unit = {},
 )
 
-/** O que as partes da tela precisam além dos dados: quem é "você", a hora e os textos do idioma. */
-data class WarContext(val accountTag: String?, val now: Long, val texts: SummaryTexts)
+/**
+ * O que as partes da tela precisam além dos dados: quem é "você", a hora, os textos do idioma e as partes
+ * do resumo escolhidas (com o que liga e desliga cada uma).
+ */
+data class WarContext(
+    val accountTag: String?,
+    val now: Long,
+    val texts: SummaryTexts,
+    val summaryOptions: SummaryOptions = SummaryOptions(),
+    val onToggleSummaryPart: (SummaryPart) -> Unit = {},
+)
 
 private const val CLOCK_TICK_MS = 30_000L
 
@@ -132,7 +147,13 @@ private fun WarBody(state: WarUiState, actions: WarActions) {
             value = currentTimeMillis()
         }
     }
-    val context = WarContext(state.accountTag, now, summaryTextsFor(Locale.current.language))
+    val context = WarContext(
+        accountTag = state.accountTag,
+        now = now,
+        texts = summaryTextsFor(Locale.current.language),
+        summaryOptions = state.summaryOptions,
+        onToggleSummaryPart = actions.onToggleSummaryPart,
+    )
     val profileError = state.profile.error
     when {
         !state.profileKnown && profileError != null -> OfflineCard(profileError, onRetry = actions.onRefresh)
