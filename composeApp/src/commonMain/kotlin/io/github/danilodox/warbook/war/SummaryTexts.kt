@@ -16,6 +16,9 @@ interface SummaryTexts {
     val maxTownHall: String
     val allAttacked: String
     val noneMissed: String
+    val preparationTitle: String
+    val bestAttacksTitle: String
+    val weakAttacksTitle: String
 
     fun townHall(level: Int): String
 
@@ -30,6 +33,9 @@ interface SummaryTexts {
     fun pendingTitle(attacks: Int, members: Int): String
 
     fun missedTitle(attacks: Int): String
+
+    /** Linha final de uma lista cortada: "+2 ataques". */
+    fun more(count: Int): String
 
     /** "5h 12min"; abaixo de 1 h só os minutos. */
     fun duration(millis: Long): String
@@ -65,6 +71,9 @@ object PortugueseSummaryTexts : SummaryTexts {
     override val maxTownHall = "CV máximo"
     override val allAttacked = "Todos já atacaram"
     override val noneMissed = "Ninguém deixou de atacar"
+    override val preparationTitle = "Preparação"
+    override val bestAttacksTitle = "Melhores ataques"
+    override val weakAttacksTitle = "Ataques ruins"
 
     override fun townHall(level: Int) = "CV $level"
 
@@ -89,6 +98,8 @@ object PortugueseSummaryTexts : SummaryTexts {
     override fun missedTitle(attacks: Int) =
         if (attacks == 1) "1 ataque não foi feito" else "$attacks ataques não foram feitos"
 
+    override fun more(count: Int) = if (count == 1) "+1 ataque" else "+$count ataques"
+
     override fun duration(millis: Long) = formatDuration(millis, "min")
 }
 
@@ -101,6 +112,9 @@ object EnglishSummaryTexts : SummaryTexts {
     override val maxTownHall = "Max TH"
     override val allAttacked = "Everyone has attacked"
     override val noneMissed = "No missed attacks"
+    override val preparationTitle = "Preparation"
+    override val bestAttacksTitle = "Best attacks"
+    override val weakAttacksTitle = "Weak attacks"
 
     override fun townHall(level: Int) = "TH $level"
 
@@ -123,6 +137,8 @@ object EnglishSummaryTexts : SummaryTexts {
     }
 
     override fun missedTitle(attacks: Int) = if (attacks == 1) "1 attack missed" else "$attacks attacks missed"
+
+    override fun more(count: Int) = if (count == 1) "+1 attack" else "+$count attacks"
 
     override fun duration(millis: Long) = formatDuration(millis, "m")
 }
