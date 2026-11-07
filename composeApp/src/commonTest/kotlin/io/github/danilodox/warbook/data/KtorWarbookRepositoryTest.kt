@@ -2,6 +2,7 @@ package io.github.danilodox.warbook.data
 
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanRole
+import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.CwlState
 import io.github.danilodox.warbook.api.PlayerDto
@@ -54,6 +55,25 @@ class KtorWarbookRepositoryTest {
 
         assertEquals(listOf(playerPath, ApiRoutes.INSTALLS, playerPath), server.paths)
         assertEquals("token-1", store.token)
+    }
+
+    @Test
+    fun buscaDeClaMandaONomeAparadoNaQuery() = runTest {
+        server.body = """{"items":[{"tag":"OPP","name":"Os Mito","clanLevel":20,"memberCount":50}]}"""
+
+        val result = repository.searchClans("  Os Mito ")
+
+        val items = assertIs<ApiResult.Success<List<ClanSearchResultDto>>>(result).value
+        assertEquals(listOf("Os Mito"), items.map { it.name })
+        val request = server.requests.last()
+        assertEquals(ApiRoutes.CLAN_SEARCH, request.url.encodedPath)
+        assertEquals("Os Mito", request.url.parameters[ApiRoutes.PARAM_NAME])
+    }
+
+    @Test
+    fun buscaComNomeCurtoNemChamaOServidor() = runTest {
+        assertEquals(ApiResult.Failure(AppError.INVALID_QUERY), repository.searchClans(" ab "))
+        assertTrue(server.requests.isEmpty())
     }
 
     @Test

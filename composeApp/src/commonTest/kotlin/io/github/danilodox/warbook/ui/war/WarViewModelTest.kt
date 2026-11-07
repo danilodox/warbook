@@ -40,7 +40,8 @@ class WarViewModelTest {
     private val api = FakeWarbookRepository()
     private val accountDao = FakeAccountDao()
     private var now = 1_000L
-    private val profiles = RoomProfileRepository(FakePlayerCacheDao(), accountDao, api) { now }
+    private val playerCache = FakePlayerCacheDao()
+    private val profiles = RoomProfileRepository(playerCache, accountDao, api) { now }
     private val accounts = RoomAccountsRepository(accountDao, profiles, api) { now++ }
     private val wars = RoomWarRepository(FakeWarCacheDao(), api) { now }
     private val preferences = FakeAppPreferences()
@@ -89,7 +90,7 @@ class WarViewModelTest {
     @Test
     fun semPerfilSalvoBuscaOPerfilAntes() = runTest(dispatcher) {
         accounts.add(player)
-        profiles.forget(player.tag)
+        playerCache.delete(player.tag)
         api.players[player.tag] = ApiResult.Success(player)
 
         val state = opened().state.value

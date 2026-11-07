@@ -9,11 +9,17 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
-/** Versão 2 (v0.4.0): tabela `war_cache`. */
+/** Versão 2 (v0.4.0): `war_cache`. Versão 3 (v0.5.0): `clan_cache`, `followed` e `accounts.clanTag`. */
 @Database(
-    entities = [AccountEntity::class, PlayerCacheEntity::class, WarCacheEntity::class],
-    version = 2,
-    autoMigrations = [AutoMigration(from = 1, to = 2)],
+    entities = [
+        AccountEntity::class,
+        PlayerCacheEntity::class,
+        WarCacheEntity::class,
+        ClanCacheEntity::class,
+        FollowedEntity::class,
+    ],
+    version = 3,
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
 )
 @ConstructedBy(WarbookDatabaseConstructor::class)
 abstract class WarbookDatabase : RoomDatabase() {
@@ -22,6 +28,10 @@ abstract class WarbookDatabase : RoomDatabase() {
     abstract fun playerCache(): PlayerCacheDao
 
     abstract fun warCache(): WarCacheDao
+
+    abstract fun clanCache(): ClanCacheDao
+
+    abstract fun followed(): FollowedDao
 }
 
 /** Implementado pelo Room (KSP) em cada plataforma. */

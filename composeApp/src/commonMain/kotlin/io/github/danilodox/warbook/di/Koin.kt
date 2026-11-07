@@ -2,12 +2,18 @@ package io.github.danilodox.warbook.di
 
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.AppPreferences
+import io.github.danilodox.warbook.data.CacheScope
+import io.github.danilodox.warbook.data.ClanRepository
 import io.github.danilodox.warbook.data.DataStoreAppPreferences
 import io.github.danilodox.warbook.data.DataStoreInstallTokenStore
+import io.github.danilodox.warbook.data.FollowRepository
 import io.github.danilodox.warbook.data.InstallTokenStore
 import io.github.danilodox.warbook.data.KtorWarbookRepository
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.RoomAccountsRepository
+import io.github.danilodox.warbook.data.RoomCacheScope
+import io.github.danilodox.warbook.data.RoomClanRepository
+import io.github.danilodox.warbook.data.RoomFollowRepository
 import io.github.danilodox.warbook.data.RoomProfileRepository
 import io.github.danilodox.warbook.data.RoomWarRepository
 import io.github.danilodox.warbook.data.WarRepository
@@ -28,10 +34,17 @@ fun appModule(appInfo: AppInfo): Module = module {
     single<WarbookRepository> { KtorWarbookRepository(get<WarbookHttpClients>().api) }
     single { get<WarbookDatabase>().accounts() }
     single { get<WarbookDatabase>().playerCache() }
-    single<ProfileRepository> { RoomProfileRepository(cache = get(), accounts = get(), api = get()) }
-    single<AccountsRepository> { RoomAccountsRepository(dao = get(), profiles = get(), api = get()) }
     single { get<WarbookDatabase>().warCache() }
-    single<WarRepository> { RoomWarRepository(cache = get(), api = get()) }
+    single { get<WarbookDatabase>().clanCache() }
+    single { get<WarbookDatabase>().followed() }
+    single<CacheScope> { RoomCacheScope(accounts = get(), followed = get()) }
+    single<ProfileRepository> {
+        RoomProfileRepository(cache = get(), accounts = get(), api = get(), scope = get(), followed = get())
+    }
+    single<AccountsRepository> { RoomAccountsRepository(dao = get(), profiles = get(), api = get()) }
+    single<WarRepository> { RoomWarRepository(cache = get(), api = get(), scope = get()) }
+    single<ClanRepository> { RoomClanRepository(cache = get(), api = get(), scope = get(), followed = get()) }
+    single<FollowRepository> { RoomFollowRepository(dao = get(), profiles = get(), clans = get(), wars = get()) }
 }
 
 /** Inicia o Koin. Chamado uma vez por plataforma (Application no Android, MainViewController no iOS). */

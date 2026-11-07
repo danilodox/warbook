@@ -45,6 +45,8 @@ class SearchViewModelTest {
 
         override suspend fun clan(rawTag: String): ApiResult<ClanDto> = error("não usado")
 
+        override suspend fun searchClans(rawName: String) = error("não usado")
+
         override suspend fun currentWar(rawClanTag: String): ApiResult<CurrentWarDto> = error("não usado")
 
         override suspend fun currentCwl(rawClanTag: String): ApiResult<CwlDto> = error("não usado")

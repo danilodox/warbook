@@ -149,8 +149,9 @@ class WarViewModel(
             val accountTag = activeTag.first() ?: return@launch
             val clanTag = clanOf(accountTag) ?: return@launch
             when (tab) {
-                WarTab.CURRENT -> track(clanTag, { copy(war = it) }, { war }) { wars.refreshWar(clanTag) }
-                WarTab.CWL -> track(clanTag, { copy(cwl = it) }, { cwl }) { wars.refreshCwl(clanTag) }
+                // Clã da conta ativa: sempre salvo, mesmo antes de a conta saber a tag do clã (banco v3).
+                WarTab.CURRENT -> track(clanTag, { copy(war = it) }, { war }) { wars.refreshWar(clanTag, keep = true) }
+                WarTab.CWL -> track(clanTag, { copy(cwl = it) }, { cwl }) { wars.refreshCwl(clanTag, keep = true) }
             }
         }
     }
