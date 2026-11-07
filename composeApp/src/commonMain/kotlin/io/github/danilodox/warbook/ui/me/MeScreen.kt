@@ -161,7 +161,7 @@ fun NoAccountScreen(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
 
 /** Faixa de cima quando a atualização falhou e a tela mostra o perfil salvo. */
 @Composable
-private fun StaleBanner(error: AppError, fetchedAt: Long) {
+internal fun StaleBanner(error: AppError, fetchedAt: Long) {
     val reason = if (error == AppError.NETWORK) Res.string.offline_no_connection else error.message
     val now = remember(fetchedAt) { currentTimeMillis() }
     val age = when (val value = ageOf(fetchedAt, now)) {
@@ -181,7 +181,7 @@ private fun StaleBanner(error: AppError, fetchedAt: Long) {
 
 /** Sem perfil salvo e sem conseguir buscar: só o cartão do erro. Rolável para o puxar-para-atualizar. */
 @Composable
-private fun OfflineCard(error: AppError, onRetry: () -> Unit) {
+internal fun OfflineCard(error: AppError, onRetry: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium)) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(

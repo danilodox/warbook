@@ -89,7 +89,7 @@ class MeViewModel(private val accounts: AccountsRepository, private val profiles
     }
 }
 
-private fun List<Account>.activeOrFirst(): Account? = firstOrNull { it.isActive } ?: firstOrNull()
+internal fun List<Account>.activeOrFirst(): Account? = firstOrNull { it.isActive } ?: firstOrNull()
 
 /** Quanto tempo faz que o perfil salvo veio do servidor. */
 sealed interface Age {

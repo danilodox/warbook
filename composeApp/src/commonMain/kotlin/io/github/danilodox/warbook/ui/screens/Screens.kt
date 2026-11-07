@@ -15,7 +15,7 @@ import io.github.danilodox.warbook.ui.theme.Spacing
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Tela vazia das abas que ainda não têm conteúdo (Clã e Guerra). */
+/** Tela vazia das abas que ainda não têm conteúdo (Clã). */
 @Composable
 fun PlaceholderScreen(title: StringResource, modifier: Modifier = Modifier) {
     Column(
