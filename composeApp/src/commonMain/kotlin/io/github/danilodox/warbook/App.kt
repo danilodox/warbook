@@ -190,7 +190,7 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
             )
         }
         composable<Route.War> { WarRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
-        composable<Route.Search> { SearchRoute() }
+        searchDestination(navController)
         composable<Route.Player> { entry ->
             val route = entry.toRoute<Route.Player>()
             PlayerRoute(
@@ -223,8 +223,22 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
 
 private const val OPEN_ACCOUNTS = "open_accounts"
 
-/** Pedido para a aba Buscar abrir no modo Clã (lido pela busca no lote 6). */
+/** Pedido para a aba Buscar abrir no modo Clã (botão "Buscar clãs" da aba Clã sem clã). */
 private const val SEARCH_CLANS = "search_clans"
+
+/** Aba Buscar: abre Jogador e Clã marcados como vindos da busca (entram nas "Recentes"). */
+private fun NavGraphBuilder.searchDestination(navController: NavHostController) {
+    composable<Route.Search> { entry ->
+        val openClanMode by entry.savedStateHandle.getStateFlow(SEARCH_CLANS, false)
+            .collectAsStateWithLifecycle()
+        SearchRoute(
+            openClanMode = openClanMode,
+            onClanModeOpened = { entry.savedStateHandle[SEARCH_CLANS] = false },
+            onOpenPlayer = { tag -> navController.navigate(Route.Player(tag, fromSearch = true)) },
+            onOpenClan = { tag -> navController.navigate(Route.ClanDetail(tag, fromSearch = true)) },
+        )
+    }
+}
 
 private fun NavGraphBuilder.verifyDestination(navController: NavHostController) {
     composable<Route.Verify> { entry ->

@@ -213,4 +213,21 @@
     <string name="clan_no_clan_title">Your account is not in a clan</string>
     <string name="clan_no_clan_body">Join a clan in the game and it shows up here. Meanwhile, you can search for clans.</string>
     <string name="clan_search_clans">Search clans</string>
+    <string name="search_mode_player">Player</string>
+    <string name="search_mode_clan">Clan</string>
+    <string name="search_player_label">Player tag (#…)</string>
+    <string name="search_clan_label">Clan tag or name</string>
+    <string name="search_nick_notice">Search by name arrives in v0.7. For now, search by tag, shown on the in-game profile (e.g. #2PQ8LV9YC).</string>
+    <string name="search_too_short">Type at least 3 letters of the clan name.</string>
+    <string name="search_results">Results</string>
+    <string name="search_no_results">No clan found with that name.</string>
+    <string name="search_result_line">#%1$s · level %2$d · %3$d members</string>
+    <string name="search_player_line">#%1$s · TH %2$d</string>
+    <string name="search_clan_line">#%1$s · level %2$d</string>
+    <string name="search_following_empty">Follow players and clans to see them here, even offline.</string>
+    <string name="search_edit">Edit</string>
+    <string name="search_done">Done</string>
+    <string name="search_remove">Remove</string>
+    <string name="search_recent_title">Recent</string>
+    <string name="search_clear">Clear</string>
 </resources>
