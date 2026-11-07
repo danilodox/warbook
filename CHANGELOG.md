@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.4.1] - 2026-11-07
+
+### Adicionado
+
+- Resumo do WhatsApp personalizável: em "Personalizar", abaixo de Copiar e Compartilhar, uma ficha por parte (placar, tempo, quem falta atacar ou quem não atacou, força por CV) e a prévia exata do texto. Só aparecem as fichas que mudam o texto naquele estado.
+- Partes novas, desligadas por padrão: "Melhores ataques" (os 3 estrelas; sem nenhum, os 3 melhores por estrelas e destruição) e "Ataques ruins" (0 ou 1 estrela), no formato `• Dantas → #4 (CV 15) ★★★ 100%`, até 5 linhas e um "+N". Entram em guerra, na encerrada e na CWL; não na preparação.
+- A escolha fica salva no aparelho e vale para a guerra e a CWL. Sem mexer, o texto é o mesmo da v0.4.0.
+
 ## [0.4.0] - 2026-11-06
 
 ### Adicionado
@@ -74,7 +82,9 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.3.0...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/danilodox/warbook/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/danilodox/warbook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/danilodox/warbook/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/danilodox/warbook/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/danilodox/warbook/releases/tag/v0.1.0
