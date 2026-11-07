@@ -4,6 +4,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.5.0] - 2026-11-07
+
+### Adicionado
+
+- Servidor: `/v1/clans/{tag}` mais completo, com tipo de entrada, nível e liga de cada membro (a liga nova do ranqueado tem preferência sobre a antiga).
+- Servidor: `GET /v1/clans/search?name=` busca clãs por nome, com mínimo de 3 letras e até 20 resultados num DTO enxuto (tag, nome, brasão, nível, membros e local). Fora do tamanho responde `INVALID_QUERY` (400). Cache de 5 minutos por nome.
+- Aba Clã: Info e Membros do clã da conta ativa. Membros ordena por posição, CV, troféus e doações, mostra a liga, as doações e as recebidas da temporada, e marca "você". Tocar num membro abre a tela Jogador. Estados para sem conta, sem clã (com "Buscar clãs"), primeira carga e sem conexão com o último resultado salvo. Puxar para atualizar.
+- Tela Jogador: o perfil de qualquer jogador com os componentes da aba Eu e o botão Seguir. A linha do clã abre a tela Clã.
+- Tela Clã: Info, Membros e Guerra de qualquer clã. A Guerra usa os componentes da aba Guerra (guerra atual, CWL e resumo do WhatsApp), com "você" ainda marcado pela conta ativa.
+- Aba Buscar: seletor Jogador | Clã. O jogador é buscado por tag; texto que não é tag avisa que a busca por nick chega na v0.7. O clã é buscado por tag ou por nome, e os resultados têm uma estrela para seguir sem abrir o clã.
+- Seguindo: jogadores e clãs juntos, até 50 no total, abrem sem internet com o último dado. "Editar" mostra o remover de cada um.
+- Recentes: os 10 últimos jogadores e clãs abertos pela busca, com "Limpar".
+- Brasões de clã e ícones de liga com Coil 3, com marcador enquanto carrega e quando falha.
+- Room na versão 3, com migração automática: clãs salvos, a lista Seguindo e o clã de cada conta. Vão para o banco só as contas, os clãs das contas e o que é seguido; o resto fica na memória enquanto o app está aberto.
+- Textos novos em português e inglês.
+
+### Corrigido
+
+- Resumo do WhatsApp: `*` e `_` nos nomes não viram mais negrito nem itálico (só no texto gerado; o app mostra o nome original).
+
 ## [0.4.1] - 2026-11-07
 
 ### Adicionado
@@ -82,7 +102,8 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.4.1...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/danilodox/warbook/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/danilodox/warbook/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/danilodox/warbook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/danilodox/warbook/compare/v0.2.0...v0.3.0

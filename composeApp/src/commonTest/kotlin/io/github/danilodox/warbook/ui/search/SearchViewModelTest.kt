@@ -1,15 +1,16 @@
 package io.github.danilodox.warbook.ui.search
 
-import io.github.danilodox.warbook.api.ClanDto
-import io.github.danilodox.warbook.api.CurrentWarDto
-import io.github.danilodox.warbook.api.CwlDto
-import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.data.ApiResult
 import io.github.danilodox.warbook.data.AppError
-import io.github.danilodox.warbook.data.WarbookRepository
+import io.github.danilodox.warbook.data.FollowKind
+import io.github.danilodox.warbook.data.FollowRepository
+import io.github.danilodox.warbook.data.RecentSearch
+import io.github.danilodox.warbook.ui.DetailTestRig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -19,38 +20,16 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
-
-    private val player = PlayerDto(
-        tag = "2PQ8LV9YC",
-        name = "Dantas",
-        townHallLevel = 15,
-        expLevel = 212,
-        trophies = 4812,
-        warStars = 1384,
-        attackWins = 47,
-        donations = 1240,
-        donationsReceived = 860,
-    )
-
-    private class FakeRepository(var result: ApiResult<PlayerDto>) : WarbookRepository {
-        val searched = mutableListOf<String>()
-
-        override suspend fun player(rawTag: String): ApiResult<PlayerDto> = result.also { searched += rawTag }
-
-        override suspend fun clan(rawTag: String): ApiResult<ClanDto> = error("não usado")
-
-        override suspend fun currentWar(rawClanTag: String): ApiResult<CurrentWarDto> = error("não usado")
-
-        override suspend fun currentCwl(rawClanTag: String): ApiResult<CwlDto> = error("não usado")
-
-        override suspend fun verify(rawTag: String, gameToken: String): ApiResult<String> = error("não usado")
-    }
+    private val rig = DetailTestRig()
+    private val mito = ClanSearchResultDto("8QU0VC", "Os Mito", "https://img/m.png", 20, 48)
 
     @BeforeTest
     fun setUp() {
@@ -62,42 +41,156 @@ class SearchViewModelTest {
         Dispatchers.resetMain()
     }
 
-    @Test
-    fun comecaParado() {
-        val viewModel = SearchViewModel(FakeRepository(ApiResult.Success(player)))
+    private fun TestScope.viewModel(mode: SearchMode = SearchMode.PLAYER) =
+        SearchViewModel(rig.clans, rig.follows, rig.preferences).also {
+            it.selectMode(mode)
+            advanceUntilIdle()
+        }
 
-        assertEquals(SearchState.Idle, viewModel.state.value)
+    private fun SearchViewModel.typed(query: String) = apply {
+        submit(query)
+        dispatcher.scheduler.advanceUntilIdle()
     }
 
+    private val SearchViewModel.results get() = assertIs<SearchOutcome.Results>(state.value.outcome).clans
+
     @Test
-    fun mostraCarregandoEDepoisOJogador() = runTest(dispatcher) {
-        val repository = FakeRepository(ApiResult.Success(player))
-        val viewModel = SearchViewModel(repository)
+    fun jogadorPorTagComHashAbreATelaJogador() = runTest(dispatcher) {
+        val viewModel = viewModel().typed(" #2pq8lv9yc ")
 
-        viewModel.search("#2pq8lv9yc")
-        assertEquals(SearchState.Loading, viewModel.state.value)
-
+        assertEquals(SearchTarget(FollowKind.PLAYER, "2PQ8LV9YC"), viewModel.state.value.open)
+        viewModel.onOpened()
         advanceUntilIdle()
-        assertEquals(SearchState.Found(player), viewModel.state.value)
-        assertEquals(listOf("#2pq8lv9yc"), repository.searched)
+        assertNull(viewModel.state.value.open)
     }
 
     @Test
-    fun mostraOErroTipado() = runTest(dispatcher) {
-        val viewModel = SearchViewModel(FakeRepository(ApiResult.Failure(AppError.NOT_FOUND)))
+    fun jogadorSoComCaracteresDeTagViraTag() = runTest(dispatcher) {
+        val viewModel = viewModel().typed("2PQ8LV9YC")
 
-        viewModel.search("2PQ8LV9YC")
+        assertEquals(SearchTarget(FollowKind.PLAYER, "2PQ8LV9YC"), viewModel.state.value.open)
+    }
+
+    @Test
+    fun nickAvisaQueChegaNaV07() = runTest(dispatcher) {
+        val viewModel = viewModel().typed("Dantas")
+
+        assertEquals(SearchOutcome.NickNotice, viewModel.state.value.outcome)
+        assertNull(viewModel.state.value.open)
+        assertTrue(rig.api.playerCalls.isEmpty())
+    }
+
+    @Test
+    fun tagComHashInvalidaMostraErro() = runTest(dispatcher) {
+        val viewModel = viewModel().typed("#ABC")
+
+        assertEquals(SearchOutcome.Failed(AppError.INVALID_TAG), viewModel.state.value.outcome)
+    }
+
+    @Test
+    fun claPorTagComOuSemHashAbreATelaCla() = runTest(dispatcher) {
+        val viewModel = viewModel(SearchMode.CLAN).typed("#2yquc8j0p")
+        assertEquals(SearchTarget(FollowKind.CLAN, "2YQUC8J0P"), viewModel.state.value.open)
+        viewModel.onOpened()
+
+        viewModel.typed("2YQUC8J0P")
+
+        assertEquals(SearchTarget(FollowKind.CLAN, "2YQUC8J0P"), viewModel.state.value.open)
+        assertTrue(rig.api.searchCalls.isEmpty())
+    }
+
+    @Test
+    fun nomeSoComLetrasDeTagBuscaPorNome() = runTest(dispatcher) {
+        val viewModel = viewModel(SearchMode.CLAN).typed("PURY")
+
+        assertEquals(listOf("PURY"), rig.api.searchCalls)
+        assertNull(viewModel.state.value.open)
+    }
+
+    @Test
+    fun nomeCurtoNaoVaiAoServidor() = runTest(dispatcher) {
+        val viewModel = viewModel(SearchMode.CLAN).typed("ab")
+
+        assertEquals(SearchOutcome.TooShort, viewModel.state.value.outcome)
+        assertTrue(rig.api.searchCalls.isEmpty())
+    }
+
+    @Test
+    fun nomeMostraOsResultadosESegueComAEstrela() = runTest(dispatcher) {
+        rig.api.searches["Os Mito"] = ApiResult.Success(listOf(mito))
+        val viewModel = viewModel(SearchMode.CLAN).typed("Os Mito")
+        assertEquals(listOf(ClanResult(mito, following = false)), viewModel.results)
+
+        viewModel.toggleFollow(viewModel.results.single())
+        advanceUntilIdle()
+        assertTrue(viewModel.results.single().following)
+        assertEquals(listOf("8QU0VC"), viewModel.state.value.followed.map { it.tag })
+
+        viewModel.toggleFollow(viewModel.results.single())
+        advanceUntilIdle()
+        assertFalse(viewModel.results.single().following)
+        assertTrue(viewModel.state.value.followed.isEmpty())
+    }
+
+    @Test
+    fun erroDaBuscaPorNome() = runTest(dispatcher) {
+        rig.api.searches["Os Mito"] = ApiResult.Failure(AppError.NETWORK)
+
+        val viewModel = viewModel(SearchMode.CLAN).typed("Os Mito")
+
+        assertEquals(SearchOutcome.Failed(AppError.NETWORK), viewModel.state.value.outcome)
+    }
+
+    @Test
+    fun limiteCheioAvisaENaoSegue() = runTest(dispatcher) {
+        repeat(FollowRepository.LIMIT) { rig.follows.followClan(ClanSearchResultDto("C$it", "Clã", null, 1, 1)) }
+        rig.api.searches["Os Mito"] = ApiResult.Success(listOf(mito))
+        val viewModel = viewModel(SearchMode.CLAN).typed("Os Mito")
+
+        viewModel.toggleFollow(viewModel.results.single())
         advanceUntilIdle()
 
-        assertEquals(SearchState.Failed(AppError.NOT_FOUND), viewModel.state.value)
+        assertTrue(viewModel.state.value.followLimitReached)
+        assertFalse(viewModel.results.single().following)
     }
 
     @Test
-    fun soOfereceTentarDeNovoQuandoPodeMudar() {
-        assertTrue(AppError.NETWORK.canRetry)
-        assertTrue(AppError.SERVER.canRetry)
-        assertTrue(AppError.RATE_LIMITED.canRetry)
-        assertFalse(AppError.INVALID_TAG.canRetry)
-        assertFalse(AppError.NOT_FOUND.canRetry)
+    fun trocarDeModoOuLimparVoltaParaSeguindoERecentes() = runTest(dispatcher) {
+        val viewModel = viewModel().typed("Dantas")
+
+        viewModel.selectMode(SearchMode.CLAN)
+        advanceUntilIdle()
+        assertEquals(SearchOutcome.None, viewModel.state.value.outcome)
+
+        viewModel.typed("ab").clear()
+        advanceUntilIdle()
+        assertEquals(SearchOutcome.None, viewModel.state.value.outcome)
+    }
+
+    @Test
+    fun editarERemoverDoSeguindo() = runTest(dispatcher) {
+        rig.follows.followClan(mito)
+        val viewModel = viewModel()
+
+        viewModel.toggleEditing()
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.editing)
+
+        viewModel.unfollow(viewModel.state.value.followed.single())
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.followed.isEmpty())
+        assertFalse(viewModel.state.value.editing, "lista vazia sai do modo de edição")
+    }
+
+    @Test
+    fun recentesAparecemELimpam() = runTest(dispatcher) {
+        rig.preferences.addRecentSearch(RecentSearch(FollowKind.PLAYER, "2PQ8LV9YC", "Dantas", 15))
+        val viewModel = viewModel()
+        assertEquals("Dantas", viewModel.state.value.recent.single().name)
+
+        viewModel.clearRecent()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.recent.isEmpty())
     }
 }

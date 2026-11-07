@@ -32,6 +32,8 @@ private typealias SpecificError = (HttpStatusCode, String?) -> ApiException?
  * Cliente da API oficial do Clash of Clans. Recebe tags já normalizadas (sem `#`).
  * Falhas viram [ApiException]. A chave só vai no cabeçalho e nunca é registrada em log.
  */
+// Uma função por endpoint da API do jogo; dividir a classe espalharia o tratamento comum de erros.
+@Suppress("TooManyFunctions")
 class CocClient(engine: HttpClientEngine, private val apiKey: String, baseUrl: String) : AutoCloseable {
     private val log = LoggerFactory.getLogger(CocClient::class.java)
     private val json = Json { ignoreUnknownKeys = true }
@@ -46,6 +48,14 @@ class CocClient(engine: HttpClientEngine, private val apiKey: String, baseUrl: S
     internal suspend fun player(tag: String): CocPlayer = send("players", "#$tag").body()
 
     internal suspend fun clan(tag: String): CocClan = send("clans", "#$tag").body()
+
+    /** [name] já validado (3 a 50 letras); o Ktor codifica espaços e acentos na query. */
+    internal suspend fun searchClans(name: String, limit: Int): CocClanList = send("clans") {
+        url {
+            parameters.append("name", name)
+            parameters.append("limit", limit.toString())
+        }
+    }.body()
 
     internal suspend fun currentWar(clanTag: String): CocWar =
         send("clans", "#$clanTag", "currentwar", specificError = ::warError).body()

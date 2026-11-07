@@ -4,6 +4,9 @@ import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanDto
+import io.github.danilodox.warbook.api.ClanSearch
+import io.github.danilodox.warbook.api.ClanSearchResponse
+import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.PlayerDto
@@ -13,6 +16,7 @@ import io.github.danilodox.warbook.api.VerifyResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -41,6 +45,9 @@ enum class AppError {
     /** Token de verificação do jogo inválido ou vencido. */
     INVALID_VERIFY_TOKEN,
 
+    /** Nome da busca de clã curto ou longo demais. */
+    INVALID_QUERY,
+
     /** Sem internet ou servidor fora do ar. */
     NETWORK,
 
@@ -53,6 +60,9 @@ interface WarbookRepository {
     suspend fun player(rawTag: String): ApiResult<PlayerDto>
 
     suspend fun clan(rawTag: String): ApiResult<ClanDto>
+
+    /** [rawName] como o usuário digitou; com menos de 3 letras nem chama o servidor. */
+    suspend fun searchClans(rawName: String): ApiResult<List<ClanSearchResultDto>>
 
     suspend fun currentWar(rawClanTag: String): ApiResult<CurrentWarDto>
 
@@ -68,6 +78,13 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
     override suspend fun player(rawTag: String) = get(rawTag, ApiRoutes::player) { it.body<PlayerDto>() }
 
     override suspend fun clan(rawTag: String) = get(rawTag, ApiRoutes::clan) { it.body<ClanDto>() }
+
+    override suspend fun searchClans(rawName: String): ApiResult<List<ClanSearchResultDto>> {
+        val name = ClanSearch.normalize(rawName) ?: return ApiResult.Failure(AppError.INVALID_QUERY)
+        return send({ it.body<ClanSearchResponse>().items }) {
+            client.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, name) }
+        }
+    }
 
     override suspend fun currentWar(rawClanTag: String) =
         get(rawClanTag, ApiRoutes::currentWar) { it.body<CurrentWarDto>() }
@@ -94,22 +111,28 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
         request: suspend (tag: String) -> HttpResponse,
     ): ApiResult<T> {
         val tag = TagNormalizer.normalize(rawTag) ?: return ApiResult.Failure(AppError.INVALID_TAG)
-        return try {
-            val response = request(tag)
-            if (response.status == HttpStatusCode.OK) {
-                ApiResult.Success(decode(response))
-            } else {
-                ApiResult.Failure(response.toAppError())
-            }
-        } catch (_: IOException) {
-            ApiResult.Failure(AppError.NETWORK)
-        } catch (_: ContentConvertException) {
-            // Resposta 200 que não bate com o DTO.
-            ApiResult.Failure(AppError.SERVER)
-        } catch (e: InstallTokenException) {
-            val error = if (e.status == HttpStatusCode.TooManyRequests.value) AppError.RATE_LIMITED else AppError.SERVER
-            ApiResult.Failure(error)
+        return send(decode) { request(tag) }
+    }
+
+    /** Faz a requisição e transforma qualquer falha em [AppError]. */
+    private suspend fun <T> send(
+        decode: suspend (HttpResponse) -> T,
+        request: suspend () -> HttpResponse,
+    ): ApiResult<T> = try {
+        val response = request()
+        if (response.status == HttpStatusCode.OK) {
+            ApiResult.Success(decode(response))
+        } else {
+            ApiResult.Failure(response.toAppError())
         }
+    } catch (_: IOException) {
+        ApiResult.Failure(AppError.NETWORK)
+    } catch (_: ContentConvertException) {
+        // Resposta 200 que não bate com o DTO.
+        ApiResult.Failure(AppError.SERVER)
+    } catch (e: InstallTokenException) {
+        val error = if (e.status == HttpStatusCode.TooManyRequests.value) AppError.RATE_LIMITED else AppError.SERVER
+        ApiResult.Failure(error)
     }
 
     private suspend fun HttpResponse.toAppError(): AppError {
@@ -121,6 +144,7 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
             ApiErrorCode.API_MAINTENANCE -> AppError.API_MAINTENANCE
             ApiErrorCode.RATE_LIMITED -> AppError.RATE_LIMITED
             ApiErrorCode.INVALID_VERIFY_TOKEN -> AppError.INVALID_VERIFY_TOKEN
+            ApiErrorCode.INVALID_QUERY -> AppError.INVALID_QUERY
             ApiErrorCode.UNAUTHORIZED, ApiErrorCode.UPSTREAM_ERROR -> AppError.SERVER
             // Corpo fora do formato (proxy, servidor antigo): decide pelo status.
             null -> if (status == HttpStatusCode.TooManyRequests) AppError.RATE_LIMITED else AppError.SERVER

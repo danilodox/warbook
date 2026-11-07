@@ -4,8 +4,13 @@ import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanDto
+import io.github.danilodox.warbook.api.ClanJoinType
 import io.github.danilodox.warbook.api.ClanRole
+import io.github.danilodox.warbook.api.ClanSearch
+import io.github.danilodox.warbook.api.ClanSearchResponse
+import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CurrentWarDto
+import io.github.danilodox.warbook.api.LeagueDto
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.UnitLevelDto
 import io.github.danilodox.warbook.api.WarAttackDto
@@ -20,6 +25,7 @@ import io.github.danilodox.warbook.testing.authorizedClient
 import io.github.danilodox.warbook.testing.testConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
@@ -65,6 +71,7 @@ class CocRoutesTest {
         assertEquals("https://img/m.png", player.clan?.badgeUrl)
         assertEquals(listOf("Barbarian King"), player.heroes.map { it.name }, "heróis da base do construtor ficam fora")
         assertEquals("Legend League", player.league)
+        assertEquals("https://img/legend-m.png", player.leagueIconUrl)
         assertEquals(1240, player.donations)
         assertEquals(47, player.attackWins)
     }
@@ -109,6 +116,100 @@ class CocRoutesTest {
         assertEquals(12, clan.requiredTownHallLevel)
         assertEquals(ClanRole.LEADER, clan.members.first().role)
         assertTrue(clan.isWarLogPublic)
+    }
+
+    @Test
+    fun claTrazInfoCompletaENivelDosMembros() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.CLAN_PATH, body = CocFixtures.clan)
+
+        val clan = api.get(ApiRoutes.clan(CocFixtures.CLAN_TAG)).decode(ClanDto.serializer())
+
+        assertEquals("Clã brasileiro, guerra sempre.", clan.description)
+        assertEquals("Brazil", clan.location)
+        assertEquals("Master League II", clan.capitalLeague)
+        assertEquals(312, clan.warWins)
+        assertEquals(7, clan.warWinStreak)
+        assertEquals(3000, clan.requiredTrophies)
+        assertEquals(ClanJoinType.INVITE_ONLY, clan.joinType)
+        assertEquals("https://img/m.png", clan.badgeUrl)
+        val me = clan.members.single { it.tag == CocFixtures.PLAYER_TAG }
+        assertEquals(212, me.expLevel)
+        assertEquals(1240 to 860, me.donations to me.donationsReceived)
+    }
+
+    @Test
+    fun ligaDoRanqueadoNovoValeMaisQueAAntiga() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.CLAN_PATH, body = CocFixtures.clan)
+
+        val members = api.get(ApiRoutes.clan(CocFixtures.CLAN_TAG)).decode(ClanDto.serializer()).members
+
+        assertEquals(LeagueDto("Legend I", "https://img/tier-s.png"), members[0].league, "sem medium usa o small")
+        assertEquals(LeagueDto("Titan League I", "https://img/titan-s.png"), members[1].league, "sem leagueTier")
+    }
+
+    @Test
+    fun buscaDeClaPorNomeDevolveListaEnxuta() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.CLAN_SEARCH_PATH, body = CocFixtures.clanSearch)
+
+        val response = api.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, "  Picuí Raiz ") }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val items = response.decode(ClanSearchResponse.serializer()).items
+        assertEquals(
+            ClanSearchResultDto(CocFixtures.CLAN_TAG, "Picuí Raiz", "https://img/m.png", 18, 47, "Brazil"),
+            items.first(),
+        )
+        assertEquals(ClanSearchResultDto("OPP", "Picuí Base", null, 5, 12, null), items.last())
+        val sent = fake.requests.single().url
+        assertEquals("Picuí Raiz", sent.parameters["name"], "nome aparado e codificado na query")
+        assertEquals(ClanSearch.MAX_RESULTS.toString(), sent.parameters["limit"])
+    }
+
+    @Test
+    fun buscaComNomeCurtoNemChegaNaApi() = testApplication {
+        val api = start()
+
+        val response = api.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, " ab ") }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(ApiErrorCode.INVALID_QUERY, response.error().code)
+        assertTrue(fake.requests.isEmpty())
+    }
+
+    @Test
+    fun buscaSemNomeViraInvalidQuery() = testApplication {
+        val api = start()
+
+        val response = api.get(ApiRoutes.CLAN_SEARCH)
+
+        assertEquals(ApiErrorCode.INVALID_QUERY, response.error().code)
+    }
+
+    @Test
+    fun buscaSemResultadoEListaVazia() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.CLAN_SEARCH_PATH, body = CocFixtures.CLAN_SEARCH_EMPTY)
+
+        val response = api.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, "zzzzzz") }
+
+        assertEquals(ClanSearchResponse(emptyList()), response.decode(ClanSearchResponse.serializer()))
+    }
+
+    @Test
+    fun buscaUsaCacheSemDiferenciarMaiusculas() = testApplication {
+        val api = start()
+        fake.on(CocFixtures.CLAN_SEARCH_PATH, body = CocFixtures.clanSearch)
+
+        api.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, "Picuí") }
+        api.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, "PICUÍ") }
+        assertEquals(1, fake.requests.size)
+
+        ticker.advance(CocService.CLAN_TTL + 1.seconds)
+        api.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, "picuí") }
+        assertEquals(2, fake.requests.size)
     }
 
     @Test

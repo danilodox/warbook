@@ -6,6 +6,8 @@ import androidx.room3.Transaction
 import androidx.room3.Upsert
 import kotlinx.coroutines.flow.Flow
 
+// Uma função por consulta do Room; agrupar esconderia o SQL de cada uma.
+@Suppress("TooManyFunctions")
 @Dao
 interface AccountDao {
     @Query("SELECT * FROM accounts ORDER BY addedAt")
@@ -30,8 +32,14 @@ interface AccountDao {
     @Query("UPDATE accounts SET verificationToken = :token WHERE tag = :tag")
     suspend fun setVerificationToken(tag: String, token: String)
 
-    @Query("UPDATE accounts SET name = :name, townHallLevel = :townHallLevel, clanName = :clanName WHERE tag = :tag")
-    suspend fun updateSummary(tag: String, name: String, townHallLevel: Int, clanName: String?)
+    @Query(
+        "UPDATE accounts SET name = :name, townHallLevel = :townHallLevel, clanName = :clanName, " +
+            "clanTag = :clanTag WHERE tag = :tag",
+    )
+    suspend fun updateSummary(tag: String, name: String, townHallLevel: Int, clanName: String?, clanTag: String?)
+
+    @Query("SELECT COUNT(*) FROM accounts WHERE clanTag = :clanTag")
+    suspend fun countWithClan(clanTag: String): Int
 
     /** Adiciona (ou atualiza) e deixa ativa. Conta que já existia mantém a verificação e a data. */
     @Transaction

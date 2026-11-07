@@ -14,11 +14,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -45,19 +49,24 @@ import io.github.danilodox.warbook.resources.app_name
 import io.github.danilodox.warbook.resources.back
 import io.github.danilodox.warbook.resources.ic_arrow_back
 import io.github.danilodox.warbook.resources.ic_settings
+import io.github.danilodox.warbook.resources.screen_clan
+import io.github.danilodox.warbook.resources.screen_player
 import io.github.danilodox.warbook.resources.settings
-import io.github.danilodox.warbook.resources.tab_clan
+import io.github.danilodox.warbook.ui.clan.ClanDetailRoute
+import io.github.danilodox.warbook.ui.clan.ClanTabActions
+import io.github.danilodox.warbook.ui.clan.ClanTabRoute
 import io.github.danilodox.warbook.ui.me.MeRoute
 import io.github.danilodox.warbook.ui.onboarding.ConfirmScreen
 import io.github.danilodox.warbook.ui.onboarding.OnboardingViewModel
 import io.github.danilodox.warbook.ui.onboarding.TagEvent
 import io.github.danilodox.warbook.ui.onboarding.TagScreen
-import io.github.danilodox.warbook.ui.screens.PlaceholderScreen
+import io.github.danilodox.warbook.ui.player.PlayerRoute
 import io.github.danilodox.warbook.ui.search.SearchRoute
 import io.github.danilodox.warbook.ui.settings.SettingsRoute
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
 import io.github.danilodox.warbook.ui.war.WarRoute
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -85,7 +94,12 @@ private fun WarbookNavigation(startRoute: Route) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
-    val currentTab = TopLevelTab.entries.firstOrNull { destination.isIn(it.route) }
+    val tabHere = TopLevelTab.entries.firstOrNull { destination.isIn(it.route) }
+    // Jogador e Clã abrem por cima de uma aba: a barra inferior continua marcando a aba de origem.
+    var originTab by rememberSaveable { mutableStateOf<TopLevelTab?>(null) }
+    if (tabHere != null && tabHere != originTab) originTab = tabHere
+    val detailTitle = detailTitleOf(destination)
+    val currentTab = tabHere ?: originTab.takeIf { detailTitle != null }
     val onSettings = destination?.hasRoute(Route.Settings::class) == true
     // Onboarding e verificação desenham o próprio topo e não têm barra inferior.
     val inFlow = destination == null || destination.isIn(Route.Onboarding) || destination.hasRoute(Route.Verify::class)
@@ -95,6 +109,7 @@ private fun WarbookNavigation(startRoute: Route) {
             if (!inFlow) {
                 WarbookTopBar(
                     onSettings = onSettings,
+                    detailTitle = detailTitle,
                     currentTab = currentTab,
                     onBack = { navController.popBackStack() },
                     onOpenSettings = { navController.navigate(Route.Settings) { launchSingleTop = true } },
@@ -103,16 +118,7 @@ private fun WarbookNavigation(startRoute: Route) {
         },
         bottomBar = {
             if (!inFlow && !onSettings) {
-                NavigationBar {
-                    TopLevelTab.entries.forEach { tab ->
-                        NavigationBarItem(
-                            selected = tab == currentTab,
-                            onClick = { navController.navigateToTab(tab) },
-                            icon = { Icon(painterResource(tab.icon), contentDescription = null) },
-                            label = { Text(stringResource(tab.label)) },
-                        )
-                    }
-                }
+                WarbookBottomBar(currentTab, onDetail = detailTitle != null, navController)
             }
         },
     ) { padding ->
@@ -124,6 +130,34 @@ private fun WarbookNavigation(startRoute: Route) {
             mainGraph(navController)
             onboardingGraph(navController)
             verifyDestination(navController)
+        }
+    }
+}
+
+/** O título das telas que abrem por cima de uma aba (Jogador, Clã), ou null. */
+private fun detailTitleOf(destination: NavDestination?): StringResource? = when {
+    destination?.hasRoute(Route.Player::class) == true -> Res.string.screen_player
+    destination?.hasRoute(Route.ClanDetail::class) == true -> Res.string.screen_clan
+    else -> null
+}
+
+@Composable
+private fun WarbookBottomBar(currentTab: TopLevelTab?, onDetail: Boolean, navController: NavHostController) {
+    NavigationBar {
+        TopLevelTab.entries.forEach { tab ->
+            NavigationBarItem(
+                selected = tab == currentTab,
+                onClick = {
+                    // Na própria aba, por cima dela (Jogador/Clã): volta para a raiz da aba.
+                    if (tab == currentTab && onDetail) {
+                        navController.popBackStack(tab.route, inclusive = false)
+                    } else {
+                        navController.navigateToTab(tab)
+                    }
+                },
+                icon = { Icon(painterResource(tab.icon), contentDescription = null) },
+                label = { Text(stringResource(tab.label)) },
+            )
         }
     }
 }
@@ -141,9 +175,38 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 onVerify = { tag -> navController.navigate(Route.Verify(tag, fromOnboarding = false)) },
             )
         }
-        composable<Route.Clan> { PlaceholderScreen(Res.string.tab_clan) }
+        composable<Route.Clan> {
+            ClanTabRoute(
+                ClanTabActions(
+                    onAddAccount = { navController.navigate(Route.Onboarding) },
+                    onSearchClans = {
+                        navController.navigateToTab(TopLevelTab.SEARCH)
+                        // A aba Buscar abre já no modo Clã.
+                        navController.currentBackStackEntry?.savedStateHandle?.set(SEARCH_CLANS, true)
+                    },
+                    onOpenWar = { navController.navigateToTab(TopLevelTab.WAR) },
+                    onOpenMember = { playerTag -> navController.navigate(Route.Player(playerTag)) },
+                ),
+            )
+        }
         composable<Route.War> { WarRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
-        composable<Route.Search> { SearchRoute() }
+        searchDestination(navController)
+        composable<Route.Player> { entry ->
+            val route = entry.toRoute<Route.Player>()
+            PlayerRoute(
+                tag = route.tag,
+                fromSearch = route.fromSearch,
+                onOpenClan = { clanTag -> navController.navigate(Route.ClanDetail(clanTag)) },
+            )
+        }
+        composable<Route.ClanDetail> { entry ->
+            val route = entry.toRoute<Route.ClanDetail>()
+            ClanDetailRoute(
+                tag = route.tag,
+                fromSearch = route.fromSearch,
+                onOpenMember = { playerTag -> navController.navigate(Route.Player(playerTag)) },
+            )
+        }
     }
     composable<Route.Settings> {
         SettingsRoute(
@@ -159,6 +222,23 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
 }
 
 private const val OPEN_ACCOUNTS = "open_accounts"
+
+/** Pedido para a aba Buscar abrir no modo Clã (botão "Buscar clãs" da aba Clã sem clã). */
+private const val SEARCH_CLANS = "search_clans"
+
+/** Aba Buscar: abre Jogador e Clã marcados como vindos da busca (entram nas "Recentes"). */
+private fun NavGraphBuilder.searchDestination(navController: NavHostController) {
+    composable<Route.Search> { entry ->
+        val openClanMode by entry.savedStateHandle.getStateFlow(SEARCH_CLANS, false)
+            .collectAsStateWithLifecycle()
+        SearchRoute(
+            openClanMode = openClanMode,
+            onClanModeOpened = { entry.savedStateHandle[SEARCH_CLANS] = false },
+            onOpenPlayer = { tag -> navController.navigate(Route.Player(tag, fromSearch = true)) },
+            onOpenClan = { tag -> navController.navigate(Route.ClanDetail(tag, fromSearch = true)) },
+        )
+    }
+}
 
 private fun NavGraphBuilder.verifyDestination(navController: NavHostController) {
     composable<Route.Verify> { entry ->
@@ -230,19 +310,21 @@ private fun NavHostController.onboardingViewModel(entry: NavBackStackEntry): Onb
 @Composable
 private fun WarbookTopBar(
     onSettings: Boolean,
+    detailTitle: StringResource?,
     currentTab: TopLevelTab?,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     val title = when {
         onSettings -> Res.string.settings
+        detailTitle != null -> detailTitle
         currentTab != null -> currentTab.label
         else -> Res.string.app_name
     }
     TopAppBar(
         title = { Text(stringResource(title)) },
         navigationIcon = {
-            if (onSettings) {
+            if (onSettings || detailTitle != null) {
                 IconButton(onClick = onBack) {
                     Icon(painterResource(Res.drawable.ic_arrow_back), stringResource(Res.string.back))
                 }

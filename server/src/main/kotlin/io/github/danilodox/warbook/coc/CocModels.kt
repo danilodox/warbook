@@ -18,7 +18,9 @@ internal data class CocPlayer(
     val donationsReceived: Int = 0,
     val clan: CocClanRef? = null,
     val role: String? = null,
-    val league: CocNamed? = null,
+    val league: CocLeague? = null,
+    /** Liga do ranqueado novo; quando vem, vale mais que [league]. */
+    val leagueTier: CocLeague? = null,
     val heroes: List<CocUnit> = emptyList(),
     /** Na API, `troops` também traz pets, máquinas de cerco e supertropas. */
     val troops: List<CocUnit> = emptyList(),
@@ -57,9 +59,25 @@ internal data class CocUnit(val name: String, val level: Int, val maxLevel: Int,
 internal data class CocNamed(val name: String)
 
 @Serializable
+internal data class CocLeague(val name: String, val iconUrls: CocIconUrls? = null)
+
+@Serializable
+internal data class CocIconUrls(
+    val tiny: String? = null,
+    val small: String? = null,
+    val medium: String? = null,
+    val large: String? = null,
+)
+
+/** `clans?name=`: a lista vem em `items`, cada um no formato do clã sem `memberList`. */
+@Serializable
+internal data class CocClanList(val items: List<CocClan> = emptyList())
+
+@Serializable
 internal data class CocClan(
     val tag: String,
     val name: String,
+    val type: String? = null,
     val badgeUrls: CocBadgeUrls? = null,
     val clanLevel: Int,
     val members: Int,
@@ -82,7 +100,10 @@ internal data class CocClanMember(
     val name: String,
     val role: String,
     val townHallLevel: Int,
+    val expLevel: Int = 0,
     val trophies: Int,
+    val league: CocLeague? = null,
+    val leagueTier: CocLeague? = null,
     val donations: Int = 0,
     val donationsReceived: Int = 0,
     val clanRank: Int,

@@ -44,6 +44,14 @@ sealed interface Route {
     @Serializable
     data object OnboardingConfirm : Route
 
+    /** T1: qualquer jogador, aberto de qualquer aba. [fromSearch] = entra nas "Recentes" da busca. */
+    @Serializable
+    data class Player(val tag: String, val fromSearch: Boolean = false) : Route
+
+    /** T2: qualquer clã, aberto de qualquer aba. [fromSearch] = entra nas "Recentes" da busca. */
+    @Serializable
+    data class ClanDetail(val tag: String, val fromSearch: Boolean = false) : Route
+
     /** O3: verificação opcional. Fica fora do onboarding para abrir também pelas Configurações. */
     @Serializable
     data class Verify(val tag: String, val fromOnboarding: Boolean) : Route

@@ -53,6 +53,8 @@ data class WarUiState(
     val selectedRound: Int? = null,
     /** Partes do resumo do WhatsApp, salvas no aparelho. */
     val summaryOptions: SummaryOptions = SummaryOptions(),
+    /** Guerra de um clã escolhido (tela Clã), não o da conta: não convida a adicionar conta nem olha o perfil. */
+    val fixedClan: Boolean = false,
 ) {
     val round: Int? get() = selectedRound ?: cwl.cached?.value?.currentRound
 }
@@ -71,6 +73,7 @@ private data class ProfileLookup(val tag: String?, val cached: CachedProfile?)
 
 /**
  * Aba Guerra (G1–G4): guerra atual e CWL do clã da conta ativa, sempre com o último resultado salvo.
+ * Com [fixedClanTag] (sub-aba Guerra da tela Clã), mostra a guerra desse clã; "você" continua sendo a conta ativa.
  * Só busca no servidor quando a aba abre ([onOpen]), ao trocar de sub-aba pela primeira vez e ao puxar.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -79,6 +82,7 @@ class WarViewModel(
     private val profiles: ProfileRepository,
     private val wars: WarRepository,
     private val preferences: AppPreferences,
+    private val fixedClanTag: String? = null,
 ) : ViewModel() {
     private val selection = MutableStateFlow(Selection())
     private val loads = MutableStateFlow(Loads())
@@ -92,7 +96,8 @@ class WarViewModel(
         if (tag == null) flowOf(ProfileLookup(null, null)) else profiles.observe(tag).map { ProfileLookup(tag, it) }
     }
 
-    private val clanTag: Flow<String?> = profile.map { it.cached?.player?.clan?.tag }.distinctUntilChanged()
+    private val clanTag: Flow<String?> = fixedClanTag?.let { flowOf(it) }
+        ?: profile.map { it.cached?.player?.clan?.tag }.distinctUntilChanged()
 
     private val war = clanTag.flatMapLatest { tag -> if (tag == null) flowOf(null) else wars.observeWar(tag) }
 
@@ -101,20 +106,22 @@ class WarViewModel(
     val state: StateFlow<WarUiState> = combine(profile, war, cwl, selection, loads) { lookup, war, cwl, sel, loads ->
         // Na troca de conta, o perfil antigo ainda pode chegar um instante; não mostra.
         val cached = lookup.cached?.takeIf { it.player.tag == lookup.tag }
-        val clan = cached?.player?.clan
+        // O nome do clã fixo não importa aqui: a tela usa só a tag (o nome vem na própria guerra).
+        val clan = if (fixedClanTag != null) ClanSummaryDto(fixedClanTag, "") else cached?.player?.clan
         val profileLoad = loads.profile.forKey(lookup.tag)
         val warLoad = loads.war.forKey(clan?.tag)
         val cwlLoad = loads.cwl.forKey(clan?.tag)
         WarUiState(
             loaded = true,
             accountTag = lookup.tag,
-            profileKnown = cached != null,
+            profileKnown = fixedClanTag != null || cached != null,
             clan = clan,
             profile = Section(null, profileLoad?.running == true, profileLoad?.error),
             tab = sel.tab,
             war = Section(war, warLoad?.running == true, warLoad?.error),
             cwl = Section(cwl, cwlLoad?.running == true, cwlLoad?.error),
             selectedRound = sel.round,
+            fixedClan = fixedClanTag != null,
         )
     }.combine(preferences.summaryOptions) { state, options -> state.copy(summaryOptions = options) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, WarUiState())
@@ -146,11 +153,13 @@ class WarViewModel(
     private fun refresh(tab: WarTab) {
         visited += tab
         viewModelScope.launch {
-            val accountTag = activeTag.first() ?: return@launch
-            val clanTag = clanOf(accountTag) ?: return@launch
+            val clanTag = fixedClanTag ?: activeTag.first()?.let { clanOf(it) } ?: return@launch
+            // Clã da conta ativa: sempre salvo, mesmo antes de a conta saber a tag do clã (banco v3).
+            // Clã fixo: salvo só se for de uma conta ou seguido (o repositório decide).
+            val keep = fixedClanTag == null
             when (tab) {
-                WarTab.CURRENT -> track(clanTag, { copy(war = it) }, { war }) { wars.refreshWar(clanTag) }
-                WarTab.CWL -> track(clanTag, { copy(cwl = it) }, { cwl }) { wars.refreshCwl(clanTag) }
+                WarTab.CURRENT -> track(clanTag, { copy(war = it) }, { war }) { wars.refreshWar(clanTag, keep) }
+                WarTab.CWL -> track(clanTag, { copy(cwl = it) }, { cwl }) { wars.refreshCwl(clanTag, keep) }
             }
         }
     }

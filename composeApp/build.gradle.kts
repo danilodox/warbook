@@ -73,6 +73,9 @@ kotlin {
             implementation(libs.datastore.preferencesCore)
             implementation(libs.room3.runtime)
             implementation(libs.sqlite.bundled)
+            // Brasões e ícones de liga pelas URLs da API; o fetcher usa o engine Ktor de cada plataforma.
+            implementation(libs.coil.compose)
+            implementation(libs.coil.networkKtor3)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

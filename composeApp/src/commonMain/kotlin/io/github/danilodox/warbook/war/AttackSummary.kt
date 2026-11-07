@@ -24,7 +24,7 @@ private fun attackBlock(title: String, attacks: List<AttackLine>, texts: Summary
         val target = attack.defenderPosition?.let { position ->
             " → #$position" + (attack.defenderTownHall?.let { " (${texts.townHall(it)})" } ?: "")
         } ?: ""
-        "• ${attack.attackerName}$target ${stars(attack.stars)} ${attack.destructionPercentage}%"
+        "• ${WhatsAppText.safeName(attack.attackerName)}$target ${stars(attack.stars)} ${attack.destructionPercentage}%"
     }
     val more = attacks.size - MAX_ATTACK_LINES
     return listOf(title) + lines + if (more > 0) listOf("• ${texts.more(more)}") else emptyList()

@@ -51,6 +51,7 @@ class RoomAccountsRepository(
                 verificationToken = null,
                 isActive = true,
                 addedAt = clock(),
+                clanTag = player.clan?.tag,
             ),
         )
         profiles.save(player)

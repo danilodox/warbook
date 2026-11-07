@@ -12,4 +12,7 @@ interface WarCacheDao {
 
     @Upsert
     suspend fun upsert(entry: WarCacheEntity)
+
+    @Query("DELETE FROM war_cache WHERE cacheKey = :cacheKey")
+    suspend fun delete(cacheKey: String)
 }

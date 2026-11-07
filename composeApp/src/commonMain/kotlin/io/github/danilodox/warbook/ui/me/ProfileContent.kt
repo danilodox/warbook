@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.UnitLevelDto
 import io.github.danilodox.warbook.data.Account
@@ -46,20 +47,18 @@ import io.github.danilodox.warbook.resources.player_town_hall
 import io.github.danilodox.warbook.resources.player_trophies
 import io.github.danilodox.warbook.resources.player_war_stars
 import io.github.danilodox.warbook.resources.unit_level
+import io.github.danilodox.warbook.ui.common.LeagueIcon
 import io.github.danilodox.warbook.ui.search.label
 import io.github.danilodox.warbook.ui.theme.Spacing
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
-/** E1: cabeçalho, números principais, unidades em texto com barra (sem ícones até a v0.6.0) e temporada. */
+/**
+ * E1 e T1: [header] (o da conta na aba Eu, o com "Seguir" na tela Jogador), números principais, unidades em
+ * texto com barra (sem ícones até a v0.6.0) e temporada.
+ */
 @Composable
-fun ProfileContent(
-    player: PlayerDto,
-    account: Account,
-    onOpenAccounts: () -> Unit,
-    onVerify: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: Modifier = Modifier) {
     val groups = listOf(
         Res.string.me_heroes to player.heroes,
         Res.string.me_equipment to player.heroEquipment,
@@ -74,7 +73,7 @@ fun ProfileContent(
         contentPadding = PaddingValues(Spacing.medium),
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
-        item { ProfileHeader(player, account, onOpenAccounts, onVerify) }
+        item { header() }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 Stat(Res.string.player_town_hall, player.townHallLevel)
@@ -98,8 +97,9 @@ fun ProfileContent(
     }
 }
 
+/** Cabeçalho da aba Eu: o nome troca de conta, selo de verificado e o convite para verificar. */
 @Composable
-private fun ProfileHeader(player: PlayerDto, account: Account, onOpenAccounts: () -> Unit, onVerify: () -> Unit) {
+fun AccountHeader(player: PlayerDto, account: Account, onOpenAccounts: () -> Unit, onVerify: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -136,10 +136,23 @@ private fun ProfileHeader(player: PlayerDto, account: Account, onOpenAccounts: (
             },
             style = MaterialTheme.typography.bodyMedium,
         )
-        player.league?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+        LeagueLine(player)
         if (!account.isVerified) {
             TextButton(onClick = onVerify) { Text(stringResource(Res.string.me_verify_account)) }
         }
+    }
+}
+
+/** Liga de troféus com o ícone que a API entrega; sem liga, nada. */
+@Composable
+internal fun LeagueLine(player: PlayerDto) {
+    val league = player.league ?: return
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small / 2),
+    ) {
+        LeagueIcon(player.leagueIconUrl, contentDescription = null, size = 20.dp)
+        Text(league, style = MaterialTheme.typography.bodySmall)
     }
 }
 

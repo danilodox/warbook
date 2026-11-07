@@ -9,6 +9,10 @@ object ApiRoutes {
     const val PLAYER = "/v1/players/{$PARAM_TAG}"
     const val VERIFY = "/v1/players/{$PARAM_TAG}/verify"
     const val CLAN = "/v1/clans/{$PARAM_TAG}"
+
+    /** `?name=`. Não colide com [CLAN]: `search` não é uma tag válida e o Ktor prefere o segmento fixo. */
+    const val CLAN_SEARCH = "/v1/clans/search"
+    const val PARAM_NAME = "name"
     const val CURRENT_WAR = "/v1/clans/{$PARAM_TAG}/war/current"
     const val CURRENT_CWL = "/v1/clans/{$PARAM_TAG}/cwl/current"
 
@@ -17,7 +21,6 @@ object ApiRoutes {
     fun verify(tag: String): String = "/v1/players/$tag/verify"
 
     fun clan(tag: String): String = "/v1/clans/$tag"
-
     fun currentWar(clanTag: String): String = "/v1/clans/$clanTag/war/current"
 
     fun currentCwl(clanTag: String): String = "/v1/clans/$clanTag/cwl/current"

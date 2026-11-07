@@ -31,6 +31,9 @@ enum class ApiErrorCode {
 
     /** Token de verificação do jogo inválido, vencido ou de outra conta. HTTP 400. */
     INVALID_VERIFY_TOKEN,
+
+    /** Nome da busca curto ou longo demais. HTTP 400. */
+    INVALID_QUERY,
 }
 
 /** Resposta de `POST /v1/installs`: token que o app manda em `Authorization: Bearer`. */

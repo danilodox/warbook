@@ -40,7 +40,8 @@ class WarViewModelTest {
     private val api = FakeWarbookRepository()
     private val accountDao = FakeAccountDao()
     private var now = 1_000L
-    private val profiles = RoomProfileRepository(FakePlayerCacheDao(), accountDao, api) { now }
+    private val playerCache = FakePlayerCacheDao()
+    private val profiles = RoomProfileRepository(playerCache, accountDao, api) { now }
     private val accounts = RoomAccountsRepository(accountDao, profiles, api) { now++ }
     private val wars = RoomWarRepository(FakeWarCacheDao(), api) { now }
     private val preferences = FakeAppPreferences()
@@ -63,6 +64,35 @@ class WarViewModelTest {
     private fun TestScope.opened(): WarViewModel = WarViewModel(accounts, profiles, wars, preferences).also {
         it.onOpen()
         advanceUntilIdle()
+    }
+
+    @Test
+    fun claFixoBuscaSemContaENaoOlhaOPerfil() = runTest(dispatcher) {
+        api.wars["OPP"] = ApiResult.Success(CurrentWarDto(WarState.PREPARATION, teamSize = 5))
+        val viewModel = WarViewModel(accounts, profiles, wars, preferences, fixedClanTag = "OPP")
+
+        viewModel.onOpen()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.fixedClan)
+        assertTrue(state.profileKnown)
+        assertEquals(listOf("OPP"), api.warCalls)
+        assertTrue(api.playerCalls.isEmpty())
+        assertEquals(WarState.PREPARATION, state.war.cached?.value?.state)
+    }
+
+    @Test
+    fun claFixoMarcaVoceComAContaAtiva() = runTest(dispatcher) {
+        accounts.add(player)
+        api.wars["OPP"] = ApiResult.Success(CurrentWarDto(WarState.IN_WAR))
+        val viewModel = WarViewModel(accounts, profiles, wars, preferences, fixedClanTag = "OPP")
+
+        viewModel.onOpen()
+        advanceUntilIdle()
+
+        assertEquals(player.tag, viewModel.state.value.accountTag)
+        assertEquals(listOf("OPP"), api.warCalls, "não busca a guerra do clã da conta")
     }
 
     @Test
@@ -89,7 +119,7 @@ class WarViewModelTest {
     @Test
     fun semPerfilSalvoBuscaOPerfilAntes() = runTest(dispatcher) {
         accounts.add(player)
-        profiles.forget(player.tag)
+        playerCache.delete(player.tag)
         api.players[player.tag] = ApiResult.Success(player)
 
         val state = opened().state.value
