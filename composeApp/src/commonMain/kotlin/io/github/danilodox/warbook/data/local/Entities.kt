@@ -22,3 +22,10 @@ data class AccountEntity(
 /** Último perfil visto de um jogador, em JSON do `PlayerDto`, para o modo offline. */
 @Entity(tableName = "player_cache")
 data class PlayerCacheEntity(@PrimaryKey val tag: String, val json: String, val fetchedAt: Long)
+
+/**
+ * Último resultado da aba Guerra de um clã, para o modo offline. [cacheKey] é `war:<tag>` (JSON do
+ * `CurrentWarDto`) ou `cwl:<tag>` (JSON do `CwlDto`).
+ */
+@Entity(tableName = "war_cache")
+data class WarCacheEntity(@PrimaryKey val cacheKey: String, val json: String, val fetchedAt: Long)

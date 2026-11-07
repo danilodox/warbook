@@ -1,5 +1,6 @@
 package io.github.danilodox.warbook.data.local
 
+import androidx.room3.AutoMigration
 import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
@@ -8,12 +9,19 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
-@Database(entities = [AccountEntity::class, PlayerCacheEntity::class], version = 1)
+/** Versão 2 (v0.4.0): tabela `war_cache`. */
+@Database(
+    entities = [AccountEntity::class, PlayerCacheEntity::class, WarCacheEntity::class],
+    version = 2,
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
+)
 @ConstructedBy(WarbookDatabaseConstructor::class)
 abstract class WarbookDatabase : RoomDatabase() {
     abstract fun accounts(): AccountDao
 
     abstract fun playerCache(): PlayerCacheDao
+
+    abstract fun warCache(): WarCacheDao
 }
 
 /** Implementado pelo Room (KSP) em cada plataforma. */

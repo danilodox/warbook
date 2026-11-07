@@ -47,7 +47,6 @@ import io.github.danilodox.warbook.resources.ic_arrow_back
 import io.github.danilodox.warbook.resources.ic_settings
 import io.github.danilodox.warbook.resources.settings
 import io.github.danilodox.warbook.resources.tab_clan
-import io.github.danilodox.warbook.resources.tab_war
 import io.github.danilodox.warbook.ui.me.MeRoute
 import io.github.danilodox.warbook.ui.onboarding.ConfirmScreen
 import io.github.danilodox.warbook.ui.onboarding.OnboardingViewModel
@@ -58,6 +57,7 @@ import io.github.danilodox.warbook.ui.search.SearchRoute
 import io.github.danilodox.warbook.ui.settings.SettingsRoute
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
+import io.github.danilodox.warbook.ui.war.WarRoute
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -142,7 +142,7 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
             )
         }
         composable<Route.Clan> { PlaceholderScreen(Res.string.tab_clan) }
-        composable<Route.War> { PlaceholderScreen(Res.string.tab_war) }
+        composable<Route.War> { WarRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
         composable<Route.Search> { SearchRoute() }
     }
     composable<Route.Settings> {

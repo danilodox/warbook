@@ -2,6 +2,8 @@ package io.github.danilodox.warbook.data
 
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanRole
+import io.github.danilodox.warbook.api.CwlDto
+import io.github.danilodox.warbook.api.CwlState
 import io.github.danilodox.warbook.api.PlayerDto
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpHeaders
@@ -91,6 +93,16 @@ class KtorWarbookRepositoryTest {
         server.body = """{"inesperado":true}"""
 
         assertEquals(ApiResult.Failure(AppError.SERVER), repository.player("2PQ8LV9YC"))
+    }
+
+    @Test
+    fun cwlUsaARotaPropriaEForaDaLigaESucesso() = runTest {
+        server.body = """{"state":"NOT_IN_CWL"}"""
+
+        val result = repository.currentCwl("#2yquc8j0p")
+
+        assertEquals(ApiResult.Success(CwlDto(CwlState.NOT_IN_CWL)), result)
+        assertEquals(ApiRoutes.currentCwl("2YQUC8J0P"), server.paths.last())
     }
 
     @Test

@@ -50,6 +50,13 @@ class CocClient(engine: HttpClientEngine, private val apiKey: String, baseUrl: S
     internal suspend fun currentWar(clanTag: String): CocWar =
         send("clans", "#$clanTag", "currentwar", specificError = ::warError).body()
 
+    /** Fora da CWL a API responde 404 ([ApiErrorCode.NOT_FOUND]). */
+    internal suspend fun leagueGroup(clanTag: String): CocLeagueGroup =
+        send("clans", "#$clanTag", "currentwar", "leaguegroup", specificError = ::warError).body()
+
+    /** [warTag] como vem do grupo, com `#`. */
+    internal suspend fun leagueWar(warTag: String): CocWar = send("clanwarleagues", "wars", warTag).body()
+
     /**
      * `true` se [token] (gerado no jogo) prova que [tag] é do usuário. O token só vai no corpo da requisição;
      * a resposta, que o repete, é descartada sem passar por log nem por mensagem de exceção.

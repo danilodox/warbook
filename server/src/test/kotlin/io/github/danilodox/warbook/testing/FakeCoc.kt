@@ -9,6 +9,7 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import java.util.Collections
 import kotlin.time.Duration
 
 val testConfig = ServerConfig(
@@ -20,10 +21,11 @@ val testConfig = ServerConfig(
 
 /** API do jogo simulada: responde pelo caminho codificado (ex.: `/v1/players/%232PQ8LV9YC`). */
 class FakeCoc {
-    val requests = mutableListOf<HttpRequestData>()
+    // Sincronizadas: a CWL busca as guerras das rodadas em paralelo.
+    val requests: MutableList<HttpRequestData> = Collections.synchronizedList(mutableListOf())
 
     /** Corpo de cada requisição, na mesma ordem de [requests]. */
-    val bodies = mutableListOf<String>()
+    val bodies: MutableList<String> = Collections.synchronizedList(mutableListOf())
     private val routes = mutableMapOf<String, Pair<HttpStatusCode, String>>()
 
     fun on(encodedPath: String, status: HttpStatusCode = HttpStatusCode.OK, body: String) {
