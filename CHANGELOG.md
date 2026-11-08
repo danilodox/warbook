@@ -14,6 +14,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 - Nomes de tropas, feitiços, máquinas, heróis e pets em português quando o app está em português. O que não está na tabela, como equipamentos, fica com o nome do jogo.
 - Ícone do app novo (livro de couro, espadas e três estrelas), adaptativo e com camada monocromática para os ícones temáticos do Android 13+. PNG de 512 para a Play Store em `androidApp/src/main/ic_launcher-playstore.png`.
 - Números com separador de milhar (5.312).
+- Ícones do Fan Kit da Supercell nas tropas, feitiços, máquinas, pets e heróis do perfil: 66 imagens em WebP de 192 px (617 KB no total), cortadas em quadrado. Unidades que o kit não tem e os equipamentos ficam com as iniciais.
+- Cartão de perfil: o ícone Compartilhar no topo das telas Eu e Jogador abre uma prévia e gera uma imagem PNG de 1080 × 1350 (4:5, o WhatsApp mostra inteira) no tema do app, com cantoneiras douradas, nome, tag, clã, CV, troféus, estrelas de guerra, nível, 4 heróis e o aviso de fã. No Android vai pelo share sheet; no iOS o ícone fica escondido por enquanto.
+- Comparar: "Comparar comigo" na tela Jogador (ao lado de Seguir, com uma conta ativa) abre a sua conta e o jogador lado a lado: CV, nível, troféus e estrelas de guerra, cada herói e as doações e ataques vencidos da temporada. Quem está à frente fica em verde com ▲; empate fica neutro. No topo, o resumo de quem ganha em mais itens. Atualiza os dois perfis ao abrir e ao puxar, e sem internet compara com os perfis salvos.
 
 ### Removido
 

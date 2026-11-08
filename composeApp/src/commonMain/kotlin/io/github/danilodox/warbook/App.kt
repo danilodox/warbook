@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,14 +50,20 @@ import io.github.danilodox.warbook.navigation.navigateToTab
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.app_name
 import io.github.danilodox.warbook.resources.back
+import io.github.danilodox.warbook.resources.card_share
 import io.github.danilodox.warbook.resources.ic_arrow_back
 import io.github.danilodox.warbook.resources.ic_settings
+import io.github.danilodox.warbook.resources.ic_share
 import io.github.danilodox.warbook.resources.screen_clan
+import io.github.danilodox.warbook.resources.screen_compare
 import io.github.danilodox.warbook.resources.screen_player
 import io.github.danilodox.warbook.resources.settings
 import io.github.danilodox.warbook.ui.clan.ClanDetailRoute
 import io.github.danilodox.warbook.ui.clan.ClanTabActions
 import io.github.danilodox.warbook.ui.clan.ClanTabRoute
+import io.github.danilodox.warbook.ui.common.LocalTopBarActions
+import io.github.danilodox.warbook.ui.common.TopBarActions
+import io.github.danilodox.warbook.ui.compare.CompareRoute
 import io.github.danilodox.warbook.ui.me.MeRoute
 import io.github.danilodox.warbook.ui.onboarding.ConfirmScreen
 import io.github.danilodox.warbook.ui.onboarding.OnboardingViewModel
@@ -111,32 +118,36 @@ private fun WarbookNavigation(startRoute: Route) {
     // Onboarding e verificação desenham o próprio topo e não têm barra inferior.
     val inFlow = destination == null || destination.isIn(Route.Onboarding) || destination.hasRoute(Route.Verify::class)
 
-    Scaffold(
-        topBar = {
-            if (!inFlow) {
-                WarbookTopBar(
-                    onSettings = onSettings,
-                    detailTitle = detailTitle,
-                    currentTab = currentTab,
-                    onBack = { navController.popBackStack() },
-                    onOpenSettings = { navController.navigate(Route.Settings) { launchSingleTop = true } },
-                )
+    val topBarActions = remember { TopBarActions() }
+    CompositionLocalProvider(LocalTopBarActions provides topBarActions) {
+        Scaffold(
+            topBar = {
+                if (!inFlow) {
+                    WarbookTopBar(
+                        onSettings = onSettings,
+                        detailTitle = detailTitle,
+                        currentTab = currentTab,
+                        onShare = topBarActions.share.takeUnless { onSettings },
+                        onBack = { navController.popBackStack() },
+                        onOpenSettings = { navController.navigate(Route.Settings) { launchSingleTop = true } },
+                    )
+                }
+            },
+            bottomBar = {
+                if (!inFlow && !onSettings) {
+                    WarbookBottomBar(currentTab, onDetail = detailTitle != null, navController)
+                }
+            },
+        ) { padding ->
+            NavHost(
+                navController = navController,
+                startDestination = startRoute,
+                modifier = Modifier.padding(padding),
+            ) {
+                mainGraph(navController)
+                onboardingGraph(navController)
+                verifyDestination(navController)
             }
-        },
-        bottomBar = {
-            if (!inFlow && !onSettings) {
-                WarbookBottomBar(currentTab, onDetail = detailTitle != null, navController)
-            }
-        },
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = startRoute,
-            modifier = Modifier.padding(padding),
-        ) {
-            mainGraph(navController)
-            onboardingGraph(navController)
-            verifyDestination(navController)
         }
     }
 }
@@ -145,6 +156,7 @@ private fun WarbookNavigation(startRoute: Route) {
 private fun detailTitleOf(destination: NavDestination?): StringResource? = when {
     destination?.hasRoute(Route.Player::class) == true -> Res.string.screen_player
     destination?.hasRoute(Route.ClanDetail::class) == true -> Res.string.screen_clan
+    destination?.hasRoute(Route.Compare::class) == true -> Res.string.screen_compare
     else -> null
 }
 
@@ -204,7 +216,11 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 tag = route.tag,
                 fromSearch = route.fromSearch,
                 onOpenClan = { clanTag -> navController.navigate(Route.ClanDetail(clanTag)) },
+                onCompare = { navController.navigate(Route.Compare(route.tag)) },
             )
+        }
+        composable<Route.Compare> {
+            CompareRoute(it.toRoute<Route.Compare>().tag, onAddAccount = { navController.navigate(Route.Onboarding) })
         }
         composable<Route.ClanDetail> { entry ->
             val route = entry.toRoute<Route.ClanDetail>()
@@ -319,6 +335,7 @@ private fun WarbookTopBar(
     onSettings: Boolean,
     detailTitle: StringResource?,
     currentTab: TopLevelTab?,
+    onShare: (() -> Unit)?,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
@@ -338,6 +355,11 @@ private fun WarbookTopBar(
             }
         },
         actions = {
+            if (onShare != null) {
+                IconButton(onClick = onShare) {
+                    Icon(painterResource(Res.drawable.ic_share), stringResource(Res.string.card_share))
+                }
+            }
             if (!onSettings) {
                 IconButton(onClick = onOpenSettings) {
                     Icon(painterResource(Res.drawable.ic_settings), stringResource(Res.string.settings))

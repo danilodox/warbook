@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.ui.common
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -29,10 +30,12 @@ fun FollowButton(
     enabled: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
+    fillWidth: Boolean = false,
 ) {
+    val width = if (fillWidth) Modifier.fillMaxWidth() else Modifier
     Column(modifier) {
         if (following) {
-            OutlinedButton(onClick = onToggle, enabled = enabled) {
+            OutlinedButton(onClick = onToggle, enabled = enabled, modifier = width) {
                 Icon(
                     painterResource(Res.drawable.ic_star_filled),
                     contentDescription = null,
@@ -42,7 +45,7 @@ fun FollowButton(
                 Text(stringResource(Res.string.following), Modifier.padding(start = Spacing.sm))
             }
         } else {
-            Button(onClick = onToggle, enabled = enabled) {
+            Button(onClick = onToggle, enabled = enabled, modifier = width) {
                 Icon(painterResource(Res.drawable.ic_star), contentDescription = null, Modifier.size(18.dp))
                 Text(stringResource(Res.string.follow), Modifier.padding(start = Spacing.sm))
             }
