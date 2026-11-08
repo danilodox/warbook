@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Warbook · primeiro plano do ícone adaptativo (108 dp; conteúdo dentro do círculo seguro de 66 dp). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- translate(54 58) scale(0.76) translate(-54 -54) -->
+    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.76" android:scaleY="0.76" android:translateY="4">
+        <!-- espada 1: ponta para cima à esquerda -->
+        <group android:translateX="72" android:translateY="72" android:rotation="-45">
+            <path android:fillColor="#D0C1AC" android:pathData="M-3.4 0 L-3.1 -44 L0 -52 L3.1 -44 L3.4 0 Z" />
+            <path android:fillColor="#EEE3D4" android:fillAlpha="0.5" android:pathData="M-3.4 0 L-3.1 -44 L0 -52 L0 0 Z" />
+            <path android:strokeColor="#8C7B66" android:strokeWidth="1.1" android:pathData="M0 -3 V-38" />
+            <path android:fillColor="#4A3220" android:pathData="M-2.1 2.5 H2.1 V9.5 H-2.1 Z" />
+            <path android:strokeColor="#2E1F14" android:strokeWidth="0.8" android:pathData="M-2.1 5 H2.1 M-2.1 7.5 H2.1" />
+            <path android:fillColor="#E8BC5E" android:pathData="M0 8 A3 3 0 1 1 -0.01 8 Z" />
+            <path android:fillColor="#E8BC5E" android:pathData="M-10 -1.5 H10 C11.8 -1.5 11.8 2.5 10 2.5 H-10 C-11.8 2.5 -11.8 -1.5 -10 -1.5 Z" />
+            <path android:fillColor="#8A1F1C" android:pathData="M0 -1.1 A1.6 1.6 0 1 1 -0.01 -1.1 Z" />
+        </group>
+        <!-- espada 2: ponta para cima à direita -->
+        <group android:translateX="36" android:translateY="72" android:rotation="45">
+            <path android:fillColor="#D0C1AC" android:pathData="M-3.4 0 L-3.1 -44 L0 -52 L3.1 -44 L3.4 0 Z" />
+            <path android:fillColor="#EEE3D4" android:fillAlpha="0.5" android:pathData="M-3.4 0 L-3.1 -44 L0 -52 L0 0 Z" />
+            <path android:strokeColor="#8C7B66" android:strokeWidth="1.1" android:pathData="M0 -3 V-38" />
+            <path android:fillColor="#4A3220" android:pathData="M-2.1 2.5 H2.1 V9.5 H-2.1 Z" />
+            <path android:strokeColor="#2E1F14" android:strokeWidth="0.8" android:pathData="M-2.1 5 H2.1 M-2.1 7.5 H2.1" />
+            <path android:fillColor="#E8BC5E" android:pathData="M0 8 A3 3 0 1 1 -0.01 8 Z" />
+            <path android:fillColor="#E8BC5E" android:pathData="M-10 -1.5 H10 C11.8 -1.5 11.8 2.5 10 2.5 H-10 C-11.8 2.5 -11.8 -1.5 -10 -1.5 Z" />
+            <path android:fillColor="#8A1F1C" android:pathData="M0 -1.1 A1.6 1.6 0 1 1 -0.01 -1.1 Z" />
+        </group>
+        <!-- livro de couro com escudo e W: translate(54 52) scale(0.7) translate(-54 -52) -->
+        <group android:pivotX="54" android:pivotY="52" android:scaleX="0.7" android:scaleY="0.7">
+            <path android:fillColor="#1F1813" android:pathData="M38 26 H70 A3 3 0 0 1 73 29 V75 A3 3 0 0 1 70 78 H38 A3 3 0 0 1 35 75 V29 A3 3 0 0 1 38 26 Z" />
+            <path android:fillColor="#73563B" android:pathData="M39 27 H69 A3 3 0 0 1 72 30 V74 A3 3 0 0 1 69 77 H39 A3 3 0 0 1 36 74 V30 A3 3 0 0 1 39 27 Z" />
+            <path android:fillColor="#4A3220" android:pathData="M38 27 H42 V77 H38 A2 2 0 0 1 36 75 V29 A2 2 0 0 1 38 27 Z" />
+            <path android:fillColor="#E8BC5E" android:pathData="M72 27 V35 L64 27 Z M72 77 V69 L64 77 Z" />
+            <path android:fillColor="#E8BC5E" android:pathData="M57 38 L67.5 41.5 V51 C67.5 58.5 62.5 62.5 57 65.5 C51.5 62.5 46.5 58.5 46.5 51 V41.5 Z" />
+            <path android:strokeColor="#3F2815" android:strokeWidth="2.4" android:pathData="M50.5 45 L53.8 56 L57 49 L60.2 56 L63.5 45" />
+        </group>
+    </group>
+    <!-- três estrelas -->
+    <group android:translateX="42" android:translateY="36.5" android:scaleX="0.9" android:scaleY="0.9">
+        <path android:fillColor="#E8BC5E" android:pathData="M0 -5 L1.47 -2.02 L4.76 -1.55 L2.38 0.77 L2.94 4.05 L0 2.5 L-2.94 4.05 L-2.38 0.77 L-4.76 -1.55 L-1.47 -2.02 Z" />
+    </group>
+    <group android:translateX="54" android:translateY="32" android:scaleX="1.2" android:scaleY="1.2">
+        <path android:fillColor="#E8BC5E" android:pathData="M0 -5 L1.47 -2.02 L4.76 -1.55 L2.38 0.77 L2.94 4.05 L0 2.5 L-2.94 4.05 L-2.38 0.77 L-4.76 -1.55 L-1.47 -2.02 Z" />
+    </group>
+    <group android:translateX="66" android:translateY="36.5" android:scaleX="0.9" android:scaleY="0.9">
+        <path android:fillColor="#E8BC5E" android:pathData="M0 -5 L1.47 -2.02 L4.76 -1.55 L2.38 0.77 L2.94 4.05 L0 2.5 L-2.94 4.05 L-2.38 0.77 L-4.76 -1.55 L-1.47 -2.02 Z" />
+    </group>
+</vector>

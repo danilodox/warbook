@@ -4,6 +4,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+### Adicionado
+
+- Visual novo "livro de guerra": paleta própria em tema escuro e claro, com cores fixas (sem as cores do papel de parede). Títulos e números em Cinzel, texto em Alegreya Sans com números alinhados e tags em JetBrains Mono, as três com licença OFL na pasta `files/licenses`.
+- Componentes do design: escudo com o nível do CV, quadros de números, barra de nível (dourada em progresso, couro no máximo), grade de tropas com o nível no canto e borda dourada no máximo, placar da guerra, faixa offline, erro de tela cheia com código, skeleton que respeita "menos movimento" e 19 ícones de traço.
+- Telas no design novo: onboarding (logo, campo da tag em monoespaçada, ajuda e aviso de fã), aba Eu, Jogador, aba e tela Clã, Guerra, CWL, Buscar e Configurações.
+- Guerra: quem falta atacar em fichas, mapa com as estrelas de cada ataque e o CV do adversário na mesma posição, e o resumo do WhatsApp preso embaixo da tela, com "Personalizar" numa folha que sobe de baixo.
+- Configurações: tema Escuro (padrão), Claro ou Igual ao sistema, salvo no aparelho; as barras do sistema seguem o tema. Aviso de conteúdo de fã com o texto completo e o link da política da Supercell.
+- Nomes de tropas, feitiços, máquinas, heróis e pets em português quando o app está em português. O que não está na tabela, como equipamentos, fica com o nome do jogo.
+- Ícone do app novo (livro de couro, espadas e três estrelas), adaptativo e com camada monocromática para os ícones temáticos do Android 13+. PNG de 512 para a Play Store em `androidApp/src/main/ic_launcher-playstore.png`.
+- Números com separador de milhar (5.312).
+
+### Removido
+
+- Tela "Em breve" (`PlaceholderScreen`), que não era mais usada.
+
 ## [0.5.0] - 2026-11-07
 
 ### Adicionado

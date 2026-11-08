@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.danilodox.warbook.api.PlayerDto
@@ -64,6 +65,7 @@ import io.github.danilodox.warbook.ui.components.grouped
 import io.github.danilodox.warbook.ui.search.label
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
+import io.github.danilodox.warbook.ui.units.UnitNames
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -74,7 +76,8 @@ import org.jetbrains.compose.resources.stringResource
  */
 @Composable
 fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: Modifier = Modifier) {
-    val heroes = player.heroes.map { it.toItem() }
+    val language = Locale.current.language
+    val heroes = player.heroes.map { it.toItem(language) }
     val grids = listOf(
         Res.string.me_equipment to player.heroEquipment,
         Res.string.me_pets to player.pets,
@@ -100,7 +103,7 @@ fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: 
             items(heroes, key = { "hero-${it.key}" }) { HeroRow(it) }
         }
         grids.forEach { (title, units) ->
-            val list = units.map { it.toItem() }
+            val list = units.map { it.toItem(language) }
             item(key = title.key) {
                 Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     UnitSection(title, list)
@@ -270,5 +273,6 @@ internal fun LeagueLine(player: PlayerDto) {
     }
 }
 
-/** A unidade da API como aparece na tela. Os nomes em português chegam com a tabela de nomes. */
-internal fun UnitLevelDto.toItem(): UnitItem = UnitItem(key = name, name = name, level = level, maxLevel = maxLevel)
+/** A unidade da API como aparece na tela: [UnitItem.key] é o nome da API, [UnitItem.name] o do idioma. */
+internal fun UnitLevelDto.toItem(language: String = "en"): UnitItem =
+    UnitItem(key = name, name = UnitNames.display(name, language), level = level, maxLevel = maxLevel)
