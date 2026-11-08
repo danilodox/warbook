@@ -31,6 +31,7 @@ import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.unit_level
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.theme.tabular
+import io.github.danilodox.warbook.ui.units.UnitIcon
 import org.jetbrains.compose.resources.stringResource
 
 /** Uma unidade do perfil já com o nome que aparece na tela. */
@@ -53,11 +54,7 @@ fun LevelBar(progress: Float, isMax: Boolean, modifier: Modifier = Modifier) {
 
 /** Herói em lista: ícone, nome, nível/máximo e barra. */
 @Composable
-fun HeroRow(
-    item: UnitItem,
-    modifier: Modifier = Modifier,
-    icon: @Composable (UnitItem) -> Unit = { UnitInitials(it) },
-) {
+fun HeroRow(item: UnitItem, modifier: Modifier = Modifier, icon: @Composable (UnitItem) -> Unit = { UnitIcon(it) }) {
     Row(
         modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -87,7 +84,7 @@ fun HeroRow(
 fun UnitGrid(
     items: List<UnitItem>,
     modifier: Modifier = Modifier,
-    icon: @Composable (UnitItem) -> Unit = { UnitInitials(it) },
+    icon: @Composable (UnitItem) -> Unit = { UnitIcon(it) },
 ) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.xs + Spacing.xxs)) {
         items.chunked(GRID_COLUMNS).forEach { row ->
@@ -131,7 +128,7 @@ private fun UnitCell(item: UnitItem, icon: @Composable (UnitItem) -> Unit, modif
     }
 }
 
-/** Sem ícone (o Fan Kit não tem, ou ainda não carregou): as primeiras letras do nome. */
+/** Sem ícone do Fan Kit: as primeiras letras do nome. */
 @Composable
 fun UnitInitials(item: UnitItem, modifier: Modifier = Modifier) {
     val initials = item.name.split(' ', '.').filter { it.isNotBlank() }.take(2).joinToString("") { it.take(1) }

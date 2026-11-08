@@ -14,6 +14,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 - Nomes de tropas, feitiços, máquinas, heróis e pets em português quando o app está em português. O que não está na tabela, como equipamentos, fica com o nome do jogo.
 - Ícone do app novo (livro de couro, espadas e três estrelas), adaptativo e com camada monocromática para os ícones temáticos do Android 13+. PNG de 512 para a Play Store em `androidApp/src/main/ic_launcher-playstore.png`.
 - Números com separador de milhar (5.312).
+- Ícones do Fan Kit da Supercell nas tropas, feitiços, máquinas, pets e heróis do perfil: 66 imagens em WebP de 192 px (617 KB no total), cortadas em quadrado. Unidades que o kit não tem e os equipamentos ficam com as iniciais.
 
 ### Removido
 
