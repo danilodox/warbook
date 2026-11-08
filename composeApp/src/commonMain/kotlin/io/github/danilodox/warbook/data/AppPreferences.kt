@@ -22,6 +22,9 @@ interface AppPreferences {
     /** Jogadores e clãs abertos pela busca, o mais recente primeiro (até [RecentSearches.LIMIT]). */
     val recentSearches: Flow<List<RecentSearch>>
 
+    /** Tema das Configurações; escuro até o usuário trocar. */
+    val themeMode: Flow<ThemeMode>
+
     suspend fun setExploreMode(enabled: Boolean)
 
     /** Lê e grava numa só edição, para dois toques rápidos não se perderem. */
@@ -30,18 +33,23 @@ interface AppPreferences {
     suspend fun addRecentSearch(item: RecentSearch)
 
     suspend fun clearRecentSearches()
+
+    suspend fun setThemeMode(mode: ThemeMode)
 }
 
 class DataStoreAppPreferences(private val dataStore: DataStore<Preferences>) : AppPreferences {
     private val exploreKey = booleanPreferencesKey("explore_mode")
     private val summaryKey = stringSetPreferencesKey("summary_parts")
     private val recentKey = stringPreferencesKey("recent_searches")
+    private val themeKey = stringPreferencesKey("theme_mode")
 
     override val exploreMode: Flow<Boolean> = dataStore.data.map { it[exploreKey] ?: false }
 
     override val summaryOptions: Flow<SummaryOptions> = dataStore.data.map { summaryOptionsOf(it[summaryKey]) }
 
     override val recentSearches: Flow<List<RecentSearch>> = dataStore.data.map { RecentSearches.decode(it[recentKey]) }
+
+    override val themeMode: Flow<ThemeMode> = dataStore.data.map { themeModeOf(it[themeKey]) }
 
     override suspend fun setExploreMode(enabled: Boolean) {
         dataStore.edit { it[exploreKey] = enabled }
@@ -61,6 +69,10 @@ class DataStoreAppPreferences(private val dataStore: DataStore<Preferences>) : A
 
     override suspend fun clearRecentSearches() {
         dataStore.edit { it.remove(recentKey) }
+    }
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        dataStore.edit { it[themeKey] = mode.name }
     }
 }
 

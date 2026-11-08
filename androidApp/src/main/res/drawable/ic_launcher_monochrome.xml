@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Warbook · camada monocromática (ícone temático, Android 13+). Uma cor só; o sistema aplica o tom. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.76" android:scaleY="0.76" android:translateY="4">
+        <!-- As espadas param na borda do livro: o recorte é o quadrado inteiro com um furo no lugar do livro. -->
+        <group>
+            <clip-path android:pathData="M0 0 H108 V108 H0 Z M40.2 33.3 V70.7 H67.8 V33.3 Z" />
+            <group android:translateX="72" android:translateY="72" android:rotation="-45">
+                <path android:fillColor="#000000" android:pathData="M-3.4 0 L-3.1 -44 L0 -52 L3.1 -44 L3.4 0 Z M-2.1 2 H2.1 V9.5 H-2.1 Z M0 8 A3 3 0 1 1 -0.01 8 Z M-10 -1.5 H10 C11.8 -1.5 11.8 2.5 10 2.5 H-10 C-11.8 2.5 -11.8 -1.5 -10 -1.5 Z" />
+            </group>
+            <group android:translateX="36" android:translateY="72" android:rotation="45">
+                <path android:fillColor="#000000" android:pathData="M-3.4 0 L-3.1 -44 L0 -52 L3.1 -44 L3.4 0 Z M-2.1 2 H2.1 V9.5 H-2.1 Z M0 8 A3 3 0 1 1 -0.01 8 Z M-10 -1.5 H10 C11.8 -1.5 11.8 2.5 10 2.5 H-10 C-11.8 2.5 -11.8 -1.5 -10 -1.5 Z" />
+            </group>
+        </group>
+        <group android:pivotX="54" android:pivotY="52" android:scaleX="0.7" android:scaleY="0.7">
+            <path android:fillColor="#000000" android:fillType="evenOdd" android:pathData="M39 27 H69 A3 3 0 0 1 72 30 V74 A3 3 0 0 1 69 77 H39 A3 3 0 0 1 36 74 V30 A3 3 0 0 1 39 27 Z M57 38 L67.5 41.5 V51 C67.5 58.5 62.5 62.5 57 65.5 C51.5 62.5 46.5 58.5 46.5 51 V41.5 Z" />
+            <path android:strokeColor="#000000" android:strokeWidth="2.6" android:pathData="M50.5 45 L53.8 56 L57 49 L60.2 56 L63.5 45" />
+        </group>
+    </group>
+    <group android:translateX="42" android:translateY="36.5" android:scaleX="0.9" android:scaleY="0.9">
+        <path android:fillColor="#000000" android:pathData="M0 -5 L1.47 -2.02 L4.76 -1.55 L2.38 0.77 L2.94 4.05 L0 2.5 L-2.94 4.05 L-2.38 0.77 L-4.76 -1.55 L-1.47 -2.02 Z" />
+    </group>
+    <group android:translateX="54" android:translateY="32" android:scaleX="1.2" android:scaleY="1.2">
+        <path android:fillColor="#000000" android:pathData="M0 -5 L1.47 -2.02 L4.76 -1.55 L2.38 0.77 L2.94 4.05 L0 2.5 L-2.94 4.05 L-2.38 0.77 L-4.76 -1.55 L-1.47 -2.02 Z" />
+    </group>
+    <group android:translateX="66" android:translateY="36.5" android:scaleX="0.9" android:scaleY="0.9">
+        <path android:fillColor="#000000" android:pathData="M0 -5 L1.47 -2.02 L4.76 -1.55 L2.38 0.77 L2.94 4.05 L0 2.5 L-2.94 4.05 L-2.38 0.77 L-4.76 -1.55 L-1.47 -2.02 Z" />
+    </group>
+</vector>

@@ -1,42 +1,26 @@
 package io.github.danilodox.warbook.ui.player
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.data.AppPreferences
 import io.github.danilodox.warbook.data.FollowRepository
 import io.github.danilodox.warbook.data.ProfileRepository
-import io.github.danilodox.warbook.resources.Res
-import io.github.danilodox.warbook.resources.player_clan_open
-import io.github.danilodox.warbook.resources.player_clan_role
-import io.github.danilodox.warbook.resources.player_no_clan
-import io.github.danilodox.warbook.resources.player_tag
-import io.github.danilodox.warbook.resources.screen_clan
-import io.github.danilodox.warbook.ui.common.ClanBadge
 import io.github.danilodox.warbook.ui.common.FollowButton
-import io.github.danilodox.warbook.ui.me.LeagueLine
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.ProfileContent
+import io.github.danilodox.warbook.ui.me.ProfileHeader
 import io.github.danilodox.warbook.ui.me.ProfileSkeleton
 import io.github.danilodox.warbook.ui.me.StaleBanner
-import io.github.danilodox.warbook.ui.search.label
 import io.github.danilodox.warbook.ui.theme.Spacing
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 /** Tela Jogador (T1). [onOpenClan] abre a tela Clã do clã dele. */
@@ -69,7 +53,7 @@ fun PlayerScreen(
         val error = state.error
         when {
             profile != null -> Column(Modifier.fillMaxSize()) {
-                if (error != null) StaleBanner(error, profile.fetchedAt)
+                if (error != null) StaleBanner(error, profile.fetchedAt, onRefresh)
                 ProfileContent(
                     player = profile.player,
                     header = { PlayerHeader(profile.player, state, onToggleFollow, onOpenClan) },
@@ -82,7 +66,7 @@ fun PlayerScreen(
     }
 }
 
-/** Nome, tag, clã (toca para abrir) e liga; "Seguir" ao lado. "Comparar" e cartão chegam na v0.6. */
+/** Cabeçalho do perfil (o clã abre a tela Clã) e "Seguir" embaixo. "Comparar" e cartão chegam no PR B. */
 @Composable
 private fun PlayerHeader(
     player: PlayerDto,
@@ -90,33 +74,8 @@ private fun PlayerHeader(
     onToggleFollow: () -> Unit,
     onOpenClan: (String) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
-        Text(player.name, style = MaterialTheme.typography.titleLarge)
-        Text(stringResource(Res.string.player_tag, player.tag), style = MaterialTheme.typography.bodySmall)
-        val clan = player.clan
-        if (clan == null) {
-            Text(stringResource(Res.string.player_no_clan), style = MaterialTheme.typography.bodyMedium)
-        } else {
-            val text = player.role
-                ?.let { stringResource(Res.string.player_clan_role, clan.name, stringResource(it.label)) }
-                ?: clan.name
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Spacing.small / 2),
-                modifier = Modifier.clickable(
-                    onClickLabel = stringResource(Res.string.screen_clan),
-                    role = Role.Button,
-                ) { onOpenClan(clan.tag) },
-            ) {
-                ClanBadge(clan.badgeUrl, contentDescription = null, size = 24.dp)
-                Text(
-                    stringResource(Res.string.player_clan_open, text),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-        LeagueLine(player)
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        ProfileHeader(player, onOpenClan = onOpenClan)
         FollowButton(
             following = state.following,
             limitReached = state.followLimitReached,

@@ -9,6 +9,7 @@ import io.github.danilodox.warbook.data.FakeWarbookRepository
 import io.github.danilodox.warbook.data.RoomAccountsRepository
 import io.github.danilodox.warbook.data.RoomProfileRepository
 import io.github.danilodox.warbook.data.testPlayer
+import io.github.danilodox.warbook.ui.components.formatThousands
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -145,8 +146,20 @@ class MeViewModelTest {
 
     @Test
     fun progressoDaUnidade() {
-        assertEquals(0.5f, UnitLevelDto("Barbarian", 5, 10).progress)
-        assertEquals(1f, UnitLevelDto("Barbarian", 12, 10).progress)
-        assertEquals(0f, UnitLevelDto("Barbarian", 3, 0).progress)
+        assertEquals(0.5f, UnitLevelDto("Barbarian", 5, 10).toItem().progress)
+        assertEquals(1f, UnitLevelDto("Barbarian", 12, 10).toItem().progress)
+        assertEquals(0f, UnitLevelDto("Barbarian", 3, 0).toItem().progress)
+        assertTrue(UnitLevelDto("Barbarian", 10, 10).toItem().isMax)
+        assertFalse(UnitLevelDto("Barbarian", 9, 10).toItem().isMax)
+        assertFalse(UnitLevelDto("Barbarian", 3, 0).toItem().isMax)
+    }
+
+    @Test
+    fun separadorDeMilhar() {
+        assertEquals("5.312", formatThousands(5312, "."))
+        assertEquals("1,284,000", formatThousands(1_284_000, ","))
+        assertEquals("902", formatThousands(902, "."))
+        assertEquals("0", formatThousands(0, "."))
+        assertEquals("-1.000", formatThousands(-1000, "."))
     }
 }

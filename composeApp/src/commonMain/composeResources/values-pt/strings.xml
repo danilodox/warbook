@@ -6,7 +6,6 @@
     <string name="tab_search">Buscar</string>
     <string name="settings">Configurações</string>
     <string name="back">Voltar</string>
-    <string name="coming_soon">Em breve</string>
     <string name="settings_version">Versão %1$s</string>
 
     <string name="search_tag_label">Tag do jogador</string>
@@ -14,6 +13,11 @@
     <string name="search_hint">Digite a tag de um jogador para testar a conexão com o servidor.</string>
     <string name="search_loading">Buscando…</string>
     <string name="retry">Tentar de novo</string>
+    <string name="retry_short">Tentar</string>
+    <string name="you_tag">você</string>
+    <string name="error_code">Código: %1$s</string>
+    <string name="fan_notice_short">Material não oficial, não endossado pela Supercell.</string>
+    <string name="thousands_separator">.</string>
 
     <string name="player_tag">#%1$s</string>
     <string name="player_clan_role">%1$s · %2$s</string>
@@ -38,7 +42,7 @@
     <string name="error_network">Sem conexão com o servidor do Warbook. Confira a internet.</string>
     <string name="error_server">O servidor do jogo não respondeu.</string>
 
-    <string name="onboarding_tagline">Estatísticas e guerras do seu clã</string>
+    <string name="onboarding_tagline">As estatísticas e as guerras do seu clã</string>
     <string name="onboarding_tag_question">Qual é a tag do seu jogador?</string>
     <string name="onboarding_tag_hint">Fica no seu perfil, embaixo do nome.</string>
     <string name="onboarding_help_title">Onde acho minha tag?</string>
@@ -71,12 +75,12 @@
     <string name="me_heroes">Heróis</string>
     <string name="me_equipment">Equipamentos de herói</string>
     <string name="me_troops">Tropas</string>
-    <string name="me_spells">Feitiços</string>
-    <string name="me_sieges">Máquinas de cerco</string>
+    <string name="me_spells_sieges">Feitiços e máquinas</string>
+    <string name="me_maxed_count">%1$d de %2$d no máximo</string>
     <string name="me_pets">Pets</string>
     <string name="me_season">Temporada</string>
-    <string name="me_donations">Doadas</string>
-    <string name="me_received">Recebidas</string>
+    <string name="me_donations">Doou</string>
+    <string name="me_received">Recebeu</string>
     <string name="me_attack_wins">Ataques vencidos</string>
     <string name="unit_level">%1$d/%2$d</string>
 
@@ -138,7 +142,13 @@
     <string name="war_strength_average">CV médio</string>
     <string name="war_strength_max">CV máximo</string>
     <string name="war_town_hall">CV %1$d</string>
-    <string name="war_map">Mapa</string>
+    <string name="war_map">Mapa %1$d × %1$d</string>
+    <string name="war_map_missed">não atacou</string>
+    <plurals name="war_map_pending">
+        <item quantity="one">%1$d pendente</item>
+        <item quantity="other">%1$d pendentes</item>
+    </plurals>
+    <string name="war_pending_attacks">%1$d ataques</string>
     <string name="war_summary_title">Resumo para o WhatsApp</string>
     <string name="war_copy">Copiar</string>
     <string name="war_copied">Copiado</string>
@@ -161,7 +171,13 @@
     <string name="cwl_not_in_title">O clã não está na CWL agora</string>
     <string name="cwl_not_in_body">A Liga de Guerra de Clãs acontece no começo de cada mês. Quando o clã entrar, as rodadas aparecem aqui.</string>
 
-    <string name="settings_fan_notice">Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a Política de Conteúdo de Fãs da Supercell: www.supercell.com/fan-content-policy.</string>
+    <string name="settings_fan_notice">Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a Política de Conteúdo de Fãs da Supercell.</string>
+    <string name="fan_policy_link">supercell.com/fan-content-policy</string>
+    <string name="settings_appearance">Aparência</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_system">Igual ao sistema</string>
+    <string name="settings_fan_title">Conteúdo de fã</string>
 
     <!-- v0.5.0: telas Jogador e Clã -->
     <string name="screen_player">Jogador</string>
@@ -169,7 +185,6 @@
     <string name="follow">Seguir</string>
     <string name="following">Seguindo</string>
     <string name="follow_limit">Você já segue 50. Deixe de seguir alguém para seguir mais.</string>
-    <string name="player_clan_open">%1$s ›</string>
     <string name="clan_tab_info">Info</string>
     <string name="clan_tab_members">Membros</string>
     <string name="clan_tab_war">Guerra</string>
@@ -199,15 +214,13 @@
     <string name="clan_unknown_value">—</string>
     <string name="clan_open_war">Ver guerra atual ›</string>
     <string name="clan_members_season">Doações da temporada atual</string>
-    <string name="clan_members_legend">Número de cima: doadas. ↓ recebidas.</string>
+    <string name="clan_members_legend">Número de cima: doou · ↓ recebeu</string>
     <string name="clan_sort_position">Posição</string>
     <string name="clan_sort_town_hall">CV</string>
     <string name="clan_sort_trophies">Troféus</string>
     <string name="clan_sort_donations">Doações</string>
-    <string name="clan_member_line">%1$s · CV %2$d · nível %3$d</string>
-    <string name="clan_member_trophies">%1$d troféus</string>
-    <string name="clan_member_received">↓ %1$d</string>
-    <string name="clan_member_you">você</string>
+    <string name="clan_member_line">%1$s · %2$s troféus</string>
+    <string name="clan_member_received">↓ %1$s</string>
     <string name="clan_invite_title">Adicione sua conta para ver seu clã</string>
     <string name="clan_invite_body">A aba Clã mostra as informações e os membros do clã da sua conta.</string>
     <string name="clan_no_clan_title">Sua conta não está em um clã</string>

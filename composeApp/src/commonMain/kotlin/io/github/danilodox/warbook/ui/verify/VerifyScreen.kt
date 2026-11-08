@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,6 +38,7 @@ import io.github.danilodox.warbook.resources.verify_steps_title
 import io.github.danilodox.warbook.resources.verify_title
 import io.github.danilodox.warbook.resources.verify_token_label
 import io.github.danilodox.warbook.resources.verify_token_note
+import io.github.danilodox.warbook.ui.components.NumberedStep
 import io.github.danilodox.warbook.ui.onboarding.FlowColumn
 import io.github.danilodox.warbook.ui.onboarding.FlowTopBar
 import io.github.danilodox.warbook.ui.onboarding.ProgressButton
@@ -95,15 +95,14 @@ fun VerifyScreen(
         }
         FlowColumn {
             Text(stringResource(Res.string.verify_intro), style = MaterialTheme.typography.bodyMedium)
-            Card(
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             ) {
-                Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Text(stringResource(Res.string.verify_steps_title), style = MaterialTheme.typography.titleSmall)
-                    steps.forEachIndexed { index, step ->
-                        Text("${index + 1}. ${stringResource(step)}", style = MaterialTheme.typography.bodySmall)
-                    }
+                    steps.forEachIndexed { index, step -> NumberedStep(index + 1, stringResource(step)) }
                 }
             }
             val error = (state as? VerifyState.Failed)?.error

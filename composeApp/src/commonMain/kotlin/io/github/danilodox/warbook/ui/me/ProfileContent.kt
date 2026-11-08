@@ -9,11 +9,11 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,20 +21,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.UnitLevelDto
 import io.github.danilodox.warbook.data.Account
 import io.github.danilodox.warbook.resources.Res
+import io.github.danilodox.warbook.resources.ic_check
+import io.github.danilodox.warbook.resources.ic_chevron_right
+import io.github.danilodox.warbook.resources.ic_expand_more
 import io.github.danilodox.warbook.resources.me_attack_wins
 import io.github.danilodox.warbook.resources.me_donations
 import io.github.danilodox.warbook.resources.me_equipment
 import io.github.danilodox.warbook.resources.me_heroes
+import io.github.danilodox.warbook.resources.me_maxed_count
 import io.github.danilodox.warbook.resources.me_pets
 import io.github.danilodox.warbook.resources.me_received
 import io.github.danilodox.warbook.resources.me_season
-import io.github.danilodox.warbook.resources.me_sieges
-import io.github.danilodox.warbook.resources.me_spells
+import io.github.danilodox.warbook.resources.me_spells_sieges
 import io.github.danilodox.warbook.resources.me_switch_account
 import io.github.danilodox.warbook.resources.me_troops
 import io.github.danilodox.warbook.resources.me_verified
@@ -43,56 +48,181 @@ import io.github.danilodox.warbook.resources.player_clan_role
 import io.github.danilodox.warbook.resources.player_level
 import io.github.danilodox.warbook.resources.player_no_clan
 import io.github.danilodox.warbook.resources.player_tag
-import io.github.danilodox.warbook.resources.player_town_hall
 import io.github.danilodox.warbook.resources.player_trophies
 import io.github.danilodox.warbook.resources.player_war_stars
-import io.github.danilodox.warbook.resources.unit_level
+import io.github.danilodox.warbook.resources.screen_clan
+import io.github.danilodox.warbook.ui.common.ClanBadge
 import io.github.danilodox.warbook.ui.common.LeagueIcon
+import io.github.danilodox.warbook.ui.components.HeroRow
+import io.github.danilodox.warbook.ui.components.SectionHeader
+import io.github.danilodox.warbook.ui.components.ShieldSize
+import io.github.danilodox.warbook.ui.components.StatRow
+import io.github.danilodox.warbook.ui.components.StatTile
+import io.github.danilodox.warbook.ui.components.TownHallShield
+import io.github.danilodox.warbook.ui.components.UnitGrid
+import io.github.danilodox.warbook.ui.components.UnitItem
+import io.github.danilodox.warbook.ui.components.grouped
 import io.github.danilodox.warbook.ui.search.label
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.ui.theme.WarbookTheme
+import io.github.danilodox.warbook.ui.units.UnitNames
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * E1 e T1: [header] (o da conta na aba Eu, o com "Seguir" na tela Jogador), números principais, unidades em
- * texto com barra (sem ícones até a v0.6.0) e temporada.
+ * E1 e T1: [header] (o da conta na aba Eu, o com "Seguir" na tela Jogador), números principais,
+ * heróis em lista com barra, o resto em grade com o nível no canto, e a temporada.
  */
 @Composable
 fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: Modifier = Modifier) {
-    val groups = listOf(
-        Res.string.me_heroes to player.heroes,
+    val language = Locale.current.language
+    val heroes = player.heroes.map { it.toItem(language) }
+    val grids = listOf(
         Res.string.me_equipment to player.heroEquipment,
-        Res.string.me_troops to player.troops,
-        Res.string.me_spells to player.spells,
-        Res.string.me_sieges to player.siegeMachines,
         Res.string.me_pets to player.pets,
+        Res.string.me_troops to player.troops,
+        Res.string.me_spells_sieges to player.spells + player.siegeMachines,
     ).filter { (_, units) -> units.isNotEmpty() }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.small),
+        contentPadding = PaddingValues(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         item { header() }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                Stat(Res.string.player_town_hall, player.townHallLevel)
-                Stat(Res.string.player_level, player.expLevel)
-                Stat(Res.string.player_trophies, player.trophies)
-                Stat(Res.string.player_war_stars, player.warStars)
+            StatRow {
+                StatTile(stringResource(Res.string.player_level), player.expLevel.toString())
+                StatTile(stringResource(Res.string.player_trophies), player.trophies.grouped())
+                StatTile(stringResource(Res.string.player_war_stars), player.warStars.grouped())
             }
         }
-        groups.forEach { (title, units) ->
-            item(key = title.key) { SectionTitle(title) }
-            items(units, key = { "${title.key}-${it.name}" }) { UnitRow(it) }
+        if (heroes.isNotEmpty()) {
+            item(key = "heroes") { UnitSection(Res.string.me_heroes, heroes) }
+            items(heroes, key = { "hero-${it.key}" }) { HeroRow(it) }
         }
-        item { SectionTitle(Res.string.me_season) }
+        grids.forEach { (title, units) ->
+            val list = units.map { it.toItem(language) }
+            item(key = title.key) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    UnitSection(title, list)
+                    UnitGrid(list)
+                }
+            }
+        }
+        item { SectionHeader(stringResource(Res.string.me_season)) }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                Stat(Res.string.me_donations, player.donations)
-                Stat(Res.string.me_received, player.donationsReceived)
-                Stat(Res.string.me_attack_wins, player.attackWins)
+            StatRow {
+                StatTile(stringResource(Res.string.me_donations), player.donations.grouped())
+                StatTile(stringResource(Res.string.me_received), player.donationsReceived.grouped())
+                StatTile(stringResource(Res.string.me_attack_wins), player.attackWins.grouped())
             }
+        }
+    }
+}
+
+/** Título da seção com quantos já estão no nível máximo. */
+@Composable
+private fun UnitSection(title: StringResource, items: List<UnitItem>) {
+    SectionHeader(stringResource(title)) {
+        Text(
+            stringResource(Res.string.me_maxed_count, items.count { it.isMax }, items.size),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/**
+ * Cabeçalho do perfil: escudo do CV, nome (com [nameExtras] ao lado), tag, clã e liga.
+ * Com [onOpenClan] a linha do clã abre a tela Clã.
+ */
+@Composable
+fun ProfileHeader(
+    player: PlayerDto,
+    modifier: Modifier = Modifier,
+    onNameClick: (() -> Unit)? = null,
+    onOpenClan: ((String) -> Unit)? = null,
+    nameExtras: @Composable RowScope.() -> Unit = {},
+) {
+    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        TownHallShield(player.townHallLevel, size = ShieldSize.Large)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                NameText(player.name, onNameClick, Modifier.weight(1f, fill = false))
+                nameExtras()
+            }
+            Text(
+                stringResource(Res.string.player_tag, player.tag),
+                style = WarbookTheme.text.tag,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            ClanLine(player, onOpenClan)
+            LeagueLine(player)
+        }
+    }
+}
+
+@Composable
+private fun NameText(name: String, onClick: (() -> Unit)?, modifier: Modifier) {
+    val clickable = if (onClick == null) {
+        Modifier
+    } else {
+        Modifier.clickable(
+            onClickLabel = stringResource(Res.string.me_switch_account),
+            role = Role.Button,
+            onClick = onClick,
+        )
+    }
+    Row(modifier.then(clickable), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            name,
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        // O nome troca de conta (E2).
+        if (onClick != null) {
+            Icon(painterResource(Res.drawable.ic_expand_more), contentDescription = null, Modifier.size(20.dp))
+        }
+    }
+}
+
+@Composable
+private fun ClanLine(player: PlayerDto, onOpenClan: ((String) -> Unit)?) {
+    val clan = player.clan
+    if (clan == null) {
+        Text(
+            stringResource(Res.string.player_no_clan),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        return
+    }
+    val text = player.role
+        ?.let { stringResource(Res.string.player_clan_role, clan.name, stringResource(it.label)) }
+        ?: clan.name
+    val clickable = if (onOpenClan == null) {
+        Modifier
+    } else {
+        Modifier.clickable(onClickLabel = stringResource(Res.string.screen_clan), role = Role.Button) {
+            onOpenClan(clan.tag)
+        }
+    }
+    Row(
+        clickable.padding(vertical = Spacing.xxs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+    ) {
+        ClanBadge(clan.badgeUrl, contentDescription = null, size = 20.dp)
+        Text(text, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (onOpenClan != null) {
+            Icon(painterResource(Res.drawable.ic_chevron_right), contentDescription = null, Modifier.size(16.dp))
         }
     }
 }
@@ -100,45 +230,32 @@ fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: 
 /** Cabeçalho da aba Eu: o nome troca de conta, selo de verificado e o convite para verificar. */
 @Composable
 fun AccountHeader(player: PlayerDto, account: Account, onOpenAccounts: () -> Unit, onVerify: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-        ) {
-            // O nome troca de conta (E2).
-            Text(
-                "${player.name} ▾",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.clickable(
-                    onClickLabel = stringResource(Res.string.me_switch_account),
-                    role = Role.Button,
-                    onClick = onOpenAccounts,
-                ),
-            )
-            if (account.isVerified) {
-                Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.small) {
-                    Text(
-                        "✓ ${stringResource(Res.string.me_verified)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(horizontal = Spacing.small / 2),
-                    )
-                }
+    Column {
+        ProfileHeader(player, onNameClick = onOpenAccounts) {
+            if (account.isVerified) VerifiedChip()
+        }
+        if (!account.isVerified) {
+            TextButton(onClick = onVerify, modifier = Modifier.padding(start = Spacing.xxxl + Spacing.md)) {
+                Text(stringResource(Res.string.me_verify_account))
             }
         }
-        Text(stringResource(Res.string.player_tag, player.tag), style = MaterialTheme.typography.bodySmall)
-        val clan = player.clan
-        val role = player.role
-        Text(
-            when {
-                clan == null -> stringResource(Res.string.player_no_clan)
-                role == null -> clan.name
-                else -> stringResource(Res.string.player_clan_role, clan.name, stringResource(role.label))
-            },
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        LeagueLine(player)
-        if (!account.isVerified) {
-            TextButton(onClick = onVerify) { Text(stringResource(Res.string.me_verify_account)) }
+    }
+}
+
+@Composable
+private fun VerifiedChip() {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        shape = MaterialTheme.shapes.extraSmall,
+    ) {
+        Row(
+            Modifier.padding(horizontal = Spacing.xs + Spacing.xxs, vertical = Spacing.xxs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.xxs),
+        ) {
+            Icon(painterResource(Res.drawable.ic_check), contentDescription = null, Modifier.size(12.dp))
+            Text(stringResource(Res.string.me_verified).lowercase(), style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -149,46 +266,13 @@ internal fun LeagueLine(player: PlayerDto) {
     val league = player.league ?: return
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small / 2),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
     ) {
         LeagueIcon(player.leagueIconUrl, contentDescription = null, size = 20.dp)
-        Text(league, style = MaterialTheme.typography.bodySmall)
+        Text(league, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
-@Composable
-private fun SectionTitle(title: StringResource) {
-    Text(
-        stringResource(title),
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(top = Spacing.small),
-    )
-}
-
-@Composable
-private fun UnitRow(unit: UnitLevelDto) {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
-        Row(Modifier.fillMaxWidth()) {
-            Text(unit.name, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-            Text(
-                stringResource(Res.string.unit_level, unit.level, unit.maxLevel),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-        LinearProgressIndicator(progress = { unit.progress }, modifier = Modifier.fillMaxWidth())
-    }
-}
-
-@Composable
-private fun RowScope.Stat(label: StringResource, value: Int) {
-    OutlinedCard(Modifier.weight(1f)) {
-        Column(Modifier.padding(Spacing.small)) {
-            Text(stringResource(label), style = MaterialTheme.typography.labelSmall)
-            Text(value.toString(), style = MaterialTheme.typography.titleMedium)
-        }
-    }
-}
-
-/** Fração do nível máximo, de 0 a 1. */
-internal val UnitLevelDto.progress: Float
-    get() = if (maxLevel <= 0) 0f else (level.toFloat() / maxLevel).coerceIn(0f, 1f)
+/** A unidade da API como aparece na tela: [UnitItem.key] é o nome da API, [UnitItem.name] o do idioma. */
+internal fun UnitLevelDto.toItem(language: String = "en"): UnitItem =
+    UnitItem(key = name, name = UnitNames.display(name, language), level = level, maxLevel = maxLevel)
