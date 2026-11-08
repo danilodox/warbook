@@ -80,7 +80,7 @@ fun SettingsScreen(
         Text(
             stringResource(Res.string.settings_fan_notice),
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(Spacing.medium),
+            modifier = Modifier.padding(Spacing.lg),
         )
     }
 }
@@ -91,7 +91,7 @@ private fun Section(title: StringResource) {
         stringResource(title),
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = Spacing.medium, end = Spacing.medium, top = Spacing.medium),
+        modifier = Modifier.padding(start = Spacing.lg, end = Spacing.lg, top = Spacing.lg),
     )
 }
 

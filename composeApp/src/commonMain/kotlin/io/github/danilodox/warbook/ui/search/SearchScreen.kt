@@ -118,11 +118,11 @@ private fun SearchScreen(state: SearchUiState, viewModel: SearchViewModel, modif
                     Text(stringResource(Res.string.search_button))
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.medium),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.lg),
         )
         LazyColumn(
-            contentPadding = PaddingValues(Spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            contentPadding = PaddingValues(Spacing.lg),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             modifier = Modifier.weight(1f),
         ) {
             outcome(state, viewModel, onRetry = submit)

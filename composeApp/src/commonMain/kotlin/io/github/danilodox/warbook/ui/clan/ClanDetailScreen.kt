@@ -56,7 +56,7 @@ fun ClanDetailRoute(tag: String, fromSearch: Boolean, onOpenMember: (String) -> 
     Column(modifier.fillMaxSize()) {
         val clan = state.clan?.value
         if (clan != null) {
-            ClanHeader(clan, Modifier.padding(horizontal = Spacing.medium, vertical = Spacing.small)) {
+            ClanHeader(clan, Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm)) {
                 FollowButton(
                     state.following,
                     state.followLimitReached,
@@ -135,7 +135,7 @@ private fun ClanTabs(selected: ClanTab, onSelect: (ClanTab) -> Unit) {
 @Composable
 internal fun <T> SegmentedTabs(tabs: List<Pair<T, StringResource>>, selected: T, onSelect: (T) -> Unit) {
     SingleChoiceSegmentedButtonRow(
-        Modifier.fillMaxWidth().padding(horizontal = Spacing.medium, vertical = Spacing.small),
+        Modifier.fillMaxWidth().padding(horizontal = Spacing.lg, vertical = Spacing.sm),
     ) {
         tabs.forEachIndexed { index, (tab, label) ->
             SegmentedButton(

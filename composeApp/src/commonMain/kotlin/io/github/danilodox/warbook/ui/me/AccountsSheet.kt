@@ -51,8 +51,8 @@ fun AccountsSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
-            Modifier.fillMaxWidth().padding(horizontal = Spacing.medium).padding(bottom = Spacing.large),
-            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            Modifier.fillMaxWidth().padding(horizontal = Spacing.lg).padding(bottom = Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             Text(stringResource(Res.string.accounts_title), style = MaterialTheme.typography.titleMedium)
             accounts.forEach { account ->
@@ -90,7 +90,7 @@ private fun AccountRow(account: Account, onClick: () -> Unit, onLongClick: () ->
         headlineContent = { Text(account.name) },
         supportingContent = { Text(stringResource(Res.string.accounts_summary, account.townHallLevel, clan)) },
         trailingContent = {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                 if (account.isVerified) Badge("✓ ${stringResource(Res.string.me_verified)}")
                 if (account.isActive) Badge(stringResource(Res.string.accounts_active))
             }
@@ -109,7 +109,7 @@ private fun Badge(text: String) {
         Text(
             text,
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = Spacing.small / 2),
+            modifier = Modifier.padding(horizontal = Spacing.xs),
         )
     }
 }

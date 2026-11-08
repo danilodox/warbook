@@ -32,7 +32,7 @@ internal fun WarMap(war: CurrentWarDto, accountTag: String?) {
     if (ours.isEmpty()) return
     Text(stringResource(Res.string.war_map), style = MaterialTheme.typography.titleSmall)
     Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             ours.forEach { member ->
                 MapRow(member, theirs[member.mapPosition], showStars = war.state != WarState.PREPARATION, accountTag)
             }
@@ -42,7 +42,7 @@ internal fun WarMap(war: CurrentWarDto, accountTag: String?) {
 
 @Composable
 private fun MapRow(ours: WarMemberDto, theirs: WarMemberDto?, showStars: Boolean, accountTag: String?) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Text("${ours.mapPosition}", style = MaterialTheme.typography.labelSmall)
         MemberCell(ours, showStars, isYou = ours.tag == accountTag, Modifier.weight(1f))
         Text("×", style = MaterialTheme.typography.labelSmall)

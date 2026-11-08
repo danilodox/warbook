@@ -49,8 +49,8 @@ fun CwlContent(
     val selected = round ?: cwl.rounds.first().round
     val war = cwl.rounds.firstOrNull { it.round == selected }?.war
     Column(
-        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         Text(
             stringResource(Res.string.cwl_round_of, selected, cwl.rounds.size),
@@ -71,7 +71,7 @@ fun CwlContent(
 private fun RoundChips(cwl: CwlDto, selected: Int, onSelect: (Int) -> Unit) {
     Row(
         Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         cwl.rounds.forEach { round ->
             val ended = round.war?.state == WarState.WAR_ENDED
@@ -99,10 +99,10 @@ private fun GroupTable(clans: List<CwlClanDto>, ownTag: String?) {
         Text(stringResource(Res.string.cwl_group_columns), style = MaterialTheme.typography.labelSmall)
     }
     Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             clans.forEachIndexed { index, clan ->
                 val isOurs = clan.tag == ownTag
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Text("${index + 1}", style = MaterialTheme.typography.labelSmall)
                     Text(
                         clan.name,

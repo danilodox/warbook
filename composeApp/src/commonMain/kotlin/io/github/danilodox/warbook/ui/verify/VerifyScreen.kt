@@ -99,7 +99,7 @@ fun VerifyScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             ) {
-                Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Text(stringResource(Res.string.verify_steps_title), style = MaterialTheme.typography.titleSmall)
                     steps.forEachIndexed { index, step ->
                         Text("${index + 1}. ${stringResource(step)}", style = MaterialTheme.typography.bodySmall)

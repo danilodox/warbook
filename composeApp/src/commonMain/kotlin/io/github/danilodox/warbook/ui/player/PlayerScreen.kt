@@ -90,7 +90,7 @@ private fun PlayerHeader(
     onToggleFollow: () -> Unit,
     onOpenClan: (String) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Text(player.name, style = MaterialTheme.typography.titleLarge)
         Text(stringResource(Res.string.player_tag, player.tag), style = MaterialTheme.typography.bodySmall)
         val clan = player.clan
@@ -102,7 +102,7 @@ private fun PlayerHeader(
                 ?: clan.name
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Spacing.small / 2),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                 modifier = Modifier.clickable(
                     onClickLabel = stringResource(Res.string.screen_clan),
                     role = Role.Button,

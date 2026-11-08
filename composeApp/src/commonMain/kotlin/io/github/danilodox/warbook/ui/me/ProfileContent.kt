@@ -70,12 +70,12 @@ fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: 
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.small),
+        contentPadding = PaddingValues(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         item { header() }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 Stat(Res.string.player_town_hall, player.townHallLevel)
                 Stat(Res.string.player_level, player.expLevel)
                 Stat(Res.string.player_trophies, player.trophies)
@@ -88,7 +88,7 @@ fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: 
         }
         item { SectionTitle(Res.string.me_season) }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 Stat(Res.string.me_donations, player.donations)
                 Stat(Res.string.me_received, player.donationsReceived)
                 Stat(Res.string.me_attack_wins, player.attackWins)
@@ -100,10 +100,10 @@ fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: 
 /** Cabeçalho da aba Eu: o nome troca de conta, selo de verificado e o convite para verificar. */
 @Composable
 fun AccountHeader(player: PlayerDto, account: Account, onOpenAccounts: () -> Unit, onVerify: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             // O nome troca de conta (E2).
             Text(
@@ -120,7 +120,7 @@ fun AccountHeader(player: PlayerDto, account: Account, onOpenAccounts: () -> Uni
                     Text(
                         "✓ ${stringResource(Res.string.me_verified)}",
                         style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(horizontal = Spacing.small / 2),
+                        modifier = Modifier.padding(horizontal = Spacing.xs),
                     )
                 }
             }
@@ -149,7 +149,7 @@ internal fun LeagueLine(player: PlayerDto) {
     val league = player.league ?: return
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small / 2),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
     ) {
         LeagueIcon(player.leagueIconUrl, contentDescription = null, size = 20.dp)
         Text(league, style = MaterialTheme.typography.bodySmall)
@@ -161,13 +161,13 @@ private fun SectionTitle(title: StringResource) {
     Text(
         stringResource(title),
         style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(top = Spacing.small),
+        modifier = Modifier.padding(top = Spacing.sm),
     )
 }
 
 @Composable
 private fun UnitRow(unit: UnitLevelDto) {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.small / 2)) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Row(Modifier.fillMaxWidth()) {
             Text(unit.name, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
             Text(
@@ -182,7 +182,7 @@ private fun UnitRow(unit: UnitLevelDto) {
 @Composable
 private fun RowScope.Stat(label: StringResource, value: Int) {
     OutlinedCard(Modifier.weight(1f)) {
-        Column(Modifier.padding(Spacing.small)) {
+        Column(Modifier.padding(Spacing.sm)) {
             Text(stringResource(label), style = MaterialTheme.typography.labelSmall)
             Text(value.toString(), style = MaterialTheme.typography.titleMedium)
         }

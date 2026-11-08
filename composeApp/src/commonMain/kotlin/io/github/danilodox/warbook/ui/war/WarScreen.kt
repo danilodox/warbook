@@ -172,7 +172,7 @@ private fun WarBody(state: WarUiState, actions: WarActions) {
 private fun TabSelector(selected: WarTab, onSelect: (WarTab) -> Unit) {
     val tabs = listOf(WarTab.CURRENT to Res.string.war_tab_current, WarTab.CWL to Res.string.war_tab_cwl)
     SingleChoiceSegmentedButtonRow(
-        Modifier.fillMaxWidth().padding(horizontal = Spacing.medium, vertical = Spacing.small),
+        Modifier.fillMaxWidth().padding(horizontal = Spacing.lg, vertical = Spacing.sm),
     ) {
         tabs.forEachIndexed { index, (tab, label) ->
             SegmentedButton(
@@ -216,8 +216,8 @@ internal fun Message(
     action: @Composable () -> Unit = {},
 ) {
     Column(
-        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.large),
-        verticalArrangement = Arrangement.spacedBy(Spacing.small, Alignment.CenterVertically),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(stringResource(title), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
@@ -236,8 +236,8 @@ private fun PrivateWarLog(onRefresh: () -> Unit) {
         Res.string.war_private_step_4,
     )
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         Text(stringResource(Res.string.war_private_title), style = MaterialTheme.typography.titleMedium)
         Text(stringResource(Res.string.war_private_body), style = MaterialTheme.typography.bodyMedium)
@@ -245,7 +245,7 @@ private fun PrivateWarLog(onRefresh: () -> Unit) {
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 Text(stringResource(Res.string.war_private_steps_title), style = MaterialTheme.typography.titleSmall)
                 Text(stringResource(Res.string.war_private_who), style = MaterialTheme.typography.bodySmall)
                 steps.forEachIndexed { index, step ->
@@ -264,8 +264,8 @@ private fun WarSkeleton() {
     val color = MaterialTheme.colorScheme.surfaceVariant
     val shape = RoundedCornerShape(8.dp)
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         listOf(1f to 140.dp, 1f to 72.dp, 0.3f to 16.dp, 1f to 48.dp, 1f to 48.dp, 1f to 48.dp, 1f to 48.dp)
             .forEach { (width, height) ->

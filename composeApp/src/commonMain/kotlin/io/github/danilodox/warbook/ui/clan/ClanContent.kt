@@ -83,7 +83,7 @@ fun ClanHeader(clan: ClanDto, modifier: Modifier = Modifier, action: @Composable
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         ClanBadge(clan.badgeUrl, contentDescription = null, size = 56.dp)
         Column(Modifier.weight(1f)) {
@@ -106,16 +106,16 @@ fun ClanHeader(clan: ClanDto, modifier: Modifier = Modifier, action: @Composable
 fun ClanInfo(clan: ClanDto, showHeader: Boolean, onOpenWar: () -> Unit, modifier: Modifier = Modifier) {
     val unknown = stringResource(Res.string.clan_unknown_value)
     Column(
-        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.small),
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         if (showHeader) ClanHeader(clan)
         if (clan.description.isNotBlank()) Text(clan.description, style = MaterialTheme.typography.bodyMedium)
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Stat(Res.string.clan_war_league, clan.warLeague ?: unknown)
             Stat(Res.string.clan_capital_league, clan.capitalLeague ?: unknown)
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Stat(Res.string.clan_war_wins, clan.warWins.toString())
             Stat(Res.string.clan_win_streak, clan.warWinStreak.toString())
         }
@@ -140,7 +140,7 @@ fun ClanInfo(clan: ClanDto, showHeader: Boolean, onOpenWar: () -> Unit, modifier
                 Text(
                     stringResource(Res.string.clan_war_log_private_hint),
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(Spacing.small),
+                    modifier = Modifier.padding(Spacing.sm),
                 )
             }
         }
@@ -160,13 +160,13 @@ fun ClanMembers(
     val members = clan.members.sortedBy(sort)
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = Spacing.small),
+        contentPadding = PaddingValues(vertical = Spacing.sm),
     ) {
         item {
             Text(
                 stringResource(Res.string.clan_members_season),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = Spacing.medium),
+                modifier = Modifier.padding(horizontal = Spacing.lg),
             )
         }
         item { SortChips(sort, onSort) }
@@ -183,7 +183,7 @@ fun ClanMembers(
             Text(
                 stringResource(Res.string.clan_members_legend),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(Spacing.medium),
+                modifier = Modifier.padding(Spacing.lg),
             )
         }
     }
@@ -198,8 +198,8 @@ private fun SortChips(selected: MemberSort, onSort: (MemberSort) -> Unit) {
         MemberSort.DONATIONS to Res.string.clan_sort_donations,
     )
     LazyRow(
-        contentPadding = PaddingValues(horizontal = Spacing.medium),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        contentPadding = PaddingValues(horizontal = Spacing.lg),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         items(sorts, key = { it.first }) { (sort, label) ->
             FilterChip(selected = sort == selected, onClick = { onSort(sort) }, label = { Text(stringResource(label)) })
@@ -212,9 +212,9 @@ private fun SortChips(selected: MemberSort, onSort: (MemberSort) -> Unit) {
 private fun MemberRow(index: Int, member: ClanMemberDto, isYou: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
-            .padding(horizontal = Spacing.medium, vertical = Spacing.small),
+            .padding(horizontal = Spacing.lg, vertical = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         Text(index.toString(), style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(24.dp))
         LeagueIcon(member.league?.iconUrl, contentDescription = member.league?.name, size = 28.dp)
@@ -252,7 +252,7 @@ private fun MemberRow(index: Int, member: ClanMemberDto, isYou: Boolean, onClick
 @Composable
 private fun RowScope.Stat(label: StringResource, value: String) {
     OutlinedCard(Modifier.weight(1f)) {
-        Column(Modifier.padding(Spacing.small)) {
+        Column(Modifier.padding(Spacing.sm)) {
             Text(stringResource(label), style = MaterialTheme.typography.labelSmall)
             Text(value, style = MaterialTheme.typography.titleMedium)
         }
@@ -261,7 +261,7 @@ private fun RowScope.Stat(label: StringResource, value: String) {
 
 @Composable
 private fun InfoRow(label: StringResource, value: String) {
-    Row(Modifier.fillMaxWidth().padding(Spacing.small), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Row(Modifier.fillMaxWidth().padding(Spacing.sm), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Text(stringResource(label), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
         Text(value, style = MaterialTheme.typography.bodyMedium)
     }

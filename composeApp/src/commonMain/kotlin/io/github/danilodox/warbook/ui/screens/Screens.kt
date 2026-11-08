@@ -19,7 +19,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun PlaceholderScreen(title: StringResource, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize().padding(Spacing.medium),
+        modifier = modifier.fillMaxSize().padding(Spacing.lg),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

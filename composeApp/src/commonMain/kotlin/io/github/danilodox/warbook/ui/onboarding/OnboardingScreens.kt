@@ -81,7 +81,7 @@ fun TagScreen(
     val submit = { if (tag.isNotBlank()) onContinue(tag) }
 
     FlowColumn(modifier) {
-        Spacer(Modifier.size(Spacing.large))
+        Spacer(Modifier.size(Spacing.xl))
         Text(
             stringResource(Res.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
@@ -94,7 +94,7 @@ fun TagScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
-        Spacer(Modifier.size(Spacing.medium))
+        Spacer(Modifier.size(Spacing.lg))
         Text(stringResource(Res.string.onboarding_tag_question), style = MaterialTheme.typography.titleMedium)
         OutlinedTextField(
             value = tag,
@@ -140,7 +140,7 @@ private fun TagHelpCard() {
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Text(stringResource(Res.string.onboarding_help_title), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(Res.string.onboarding_help_body), style = MaterialTheme.typography.bodySmall)
         }
@@ -167,13 +167,13 @@ fun ConfirmScreen(
             )
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
-                    Modifier.fillMaxWidth().padding(Spacing.medium),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.small),
+                    Modifier.fillMaxWidth().padding(Spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(player.name, style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(Res.string.player_tag, player.tag), style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.large)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xl)) {
                         Stat(Res.string.player_town_hall, player.townHallLevel)
                         Stat(Res.string.player_level, player.expLevel)
                         Stat(Res.string.player_trophies, player.trophies)
@@ -222,8 +222,8 @@ internal fun FlowTopBar(title: StringResource?, onBack: () -> Unit, actions: @Co
 @Composable
 internal fun FlowColumn(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
-        modifier = modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        modifier = modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         content = content,
     )
 }

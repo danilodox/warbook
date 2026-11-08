@@ -59,8 +59,8 @@ fun CurrentWarContent(war: CurrentWarDto, context: WarContext, modifier: Modifie
         WarState.NOT_IN_WAR -> Message(Res.string.war_not_in_war_title, Res.string.war_not_in_war_body, modifier)
         WarState.MATCHMAKING -> Message(Res.string.war_matchmaking_title, Res.string.war_matchmaking_body, modifier)
         else -> Column(
-            modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+            modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) { WarDetails(war, WarSummary.war(war, context.now, context.texts, context.summaryOptions), context) }
     }
 }
@@ -93,7 +93,7 @@ private fun ScoreCard(war: CurrentWarDto, context: WarContext) {
     val theirs = war.opponent ?: return
     val texts = context.texts
     Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(stringResource(war.state.label()), style = MaterialTheme.typography.labelLarge)
                 Text(timeLine(war, context), style = MaterialTheme.typography.bodySmall)
@@ -184,7 +184,7 @@ private fun AttackersCard(attackers: List<PendingAttacker>, war: CurrentWarDto, 
         CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
     }
     Card(colors = colors, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             val title = if (ended) Res.string.war_missed_title else Res.string.war_pending_title
             Text("⚠ ${stringResource(title, total)}", style = MaterialTheme.typography.titleSmall)
             val you = stringResource(Res.string.war_you)
@@ -211,7 +211,7 @@ private fun StrengthCard(war: CurrentWarDto, context: WarContext) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Text(stringResource(Res.string.war_strength_title), style = MaterialTheme.typography.titleSmall)
             ScoreRow(
                 texts.decimal(strength.clan.averageTownHall),

@@ -143,8 +143,8 @@ fun MeScreen(
 @Composable
 fun NoAccountScreen(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize().padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.small, Alignment.CenterVertically),
+        modifier = modifier.fillMaxSize().padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(stringResource(Res.string.me_no_account_title), style = MaterialTheme.typography.titleMedium)
@@ -172,7 +172,7 @@ internal fun StaleBanner(error: AppError, fetchedAt: Long) {
         Text(
             "${stringResource(reason)} $age",
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = Spacing.medium, vertical = Spacing.small),
+            modifier = Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm),
         )
     }
 }
@@ -180,11 +180,11 @@ internal fun StaleBanner(error: AppError, fetchedAt: Long) {
 /** Sem perfil salvo e sem conseguir buscar: só o cartão do erro. Rolável para o puxar-para-atualizar. */
 @Composable
 internal fun OfflineCard(error: AppError, onRetry: () -> Unit) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg)) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(
-                Modifier.fillMaxWidth().padding(Spacing.medium),
-                verticalArrangement = Arrangement.spacedBy(Spacing.small),
+                Modifier.fillMaxWidth().padding(Spacing.lg),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (error == AppError.NETWORK) {
@@ -206,8 +206,8 @@ internal fun ProfileSkeleton() {
     val color = MaterialTheme.colorScheme.surfaceVariant
     val shape = RoundedCornerShape(8.dp)
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         listOf(0.6f to 48.dp, 1f to 64.dp, 0.3f to 16.dp, 1f to 120.dp, 0.3f to 16.dp, 1f to 120.dp)
             .forEach { (width, height) ->

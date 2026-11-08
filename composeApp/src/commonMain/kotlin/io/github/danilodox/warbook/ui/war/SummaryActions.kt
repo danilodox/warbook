@@ -63,7 +63,7 @@ internal fun SummaryActions(
     onToggle: (SummaryPart) -> Unit,
 ) {
     var customizing by rememberSaveable { mutableStateOf(false) }
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Text(stringResource(Res.string.war_summary_title), style = MaterialTheme.typography.titleSmall)
         CopyAndShare(summary)
         if (parts.isNotEmpty()) {
@@ -72,7 +72,7 @@ internal fun SummaryActions(
             }
         }
         if (customizing && parts.isNotEmpty()) {
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 parts.forEach { part ->
                     FilterChip(
                         selected = part in options,
@@ -86,7 +86,7 @@ internal fun SummaryActions(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(summary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(Spacing.small)) }
+            ) { Text(summary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(Spacing.sm)) }
         }
     }
 }
@@ -103,7 +103,7 @@ private fun CopyAndShare(summary: String) {
             copied = false
         }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         OutlinedButton(
             onClick = {
                 scope.launch {

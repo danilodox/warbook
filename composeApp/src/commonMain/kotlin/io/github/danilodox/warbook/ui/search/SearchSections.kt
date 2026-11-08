@@ -148,7 +148,7 @@ private fun levelLine(kind: FollowKind, level: Int?, tag: String): String = when
 private fun SectionHeader(title: StringResource, action: @Composable () -> Unit = {}) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(top = Spacing.small),
+        modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm),
     ) {
         Text(stringResource(title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
         action()
@@ -167,8 +167,8 @@ private fun EntryRow(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = Spacing.small / 2),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = Spacing.xs),
     ) {
         Box(Modifier.size(ImageSize), contentAlignment = Alignment.Center) {
             if (kind == FollowKind.CLAN) {
@@ -207,7 +207,7 @@ private fun NoticeCard(text: StringResource) {
         Text(
             stringResource(text),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(Spacing.medium),
+            modifier = Modifier.padding(Spacing.lg),
         )
     }
 }

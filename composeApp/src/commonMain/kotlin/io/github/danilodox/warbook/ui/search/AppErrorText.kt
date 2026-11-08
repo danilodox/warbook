@@ -39,7 +39,7 @@ internal fun ErrorCard(error: AppError, onRetry: () -> Unit, modifier: Modifier 
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
     ) {
-        Column(Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Text(
                 stringResource(error.message),
                 style = MaterialTheme.typography.bodyMedium,
