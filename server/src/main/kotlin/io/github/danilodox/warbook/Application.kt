@@ -13,6 +13,8 @@ import io.github.danilodox.warbook.coc.CocClient
 import io.github.danilodox.warbook.coc.CocService
 import io.github.danilodox.warbook.config.InvalidConfigException
 import io.github.danilodox.warbook.config.ServerConfig
+import io.github.danilodox.warbook.db.DatabaseUnavailableException
+import io.github.danilodox.warbook.db.WarbookDatabase
 import io.github.danilodox.warbook.errors.installErrorHandling
 import io.github.danilodox.warbook.routes.cocRoutes
 import io.github.danilodox.warbook.routes.verifyRoutes
@@ -37,9 +39,12 @@ private const val DEFAULT_PORT = 8080
 
 fun main() {
     val config = loadConfigOrExit()
+    val database = connectDatabaseOrExit(config)
     val port = System.getenv("PORT")?.toIntOrNull() ?: DEFAULT_PORT
-    embeddedServer(Netty, port = port, host = "0.0.0.0") { module(config) }
-        .start(wait = true)
+    embeddedServer(Netty, port = port, host = "0.0.0.0") {
+        monitor.subscribe(ApplicationStopped) { database.close() }
+        module(config)
+    }.start(wait = true)
 }
 
 /** Sem a configuração completa o servidor não sobe: mostra o que falta e sai. */
@@ -47,6 +52,14 @@ private fun loadConfigOrExit(): ServerConfig = try {
     ServerConfig.fromEnv()
 } catch (e: InvalidConfigException) {
     System.err.println("Configuração inválida: ${e.message}")
+    exitProcess(1)
+}
+
+/** Sem o Postgres o servidor também não sobe: diz o que conferir e sai. Aplica as migrations pendentes. */
+private fun connectDatabaseOrExit(config: ServerConfig): WarbookDatabase = try {
+    WarbookDatabase.connect(config.database)
+} catch (e: DatabaseUnavailableException) {
+    System.err.println("Banco indisponível: ${e.message}")
     exitProcess(1)
 }
 

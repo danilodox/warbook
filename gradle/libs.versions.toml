@@ -15,6 +15,11 @@ coil = "3.6.3"
 composeMultiplatform = "1.12.2"
 datastore = "1.3.0"
 detekt = "1.23.8"
+embeddedPostgres = "2.2.2"
+embeddedPostgresBinaries = "18.6.0"
+exposed = "1.6.1"
+flyway = "13.12.1"
+hikari = "7.1.0"
 junit = "4.13.2"
 koin = "4.2.2"
 kotlin = "2.4.21"
@@ -26,6 +31,7 @@ ktlintGradle = "14.2.0"
 logback = "1.6.6"
 material3 = "1.12.0-alpha03"
 navigation = "2.10.0"
+postgresql = "42.7.14"
 room3 = "3.0.3"
 sqlite = "2.7.1"
 
@@ -68,6 +74,16 @@ ktor-clientDarwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor
 ktor-serializationKotlinxJsonKmp = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 datastore-preferencesCore = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 kotlinx-coroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-javaTime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+embeddedPostgres = { module = "io.zonky.test:embedded-postgres", version.ref = "embeddedPostgres" }
+embeddedPostgres-windows = { module = "io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", version.ref = "embeddedPostgresBinaries" }
+embeddedPostgres-linux = { module = "io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64", version.ref = "embeddedPostgresBinaries" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }

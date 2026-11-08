@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.testing
 
 import com.github.benmanes.caffeine.cache.Ticker
+import io.github.danilodox.warbook.config.DatabaseConfig
 import io.github.danilodox.warbook.config.ServerConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -16,6 +17,12 @@ val testConfig = ServerConfig(
     cocApiKey = "chave-de-teste-coc",
     // Montado com repeat para não parecer chave real ao Gitleaks.
     jwtSecret = "teste".repeat(8),
+    // Os testes de rota não abrem conexão; os do banco usam o TestDatabase.
+    database = DatabaseConfig(
+        url = "jdbc:postgresql://localhost:5432/warbook",
+        user = "warbook",
+        password = "senha".repeat(3),
+    ),
     cocBaseUrl = "https://api.clashofclans.com/v1",
 )
 
