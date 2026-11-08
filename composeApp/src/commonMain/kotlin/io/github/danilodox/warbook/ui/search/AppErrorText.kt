@@ -1,16 +1,5 @@
 package io.github.danilodox.warbook.ui.search
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.data.AppError
 import io.github.danilodox.warbook.resources.Res
@@ -23,34 +12,11 @@ import io.github.danilodox.warbook.resources.error_not_found
 import io.github.danilodox.warbook.resources.error_rate_limited
 import io.github.danilodox.warbook.resources.error_server
 import io.github.danilodox.warbook.resources.error_war_log_private
-import io.github.danilodox.warbook.resources.retry
 import io.github.danilodox.warbook.resources.role_co_leader
 import io.github.danilodox.warbook.resources.role_elder
 import io.github.danilodox.warbook.resources.role_leader
 import io.github.danilodox.warbook.resources.role_member
-import io.github.danilodox.warbook.ui.theme.Spacing
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
-
-/** Cartão vermelho com o erro e, se adiantar, "Tentar de novo". */
-@Composable
-internal fun ErrorCard(error: AppError, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-    ) {
-        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            Text(
-                stringResource(error.message),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer,
-            )
-            if (error.canRetry) {
-                OutlinedButton(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-            }
-        }
-    }
-}
 
 internal val ClanRole.label: StringResource
     get() = when (this) {

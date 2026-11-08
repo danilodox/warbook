@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,15 +18,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.danilodox.warbook.api.ClanDto
@@ -48,8 +50,6 @@ import io.github.danilodox.warbook.resources.clan_level_members
 import io.github.danilodox.warbook.resources.clan_location
 import io.github.danilodox.warbook.resources.clan_member_line
 import io.github.danilodox.warbook.resources.clan_member_received
-import io.github.danilodox.warbook.resources.clan_member_trophies
-import io.github.danilodox.warbook.resources.clan_member_you
 import io.github.danilodox.warbook.resources.clan_members_legend
 import io.github.danilodox.warbook.resources.clan_members_season
 import io.github.danilodox.warbook.resources.clan_open_war
@@ -69,12 +69,22 @@ import io.github.danilodox.warbook.resources.clan_war_log_private_hint
 import io.github.danilodox.warbook.resources.clan_war_log_public
 import io.github.danilodox.warbook.resources.clan_war_wins
 import io.github.danilodox.warbook.resources.clan_win_streak
+import io.github.danilodox.warbook.resources.ic_check
 import io.github.danilodox.warbook.resources.player_tag
 import io.github.danilodox.warbook.ui.common.ClanBadge
-import io.github.danilodox.warbook.ui.common.LeagueIcon
+import io.github.danilodox.warbook.ui.components.StatRow
+import io.github.danilodox.warbook.ui.components.StatTile
+import io.github.danilodox.warbook.ui.components.TownHallShield
+import io.github.danilodox.warbook.ui.components.YouTag
+import io.github.danilodox.warbook.ui.components.grouped
+import io.github.danilodox.warbook.ui.components.youContentColor
+import io.github.danilodox.warbook.ui.components.youHighlight
 import io.github.danilodox.warbook.ui.search.label
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.ui.theme.WarbookTheme
+import io.github.danilodox.warbook.ui.theme.tabular
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /** Brasão, nome, tag e "Nível · membros". [action] fica à direita (o "Seguir" da tela Clã). */
@@ -83,15 +93,25 @@ fun ClanHeader(clan: ClanDto, modifier: Modifier = Modifier, action: @Composable
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
-        ClanBadge(clan.badgeUrl, contentDescription = null, size = 56.dp)
-        Column(Modifier.weight(1f)) {
-            Text(clan.name, style = MaterialTheme.typography.titleMedium)
-            Text(stringResource(Res.string.player_tag, clan.tag), style = MaterialTheme.typography.bodySmall)
+        ClanBadge(clan.badgeUrl, contentDescription = null, size = 48.dp)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
+            Text(
+                clan.name,
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                stringResource(Res.string.player_tag, clan.tag),
+                style = WarbookTheme.text.tag,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Text(
                 stringResource(Res.string.clan_level_members, clan.clanLevel, clan.memberCount),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.tabular(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         action()
@@ -107,47 +127,57 @@ fun ClanInfo(clan: ClanDto, showHeader: Boolean, onOpenWar: () -> Unit, modifier
     val unknown = stringResource(Res.string.clan_unknown_value)
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         if (showHeader) ClanHeader(clan)
         if (clan.description.isNotBlank()) Text(clan.description, style = MaterialTheme.typography.bodyMedium)
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            Stat(Res.string.clan_war_league, clan.warLeague ?: unknown)
-            Stat(Res.string.clan_capital_league, clan.capitalLeague ?: unknown)
+        StatRow {
+            StatTile(stringResource(Res.string.clan_war_wins), clan.warWins.grouped())
+            StatTile(stringResource(Res.string.clan_win_streak), clan.warWinStreak.toString())
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            Stat(Res.string.clan_war_wins, clan.warWins.toString())
-            Stat(Res.string.clan_win_streak, clan.warWinStreak.toString())
+        StatRow {
+            StatTile(stringResource(Res.string.clan_war_league), clan.warLeague ?: unknown)
+            StatTile(stringResource(Res.string.clan_capital_league), clan.capitalLeague ?: unknown)
         }
-        OutlinedCard(Modifier.fillMaxWidth()) {
-            val logLabel = if (clan.isWarLogPublic) Res.string.clan_war_log_public else Res.string.clan_war_log_private
-            InfoRow(Res.string.clan_war_log, stringResource(logLabel))
-            HorizontalDivider()
-            InfoRow(Res.string.clan_war_frequency, clan.warFrequency.label()?.let { stringResource(it) } ?: unknown)
-            HorizontalDivider()
-            InfoRow(Res.string.clan_requirements, requirements(clan))
-            HorizontalDivider()
-            InfoRow(Res.string.clan_join, clan.joinType.label()?.let { stringResource(it) } ?: unknown)
-            HorizontalDivider()
-            InfoRow(Res.string.clan_location, clan.location ?: unknown)
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            shape = MaterialTheme.shapes.large,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column {
+                val log = if (clan.isWarLogPublic) Res.string.clan_war_log_public else Res.string.clan_war_log_private
+                InfoRow(Res.string.clan_war_log, stringResource(log))
+                InfoDivider()
+                InfoRow(Res.string.clan_war_frequency, clan.warFrequency.label()?.let { stringResource(it) } ?: unknown)
+                InfoDivider()
+                InfoRow(Res.string.clan_requirements, requirements(clan))
+                InfoDivider()
+                InfoRow(Res.string.clan_join, clan.joinType.label()?.let { stringResource(it) } ?: unknown)
+                InfoDivider()
+                InfoRow(Res.string.clan_location, clan.location ?: unknown)
+            }
         }
         if (clan.isWarLogPublic) {
             OutlinedButton(onClick = onOpenWar, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(Res.string.clan_open_war))
             }
         } else {
-            Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.small) {
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                shape = MaterialTheme.shapes.small,
+            ) {
                 Text(
                     stringResource(Res.string.clan_war_log_private_hint),
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(Spacing.sm),
+                    modifier = Modifier.padding(Spacing.md),
                 )
             }
         }
     }
 }
 
-/** C2: fichas de ordem e a lista. Tocar abre a tela Jogador; [accountTag] marca "você". */
+/** C2: fichas de ordem, a legenda e a lista. Tocar abre a tela Jogador; [accountTag] marca "você". */
 @Composable
 fun ClanMembers(
     clan: ClanDto,
@@ -161,29 +191,23 @@ fun ClanMembers(
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = Spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xxs),
     ) {
+        item { SortChips(sort, onSort) }
         item {
             Text(
-                stringResource(Res.string.clan_members_season),
+                stringResource(Res.string.clan_members_season) + " · " + stringResource(Res.string.clan_members_legend),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = Spacing.lg),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.xs),
             )
         }
-        item { SortChips(sort, onSort) }
         itemsIndexed(members, key = { _, item -> item.tag }) { index, member ->
             MemberRow(
                 index = index + 1,
                 member = member,
                 isYou = member.tag == accountTag,
                 onClick = { onOpenMember(member.tag) },
-            )
-            HorizontalDivider()
-        }
-        item {
-            Text(
-                stringResource(Res.string.clan_members_legend),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(Spacing.lg),
             )
         }
     }
@@ -202,69 +226,100 @@ private fun SortChips(selected: MemberSort, onSort: (MemberSort) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         items(sorts, key = { it.first }) { (sort, label) ->
-            FilterChip(selected = sort == selected, onClick = { onSort(sort) }, label = { Text(stringResource(label)) })
+            val isSelected = sort == selected
+            FilterChip(
+                selected = isSelected,
+                onClick = { onSort(sort) },
+                label = { Text(stringResource(label)) },
+                leadingIcon = if (isSelected) {
+                    { Icon(painterResource(Res.drawable.ic_check), contentDescription = null, Modifier.size(16.dp)) }
+                } else {
+                    null
+                },
+            )
         }
     }
 }
 
-/** Posição na lista, nome, cargo · CV · nível, troféus com o ícone da liga, doadas e ↓ recebidas. */
+/** Posição, escudo do CV, nome (com "você"), cargo · troféus, e à direita doou e ↓ recebeu. */
 @Composable
 private fun MemberRow(index: Int, member: ClanMemberDto, isYou: Boolean, onClick: () -> Unit) {
+    val content = youContentColor(isYou)
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
-            .padding(horizontal = Spacing.lg, vertical = Spacing.sm),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.sm)
+            .youHighlight(isYou)
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
-        Text(index.toString(), style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(24.dp))
-        LeagueIcon(member.league?.iconUrl, contentDescription = member.league?.name, size = 28.dp)
+        Text(
+            index.toString(),
+            style = MaterialTheme.typography.bodySmall.tabular(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(20.dp),
+        )
+        TownHallShield(member.townHallLevel)
         Column(Modifier.weight(1f)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+            ) {
+                Text(
+                    member.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = content,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                if (isYou) YouTag()
+            }
             Text(
-                member.name,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = if (isYou) FontWeight.Bold else null,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            val line = stringResource(
-                Res.string.clan_member_line,
-                stringResource(member.role.label),
-                member.townHallLevel,
-                member.expLevel,
-            )
-            val you = if (isYou) " · ${stringResource(Res.string.clan_member_you)}" else ""
-            Text(line + you, style = MaterialTheme.typography.bodySmall)
-            Text(
-                stringResource(Res.string.clan_member_trophies, member.trophies),
-                style = MaterialTheme.typography.bodySmall,
+                stringResource(
+                    Res.string.clan_member_line,
+                    stringResource(member.role.label),
+                    member.trophies.grouped(),
+                ),
+                style = MaterialTheme.typography.bodySmall.tabular(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text(member.donations.toString(), style = MaterialTheme.typography.titleSmall)
+            Text(member.donations.grouped(), style = MaterialTheme.typography.titleSmall.tabular(), color = content)
             Text(
-                stringResource(Res.string.clan_member_received, member.donationsReceived),
-                style = MaterialTheme.typography.bodySmall,
+                stringResource(Res.string.clan_member_received, member.donationsReceived.grouped()),
+                style = MaterialTheme.typography.bodySmall.tabular(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-        }
-    }
-}
-
-@Composable
-private fun RowScope.Stat(label: StringResource, value: String) {
-    OutlinedCard(Modifier.weight(1f)) {
-        Column(Modifier.padding(Spacing.sm)) {
-            Text(stringResource(label), style = MaterialTheme.typography.labelSmall)
-            Text(value, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
 
 @Composable
 private fun InfoRow(label: StringResource, value: String) {
-    Row(Modifier.fillMaxWidth().padding(Spacing.sm), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        Text(stringResource(label), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-        Text(value, style = MaterialTheme.typography.bodyMedium)
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = Spacing.lg, vertical = Spacing.md),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        Text(
+            stringResource(label),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(value, style = MaterialTheme.typography.bodyMedium.tabular(), textAlign = TextAlign.End)
     }
+}
+
+@Composable
+private fun InfoDivider() {
+    HorizontalDivider(Modifier.padding(horizontal = Spacing.lg), color = MaterialTheme.colorScheme.outlineVariant)
 }
 
 @Composable

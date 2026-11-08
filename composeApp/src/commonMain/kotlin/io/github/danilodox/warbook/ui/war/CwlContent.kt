@@ -4,19 +4,22 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import io.github.danilodox.warbook.api.CwlClanDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.CwlState
@@ -29,8 +32,16 @@ import io.github.danilodox.warbook.resources.cwl_not_in_title
 import io.github.danilodox.warbook.resources.cwl_round_chip
 import io.github.danilodox.warbook.resources.cwl_round_not_drawn
 import io.github.danilodox.warbook.resources.cwl_round_of
+import io.github.danilodox.warbook.resources.ic_check
+import io.github.danilodox.warbook.ui.common.ClanBadge
+import io.github.danilodox.warbook.ui.components.SectionHeader
+import io.github.danilodox.warbook.ui.components.StarIcon
+import io.github.danilodox.warbook.ui.components.youContentColor
+import io.github.danilodox.warbook.ui.components.youHighlight
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.ui.theme.tabular
 import io.github.danilodox.warbook.war.WarSummary
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /** Sub-aba CWL (G3): fichas das rodadas, a guerra da rodada escolhida e a classificação do grupo. */
@@ -48,19 +59,18 @@ fun CwlContent(
     }
     val selected = round ?: cwl.rounds.first().round
     val war = cwl.rounds.firstOrNull { it.round == selected }?.war
-    Column(
-        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
-    ) {
-        Text(
-            stringResource(Res.string.cwl_round_of, selected, cwl.rounds.size),
-            style = MaterialTheme.typography.titleMedium,
-        )
+    val summary = war?.let { WarSummary.cwl(cwl, selected, context.now, context.texts, context.summaryOptions) }
+    WarLayout(war, summary, context, modifier) {
+        SectionHeader(stringResource(Res.string.cwl_round_of, selected, cwl.rounds.size))
         RoundChips(cwl, selected, onSelectRound)
         if (war == null) {
-            Text(stringResource(Res.string.cwl_round_not_drawn), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                stringResource(Res.string.cwl_round_not_drawn),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         } else {
-            WarDetails(war, WarSummary.cwl(cwl, selected, context.now, context.texts, context.summaryOptions), context)
+            WarDetails(war, context)
         }
         GroupTable(cwl.clans, ownTag = war?.clan?.tag ?: cwl.rounds.firstNotNullOfOrNull { it.war?.clan?.tag })
     }
@@ -79,8 +89,11 @@ private fun RoundChips(cwl: CwlDto, selected: Int, onSelect: (Int) -> Unit) {
                 selected = round.round == selected,
                 onClick = { onSelect(round.round) },
                 enabled = round.war != null,
-                label = {
-                    Text(stringResource(Res.string.cwl_round_chip, round.round) + if (ended) " ✓" else "")
+                label = { Text(stringResource(Res.string.cwl_round_chip, round.round)) },
+                leadingIcon = if (ended) {
+                    { Icon(painterResource(Res.drawable.ic_check), contentDescription = null, Modifier.size(16.dp)) }
+                } else {
+                    null
                 },
             )
         }
@@ -90,31 +103,48 @@ private fun RoundChips(cwl: CwlDto, selected: Int, onSelect: (Int) -> Unit) {
 @Composable
 private fun GroupTable(clans: List<CwlClanDto>, ownTag: String?) {
     if (clans.isEmpty()) return
-    Row(Modifier.fillMaxWidth()) {
+    SectionHeader(stringResource(Res.string.cwl_group)) {
         Text(
-            stringResource(Res.string.cwl_group),
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.weight(1f),
+            stringResource(Res.string.cwl_group_columns),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(stringResource(Res.string.cwl_group_columns), style = MaterialTheme.typography.labelSmall)
     }
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.large,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(vertical = Spacing.xs)) {
             clans.forEachIndexed { index, clan ->
                 val isOurs = clan.tag == ownTag
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    Text("${index + 1}", style = MaterialTheme.typography.labelSmall)
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = Spacing.xs).youHighlight(isOurs)
+                        .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                ) {
+                    Text(
+                        "${index + 1}",
+                        style = MaterialTheme.typography.bodySmall.tabular(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.width(16.dp),
+                    )
+                    ClanBadge(clan.badgeUrl, contentDescription = null, size = 24.dp)
                     Text(
                         clan.name,
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = if (isOurs) FontWeight.Bold else null,
+                        fontWeight = FontWeight.Bold,
+                        color = youContentColor(isOurs),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
+                    StarIcon(filled = true)
                     Text(
                         "${clan.stars} · ${clan.destructionPercentage.toInt()}%",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.tabular(),
+                        color = youContentColor(isOurs),
                     )
                 }
             }

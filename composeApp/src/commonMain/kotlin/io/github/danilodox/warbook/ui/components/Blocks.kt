@@ -3,6 +3,7 @@ package io.github.danilodox.warbook.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -94,3 +96,29 @@ fun Modifier.youHighlight(isYou: Boolean): Modifier = if (isYou) {
 @Composable
 fun youContentColor(isYou: Boolean) =
     if (isYou) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+
+/** Passo numerado: o número em dourado, alinhado com a primeira linha do texto. */
+@Composable
+fun NumberedStep(number: Int, text: String, modifier: Modifier = Modifier) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Text(
+            number.toString(),
+            style = MaterialTheme.typography.bodyMedium.tabular(),
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(text, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/** Bloco de conteúdo: fundo um tom acima da tela e cantos grandes. */
+@Composable
+fun Panel(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Surface(color = color, shape = MaterialTheme.shapes.large, modifier = modifier.fillMaxWidth()) {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm), content = content)
+    }
+}

@@ -22,6 +22,7 @@ import io.github.danilodox.warbook.resources.clan_search_clans
 import io.github.danilodox.warbook.resources.clan_tab_info
 import io.github.danilodox.warbook.resources.clan_tab_members
 import io.github.danilodox.warbook.resources.me_add_account
+import io.github.danilodox.warbook.ui.components.SubTabs
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.ProfileSkeleton
 import io.github.danilodox.warbook.ui.war.Message
@@ -62,7 +63,7 @@ private fun ClanTabScreen(
         }
         else -> Column(modifier.fillMaxSize()) {
             val tabs = listOf(ClanTab.INFO to Res.string.clan_tab_info, ClanTab.MEMBERS to Res.string.clan_tab_members)
-            SegmentedTabs(tabs, state.tab, viewModel::selectTab)
+            SubTabs(tabs, state.tab, viewModel::selectTab)
             ClanSectionBody(
                 state = ClanSectionState(state.clan, state.refreshing, state.error),
                 onRefresh = viewModel::refresh,

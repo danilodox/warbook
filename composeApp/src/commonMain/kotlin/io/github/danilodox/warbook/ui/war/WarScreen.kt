@@ -1,25 +1,16 @@
 package io.github.danilodox.warbook.ui.war
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -57,6 +48,11 @@ import io.github.danilodox.warbook.resources.war_private_title
 import io.github.danilodox.warbook.resources.war_private_who
 import io.github.danilodox.warbook.resources.war_tab_current
 import io.github.danilodox.warbook.resources.war_tab_cwl
+import io.github.danilodox.warbook.ui.components.NumberedStep
+import io.github.danilodox.warbook.ui.components.Panel
+import io.github.danilodox.warbook.ui.components.SkeletonBlock
+import io.github.danilodox.warbook.ui.components.SkeletonLine
+import io.github.danilodox.warbook.ui.components.SubTabs
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.StaleBanner
 import io.github.danilodox.warbook.ui.theme.Spacing
@@ -170,18 +166,11 @@ private fun WarBody(state: WarUiState, actions: WarActions) {
 
 @Composable
 private fun TabSelector(selected: WarTab, onSelect: (WarTab) -> Unit) {
-    val tabs = listOf(WarTab.CURRENT to Res.string.war_tab_current, WarTab.CWL to Res.string.war_tab_cwl)
-    SingleChoiceSegmentedButtonRow(
-        Modifier.fillMaxWidth().padding(horizontal = Spacing.lg, vertical = Spacing.sm),
-    ) {
-        tabs.forEachIndexed { index, (tab, label) ->
-            SegmentedButton(
-                selected = tab == selected,
-                onClick = { onSelect(tab) },
-                shape = SegmentedButtonDefaults.itemShape(index, tabs.size),
-            ) { Text(stringResource(label)) }
-        }
-    }
+    SubTabs(
+        listOf(WarTab.CURRENT to Res.string.war_tab_current, WarTab.CWL to Res.string.war_tab_cwl),
+        selected,
+        onSelect,
+    )
 }
 
 /**
@@ -199,7 +188,7 @@ private fun <T> SectionBody(
     when {
         error == AppError.WAR_LOG_PRIVATE -> PrivateWarLog(onRetry)
         cached != null -> Column(Modifier.fillMaxSize()) {
-            if (error != null) StaleBanner(error, cached.fetchedAt)
+            if (error != null) StaleBanner(error, cached.fetchedAt, onRetry)
             content(cached, Modifier.weight(1f))
         }
         error != null -> OfflineCard(error, onRetry)
@@ -217,11 +206,16 @@ internal fun Message(
 ) {
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(title), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-        Text(stringResource(body), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+        Text(stringResource(title), style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
+        Text(
+            stringResource(body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
         action()
     }
 }
@@ -239,19 +233,20 @@ private fun PrivateWarLog(onRefresh: () -> Unit) {
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
-        Text(stringResource(Res.string.war_private_title), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(Res.string.war_private_body), style = MaterialTheme.typography.bodyMedium)
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                Text(stringResource(Res.string.war_private_steps_title), style = MaterialTheme.typography.titleSmall)
-                Text(stringResource(Res.string.war_private_who), style = MaterialTheme.typography.bodySmall)
-                steps.forEachIndexed { index, step ->
-                    Text("${index + 1}. ${stringResource(step)}", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
+        Text(stringResource(Res.string.war_private_title), style = MaterialTheme.typography.titleLarge)
+        Text(
+            stringResource(Res.string.war_private_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Panel(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            Text(stringResource(Res.string.war_private_steps_title), style = MaterialTheme.typography.titleSmall)
+            Text(
+                stringResource(Res.string.war_private_who),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            steps.forEachIndexed { index, step -> NumberedStep(index + 1, stringResource(step)) }
         }
         OutlinedButton(onClick = onRefresh) { Text(stringResource(Res.string.war_private_refresh)) }
     }
@@ -261,15 +256,21 @@ private fun PrivateWarLog(onRefresh: () -> Unit) {
 @Suppress("MagicNumber")
 @Composable
 private fun WarSkeleton() {
-    val color = MaterialTheme.colorScheme.surfaceVariant
-    val shape = RoundedCornerShape(8.dp)
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
-        listOf(1f to 140.dp, 1f to 72.dp, 0.3f to 16.dp, 1f to 48.dp, 1f to 48.dp, 1f to 48.dp, 1f to 48.dp)
-            .forEach { (width, height) ->
-                Box(Modifier.fillMaxWidth(width).height(height).background(color, shape))
+        SkeletonBlock(width = null, height = 150.dp, shape = MaterialTheme.shapes.large)
+        SkeletonBlock(width = null, height = 96.dp, shape = MaterialTheme.shapes.large)
+        SkeletonLine(0.3f, 16.dp)
+        repeat(6) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SkeletonBlock(width = 26.dp, height = 28.dp)
+                SkeletonLine(1f, 14.dp, Modifier.weight(1f))
             }
+        }
     }
 }

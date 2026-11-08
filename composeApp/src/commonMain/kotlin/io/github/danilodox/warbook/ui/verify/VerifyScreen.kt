@@ -2,7 +2,6 @@ package io.github.danilodox.warbook.ui.verify
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,12 +38,12 @@ import io.github.danilodox.warbook.resources.verify_steps_title
 import io.github.danilodox.warbook.resources.verify_title
 import io.github.danilodox.warbook.resources.verify_token_label
 import io.github.danilodox.warbook.resources.verify_token_note
+import io.github.danilodox.warbook.ui.components.NumberedStep
 import io.github.danilodox.warbook.ui.onboarding.FlowColumn
 import io.github.danilodox.warbook.ui.onboarding.FlowTopBar
 import io.github.danilodox.warbook.ui.onboarding.ProgressButton
 import io.github.danilodox.warbook.ui.search.message
 import io.github.danilodox.warbook.ui.theme.Spacing
-import io.github.danilodox.warbook.ui.theme.tabular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -104,7 +102,7 @@ fun VerifyScreen(
             ) {
                 Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Text(stringResource(Res.string.verify_steps_title), style = MaterialTheme.typography.titleSmall)
-                    steps.forEachIndexed { index, step -> Step(index + 1, stringResource(step)) }
+                    steps.forEachIndexed { index, step -> NumberedStep(index + 1, stringResource(step)) }
                 }
             }
             val error = (state as? VerifyState.Failed)?.error
@@ -141,19 +139,5 @@ fun VerifyScreen(
                 }
             }
         }
-    }
-}
-
-/** Passo numerado: o número em dourado, alinhado com a primeira linha do texto. */
-@Composable
-private fun Step(number: Int, text: String) {
-    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        Text(
-            number.toString(),
-            style = MaterialTheme.typography.bodyMedium.tabular(),
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Text(text, style = MaterialTheme.typography.bodyMedium)
     }
 }

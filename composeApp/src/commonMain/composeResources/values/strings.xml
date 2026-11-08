@@ -142,7 +142,13 @@
     <string name="war_strength_average">Average TH</string>
     <string name="war_strength_max">Max TH</string>
     <string name="war_town_hall">TH %1$d</string>
-    <string name="war_map">Map</string>
+    <string name="war_map">Map %1$d × %1$d</string>
+    <string name="war_map_missed">didn't attack</string>
+    <plurals name="war_map_pending">
+        <item quantity="one">%1$d pending</item>
+        <item quantity="other">%1$d pending</item>
+    </plurals>
+    <string name="war_pending_attacks">%1$d attacks</string>
     <string name="war_summary_title">Summary for WhatsApp</string>
     <string name="war_copy">Copy</string>
     <string name="war_copied">Copied</string>
@@ -207,10 +213,8 @@
     <string name="clan_sort_town_hall">TH</string>
     <string name="clan_sort_trophies">Trophies</string>
     <string name="clan_sort_donations">Donations</string>
-    <string name="clan_member_line">%1$s · TH %2$d · level %3$d</string>
-    <string name="clan_member_trophies">%1$d trophies</string>
-    <string name="clan_member_received">↓ %1$d</string>
-    <string name="clan_member_you">you</string>
+    <string name="clan_member_line">%1$s · %2$s trophies</string>
+    <string name="clan_member_received">↓ %1$s</string>
     <string name="clan_invite_title">Add your account to see your clan</string>
     <string name="clan_invite_body">The Clan tab shows the info and members of your account\'s clan.</string>
     <string name="clan_no_clan_title">Your account is not in a clan</string>

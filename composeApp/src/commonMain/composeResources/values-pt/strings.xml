@@ -142,7 +142,13 @@
     <string name="war_strength_average">CV médio</string>
     <string name="war_strength_max">CV máximo</string>
     <string name="war_town_hall">CV %1$d</string>
-    <string name="war_map">Mapa</string>
+    <string name="war_map">Mapa %1$d × %1$d</string>
+    <string name="war_map_missed">não atacou</string>
+    <plurals name="war_map_pending">
+        <item quantity="one">%1$d pendente</item>
+        <item quantity="other">%1$d pendentes</item>
+    </plurals>
+    <string name="war_pending_attacks">%1$d ataques</string>
     <string name="war_summary_title">Resumo para o WhatsApp</string>
     <string name="war_copy">Copiar</string>
     <string name="war_copied">Copiado</string>
@@ -202,15 +208,13 @@
     <string name="clan_unknown_value">—</string>
     <string name="clan_open_war">Ver guerra atual ›</string>
     <string name="clan_members_season">Doações da temporada atual</string>
-    <string name="clan_members_legend">Número de cima: doadas. ↓ recebidas.</string>
+    <string name="clan_members_legend">Número de cima: doou · ↓ recebeu</string>
     <string name="clan_sort_position">Posição</string>
     <string name="clan_sort_town_hall">CV</string>
     <string name="clan_sort_trophies">Troféus</string>
     <string name="clan_sort_donations">Doações</string>
-    <string name="clan_member_line">%1$s · CV %2$d · nível %3$d</string>
-    <string name="clan_member_trophies">%1$d troféus</string>
-    <string name="clan_member_received">↓ %1$d</string>
-    <string name="clan_member_you">você</string>
+    <string name="clan_member_line">%1$s · %2$s troféus</string>
+    <string name="clan_member_received">↓ %1$s</string>
     <string name="clan_invite_title">Adicione sua conta para ver seu clã</string>
     <string name="clan_invite_body">A aba Clã mostra as informações e os membros do clã da sua conta.</string>
     <string name="clan_no_clan_title">Sua conta não está em um clã</string>

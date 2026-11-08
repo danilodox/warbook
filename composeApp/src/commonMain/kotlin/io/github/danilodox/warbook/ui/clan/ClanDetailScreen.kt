@@ -2,13 +2,8 @@ package io.github.danilodox.warbook.ui.clan
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +25,7 @@ import io.github.danilodox.warbook.resources.clan_tab_info
 import io.github.danilodox.warbook.resources.clan_tab_members
 import io.github.danilodox.warbook.resources.clan_tab_war
 import io.github.danilodox.warbook.ui.common.FollowButton
+import io.github.danilodox.warbook.ui.components.SubTabs
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.ProfileSkeleton
 import io.github.danilodox.warbook.ui.me.StaleBanner
@@ -37,8 +33,6 @@ import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.war.WarActions
 import io.github.danilodox.warbook.ui.war.WarScreen
 import io.github.danilodox.warbook.ui.war.WarViewModel
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 /** Tela Clã (T2). [onOpenMember] abre a tela Jogador. */
@@ -56,7 +50,7 @@ fun ClanDetailRoute(tag: String, fromSearch: Boolean, onOpenMember: (String) -> 
     Column(modifier.fillMaxSize()) {
         val clan = state.clan?.value
         if (clan != null) {
-            ClanHeader(clan, Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm)) {
+            ClanHeader(clan, Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.md)) {
                 FollowButton(
                     state.following,
                     state.followLimitReached,
@@ -128,23 +122,7 @@ private fun ClanTabs(selected: ClanTab, onSelect: (ClanTab) -> Unit) {
         ClanTab.MEMBERS to Res.string.clan_tab_members,
         ClanTab.WAR to Res.string.clan_tab_war,
     )
-    SegmentedTabs(tabs, selected, onSelect)
-}
-
-/** Sub-abas em botões segmentados (Info | Membros, Info | Membros | Guerra). */
-@Composable
-internal fun <T> SegmentedTabs(tabs: List<Pair<T, StringResource>>, selected: T, onSelect: (T) -> Unit) {
-    SingleChoiceSegmentedButtonRow(
-        Modifier.fillMaxWidth().padding(horizontal = Spacing.lg, vertical = Spacing.sm),
-    ) {
-        tabs.forEachIndexed { index, (tab, label) ->
-            SegmentedButton(
-                selected = tab == selected,
-                onClick = { onSelect(tab) },
-                shape = SegmentedButtonDefaults.itemShape(index, tabs.size),
-            ) { Text(stringResource(label)) }
-        }
-    }
+    SubTabs(tabs, selected, onSelect)
 }
 
 /** O salvo do clã e a atualização dele, para o corpo da aba Clã e da tela Clã. */
@@ -168,7 +146,7 @@ internal fun ClanSectionBody(
         val error = state.error
         when {
             cached != null -> Column(Modifier.fillMaxSize()) {
-                if (error != null) StaleBanner(error, cached.fetchedAt)
+                if (error != null) StaleBanner(error, cached.fetchedAt, onRefresh)
                 content(cached.value, Modifier.weight(1f))
             }
             error != null -> OfflineCard(error, onRetry = onRefresh)
