@@ -2,16 +2,16 @@ package io.github.danilodox.warbook.ui.verify
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +45,7 @@ import io.github.danilodox.warbook.ui.onboarding.FlowTopBar
 import io.github.danilodox.warbook.ui.onboarding.ProgressButton
 import io.github.danilodox.warbook.ui.search.message
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.ui.theme.tabular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -95,15 +97,14 @@ fun VerifyScreen(
         }
         FlowColumn {
             Text(stringResource(Res.string.verify_intro), style = MaterialTheme.typography.bodyMedium)
-            Card(
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Text(stringResource(Res.string.verify_steps_title), style = MaterialTheme.typography.titleSmall)
-                    steps.forEachIndexed { index, step ->
-                        Text("${index + 1}. ${stringResource(step)}", style = MaterialTheme.typography.bodySmall)
-                    }
+                    steps.forEachIndexed { index, step -> Step(index + 1, stringResource(step)) }
                 }
             }
             val error = (state as? VerifyState.Failed)?.error
@@ -140,5 +141,19 @@ fun VerifyScreen(
                 }
             }
         }
+    }
+}
+
+/** Passo numerado: o número em dourado, alinhado com a primeira linha do texto. */
+@Composable
+private fun Step(number: Int, text: String) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Text(
+            number.toString(),
+            style = MaterialTheme.typography.bodyMedium.tabular(),
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(text, style = MaterialTheme.typography.bodyMedium)
     }
 }

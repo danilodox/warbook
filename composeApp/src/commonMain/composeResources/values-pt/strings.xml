@@ -6,7 +6,6 @@
     <string name="tab_search">Buscar</string>
     <string name="settings">Configurações</string>
     <string name="back">Voltar</string>
-    <string name="coming_soon">Em breve</string>
     <string name="settings_version">Versão %1$s</string>
 
     <string name="search_tag_label">Tag do jogador</string>
@@ -17,6 +16,8 @@
     <string name="retry_short">Tentar</string>
     <string name="you_tag">você</string>
     <string name="error_code">Código: %1$s</string>
+    <string name="fan_notice_short">Material não oficial, não endossado pela Supercell.</string>
+    <string name="thousands_separator">.</string>
 
     <string name="player_tag">#%1$s</string>
     <string name="player_clan_role">%1$s · %2$s</string>
@@ -41,7 +42,7 @@
     <string name="error_network">Sem conexão com o servidor do Warbook. Confira a internet.</string>
     <string name="error_server">O servidor do jogo não respondeu.</string>
 
-    <string name="onboarding_tagline">Estatísticas e guerras do seu clã</string>
+    <string name="onboarding_tagline">As estatísticas e as guerras do seu clã</string>
     <string name="onboarding_tag_question">Qual é a tag do seu jogador?</string>
     <string name="onboarding_tag_hint">Fica no seu perfil, embaixo do nome.</string>
     <string name="onboarding_help_title">Onde acho minha tag?</string>
@@ -74,12 +75,12 @@
     <string name="me_heroes">Heróis</string>
     <string name="me_equipment">Equipamentos de herói</string>
     <string name="me_troops">Tropas</string>
-    <string name="me_spells">Feitiços</string>
-    <string name="me_sieges">Máquinas de cerco</string>
+    <string name="me_spells_sieges">Feitiços e máquinas</string>
+    <string name="me_maxed_count">%1$d de %2$d no máximo</string>
     <string name="me_pets">Pets</string>
     <string name="me_season">Temporada</string>
-    <string name="me_donations">Doadas</string>
-    <string name="me_received">Recebidas</string>
+    <string name="me_donations">Doou</string>
+    <string name="me_received">Recebeu</string>
     <string name="me_attack_wins">Ataques vencidos</string>
     <string name="unit_level">%1$d/%2$d</string>
 
@@ -172,7 +173,6 @@
     <string name="follow">Seguir</string>
     <string name="following">Seguindo</string>
     <string name="follow_limit">Você já segue 50. Deixe de seguir alguém para seguir mais.</string>
-    <string name="player_clan_open">%1$s ›</string>
     <string name="clan_tab_info">Info</string>
     <string name="clan_tab_members">Membros</string>
     <string name="clan_tab_war">Guerra</string>

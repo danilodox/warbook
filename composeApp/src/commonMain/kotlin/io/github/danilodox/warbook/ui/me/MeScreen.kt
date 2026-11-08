@@ -1,22 +1,15 @@
 package io.github.danilodox.warbook.ui.me
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -37,17 +30,21 @@ import io.github.danilodox.warbook.data.AppError
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.currentTimeMillis
 import io.github.danilodox.warbook.resources.Res
+import io.github.danilodox.warbook.resources.ic_offline
 import io.github.danilodox.warbook.resources.me_add_account
 import io.github.danilodox.warbook.resources.me_no_account_body
 import io.github.danilodox.warbook.resources.me_no_account_title
 import io.github.danilodox.warbook.resources.offline_body
 import io.github.danilodox.warbook.resources.offline_no_connection
 import io.github.danilodox.warbook.resources.offline_title
-import io.github.danilodox.warbook.resources.retry
 import io.github.danilodox.warbook.resources.updated_days
 import io.github.danilodox.warbook.resources.updated_hours
 import io.github.danilodox.warbook.resources.updated_just_now
 import io.github.danilodox.warbook.resources.updated_minutes
+import io.github.danilodox.warbook.ui.components.ErrorState
+import io.github.danilodox.warbook.ui.components.OfflineBanner
+import io.github.danilodox.warbook.ui.components.SkeletonBlock
+import io.github.danilodox.warbook.ui.components.SkeletonLine
 import io.github.danilodox.warbook.ui.search.canRetry
 import io.github.danilodox.warbook.ui.search.message
 import io.github.danilodox.warbook.ui.theme.Spacing
@@ -126,7 +123,7 @@ fun MeScreen(
             val error = state.refreshError
             when {
                 profile != null -> Column(Modifier.fillMaxSize()) {
-                    if (error != null) StaleBanner(error, profile.fetchedAt)
+                    if (error != null) StaleBanner(error, profile.fetchedAt, onRefresh)
                     ProfileContent(
                         player = profile.player,
                         header = { AccountHeader(profile.player, active, onOpenAccounts) { onVerify(active.tag) } },
@@ -157,9 +154,9 @@ fun NoAccountScreen(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/** Faixa de cima quando a atualização falhou e a tela mostra o perfil salvo. */
+/** Faixa em couro quando a atualização falhou e a tela mostra o perfil salvo. */
 @Composable
-internal fun StaleBanner(error: AppError, fetchedAt: Long) {
+internal fun StaleBanner(error: AppError, fetchedAt: Long, onRetry: (() -> Unit)? = null) {
     val reason = if (error == AppError.NETWORK) Res.string.offline_no_connection else error.message
     val now = remember(fetchedAt) { currentTimeMillis() }
     val age = when (val value = ageOf(fetchedAt, now)) {
@@ -168,33 +165,31 @@ internal fun StaleBanner(error: AppError, fetchedAt: Long) {
         is Age.Hours -> stringResource(Res.string.updated_hours, value.value)
         is Age.Days -> stringResource(Res.string.updated_days, value.value)
     }
-    Surface(color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
-        Text(
-            "${stringResource(reason)} $age",
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm),
-        )
-    }
+    OfflineBanner(
+        "${stringResource(reason)} $age",
+        modifier = Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm),
+        onRetry = onRetry?.takeIf { error.canRetry },
+    )
 }
 
-/** Sem perfil salvo e sem conseguir buscar: só o cartão do erro. Rolável para o puxar-para-atualizar. */
+/** Sem perfil salvo e sem conseguir buscar: o erro de tela cheia. Rolável para o puxar-para-atualizar. */
 @Composable
 internal fun OfflineCard(error: AppError, onRetry: () -> Unit) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg)) {
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                Modifier.fillMaxWidth().padding(Spacing.lg),
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                if (error == AppError.NETWORK) {
-                    Text(stringResource(Res.string.offline_title), style = MaterialTheme.typography.titleMedium)
-                    Text(stringResource(Res.string.offline_body), style = MaterialTheme.typography.bodyMedium)
-                } else {
-                    Text(stringResource(error.message), style = MaterialTheme.typography.bodyMedium)
-                }
-                if (error.canRetry) OutlinedButton(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-            }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        if (error == AppError.NETWORK) {
+            ErrorState(
+                title = stringResource(Res.string.offline_title),
+                body = stringResource(Res.string.offline_body),
+                icon = Res.drawable.ic_offline,
+                onRetry = onRetry,
+            )
+        } else {
+            ErrorState(
+                title = stringResource(error.message),
+                body = null,
+                code = error.name,
+                onRetry = onRetry.takeIf { error.canRetry },
+            )
         }
     }
 }
@@ -203,15 +198,36 @@ internal fun OfflineCard(error: AppError, onRetry: () -> Unit) {
 @Suppress("MagicNumber")
 @Composable
 internal fun ProfileSkeleton() {
-    val color = MaterialTheme.colorScheme.surfaceVariant
-    val shape = RoundedCornerShape(8.dp)
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
-        listOf(0.6f to 48.dp, 1f to 64.dp, 0.3f to 16.dp, 1f to 120.dp, 0.3f to 16.dp, 1f to 120.dp)
-            .forEach { (width, height) ->
-                Box(Modifier.fillMaxWidth(width).height(height).background(color, shape))
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+            SkeletonBlock(width = 48.dp, height = 52.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                SkeletonLine(0.6f, 22.dp)
+                SkeletonLine(0.35f, 14.dp)
+                SkeletonLine(0.5f, 14.dp)
             }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs + Spacing.xxs)) {
+            repeat(3) { SkeletonBlock(width = null, height = 48.dp, modifier = Modifier.weight(1f)) }
+        }
+        SkeletonLine(0.3f, 16.dp)
+        repeat(3) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SkeletonBlock(width = 38.dp, height = 38.dp)
+                SkeletonLine(1f, 14.dp, Modifier.weight(1f))
+            }
+        }
+        SkeletonLine(0.3f, 16.dp)
+        repeat(2) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs + Spacing.xxs)) {
+                repeat(5) { SkeletonBlock(width = null, height = 56.dp, modifier = Modifier.weight(1f)) }
+            }
+        }
     }
 }
