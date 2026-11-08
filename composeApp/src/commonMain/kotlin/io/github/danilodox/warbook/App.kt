@@ -36,7 +36,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.AppPreferences
-import io.github.danilodox.warbook.data.ThemeMode
 import io.github.danilodox.warbook.data.WarbookHttpClients
 import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.navigation.Route
@@ -76,6 +75,8 @@ import io.github.danilodox.warbook.ui.theme.SystemBarsAppearance
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
 import io.github.danilodox.warbook.ui.war.WarRoute
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -92,7 +93,10 @@ fun App() {
     val startViewModel = viewModel { StartViewModel(accounts, preferences) }
     val start by startViewModel.start.collectAsStateWithLifecycle()
 
-    val themeMode by preferences.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.DARK)
+    // O tema é lido antes do primeiro quadro: começando no padrão (escuro), quem usa o claro via o escuro
+    // por um instante. O DataStore é um arquivo pequeno; a leitura leva poucos milissegundos.
+    val initialTheme = remember(preferences) { runBlocking { preferences.themeMode.first() } }
+    val themeMode by preferences.themeMode.collectAsStateWithLifecycle(initialValue = initialTheme)
     val dark = themeMode.isDark(isSystemInDarkTheme())
 
     WarbookTheme(darkTheme = dark) {
