@@ -4,6 +4,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+### Corrigido
+
+- Tema claro: ao abrir o app, o tema escuro não aparece mais por um instante antes do claro.
+
 ## [0.6.0] - 2026-11-08
 
 ### Adicionado
