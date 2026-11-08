@@ -1,5 +1,6 @@
 package io.github.danilodox.warbook
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.AppPreferences
+import io.github.danilodox.warbook.data.ThemeMode
 import io.github.danilodox.warbook.data.WarbookHttpClients
 import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.navigation.Route
@@ -63,6 +65,7 @@ import io.github.danilodox.warbook.ui.onboarding.TagScreen
 import io.github.danilodox.warbook.ui.player.PlayerRoute
 import io.github.danilodox.warbook.ui.search.SearchRoute
 import io.github.danilodox.warbook.ui.settings.SettingsRoute
+import io.github.danilodox.warbook.ui.theme.SystemBarsAppearance
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
 import io.github.danilodox.warbook.ui.war.WarRoute
@@ -82,7 +85,11 @@ fun App() {
     val startViewModel = viewModel { StartViewModel(accounts, preferences) }
     val start by startViewModel.start.collectAsStateWithLifecycle()
 
-    WarbookTheme {
+    val themeMode by preferences.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.DARK)
+    val dark = themeMode.isDark(isSystemInDarkTheme())
+
+    WarbookTheme(darkTheme = dark) {
+        SystemBarsAppearance(dark)
         // Ler o banco é rápido: até lá fica só o fundo, sem tela de carregamento.
         val startRoute = start
         if (startRoute == null) Surface(Modifier.fillMaxSize()) {} else WarbookNavigation(startRoute)

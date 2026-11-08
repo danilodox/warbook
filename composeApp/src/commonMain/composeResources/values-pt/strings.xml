@@ -171,7 +171,13 @@
     <string name="cwl_not_in_title">O clã não está na CWL agora</string>
     <string name="cwl_not_in_body">A Liga de Guerra de Clãs acontece no começo de cada mês. Quando o clã entrar, as rodadas aparecem aqui.</string>
 
-    <string name="settings_fan_notice">Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a Política de Conteúdo de Fãs da Supercell: www.supercell.com/fan-content-policy.</string>
+    <string name="settings_fan_notice">Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a Política de Conteúdo de Fãs da Supercell.</string>
+    <string name="fan_policy_link">supercell.com/fan-content-policy</string>
+    <string name="settings_appearance">Aparência</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_system">Igual ao sistema</string>
+    <string name="settings_fan_title">Conteúdo de fã</string>
 
     <!-- v0.5.0: telas Jogador e Clã -->
     <string name="screen_player">Jogador</string>

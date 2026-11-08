@@ -171,7 +171,13 @@
     <string name="cwl_not_in_title">The clan is not in the CWL right now</string>
     <string name="cwl_not_in_body">Clan War Leagues happen at the start of each month. When the clan joins, the rounds show up here.</string>
 
-    <string name="settings_fan_notice">This material is unofficial and is not endorsed by Supercell. For more information see Supercell\'s Fan Content Policy: www.supercell.com/fan-content-policy.</string>
+    <string name="settings_fan_notice">This material is unofficial and is not endorsed by Supercell. For more information see Supercell\'s Fan Content Policy.</string>
+    <string name="fan_policy_link">supercell.com/fan-content-policy</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_system">Same as the system</string>
+    <string name="settings_fan_title">Fan content</string>
 
     <!-- v0.5.0: Player and Clan screens -->
     <string name="screen_player">Player</string>

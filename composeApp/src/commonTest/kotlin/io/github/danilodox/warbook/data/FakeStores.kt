@@ -188,6 +188,11 @@ class FakeAppPreferences(explore: Boolean = false) : AppPreferences {
     override val exploreMode = MutableStateFlow(explore)
     override val summaryOptions = MutableStateFlow(SummaryOptions())
     override val recentSearches = MutableStateFlow<List<RecentSearch>>(emptyList())
+    override val themeMode = MutableStateFlow(ThemeMode.DARK)
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        themeMode.value = mode
+    }
 
     override suspend fun addRecentSearch(item: RecentSearch) {
         recentSearches.update { RecentSearches.add(it, item) }
