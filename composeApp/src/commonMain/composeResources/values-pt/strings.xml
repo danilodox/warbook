@@ -14,6 +14,9 @@
     <string name="search_hint">Digite a tag de um jogador para testar a conexão com o servidor.</string>
     <string name="search_loading">Buscando…</string>
     <string name="retry">Tentar de novo</string>
+    <string name="retry_short">Tentar</string>
+    <string name="you_tag">você</string>
+    <string name="error_code">Código: %1$s</string>
 
     <string name="player_tag">#%1$s</string>
     <string name="player_clan_role">%1$s · %2$s</string>
