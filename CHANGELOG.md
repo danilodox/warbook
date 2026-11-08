@@ -4,6 +4,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.6.0] - 2026-11-08
+
 ### Adicionado
 
 - Visual novo "livro de guerra": paleta própria em tema escuro e claro, com cores fixas (sem as cores do papel de parede). Títulos e números em Cinzel, texto em Alegreya Sans com números alinhados e tags em JetBrains Mono, as três com licença OFL na pasta `files/licenses`.
@@ -120,7 +122,8 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.5.0...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/danilodox/warbook/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/danilodox/warbook/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/danilodox/warbook/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/danilodox/warbook/compare/v0.3.0...v0.4.0
