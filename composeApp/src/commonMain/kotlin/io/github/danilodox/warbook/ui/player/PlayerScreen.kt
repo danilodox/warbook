@@ -16,6 +16,7 @@ import io.github.danilodox.warbook.data.FollowRepository
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.ui.common.FollowButton
 import io.github.danilodox.warbook.ui.me.OfflineCard
+import io.github.danilodox.warbook.ui.me.ProfileCardAction
 import io.github.danilodox.warbook.ui.me.ProfileContent
 import io.github.danilodox.warbook.ui.me.ProfileHeader
 import io.github.danilodox.warbook.ui.me.ProfileSkeleton
@@ -31,6 +32,7 @@ fun PlayerRoute(tag: String, fromSearch: Boolean, onOpenClan: (String) -> Unit, 
     val preferences: AppPreferences = koinInject()
     val viewModel = viewModel(key = "player-$tag") { PlayerViewModel(tag, profiles, follows, preferences, fromSearch) }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    ProfileCardAction(state.profile?.player)
     PlayerScreen(state, viewModel::refresh, viewModel::toggleFollow, onOpenClan, modifier)
 }
 
@@ -66,7 +68,7 @@ fun PlayerScreen(
     }
 }
 
-/** Cabeçalho do perfil (o clã abre a tela Clã) e "Seguir" embaixo. "Comparar" e cartão chegam no PR B. */
+/** Cabeçalho do perfil (o clã abre a tela Clã) e "Seguir" embaixo. "Comparar" chega no lote 9. */
 @Composable
 private fun PlayerHeader(
     player: PlayerDto,

@@ -153,6 +153,10 @@
     <string name="war_copy">Copiar</string>
     <string name="war_copied">Copiado</string>
     <string name="war_share">Compartilhar</string>
+    <string name="card_title">Cartão de perfil</string>
+    <string name="card_share">Compartilhar cartão de perfil</string>
+    <string name="card_kind">Perfil de jogador</string>
+    <string name="card_fan_app">warbook · app de fã</string>
     <string name="war_customize">Personalizar</string>
     <string name="war_customize_done">Pronto</string>
     <string name="war_preview">Prévia do texto</string>

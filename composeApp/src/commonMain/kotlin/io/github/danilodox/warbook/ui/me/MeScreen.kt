@@ -75,6 +75,7 @@ fun MeRoute(
         }
     }
 
+    ProfileCardAction(state.profile?.player)
     MeScreen(
         state = state,
         onRefresh = viewModel::refresh,
