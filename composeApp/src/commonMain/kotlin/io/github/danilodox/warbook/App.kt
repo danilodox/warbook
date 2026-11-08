@@ -55,6 +55,7 @@ import io.github.danilodox.warbook.resources.ic_arrow_back
 import io.github.danilodox.warbook.resources.ic_settings
 import io.github.danilodox.warbook.resources.ic_share
 import io.github.danilodox.warbook.resources.screen_clan
+import io.github.danilodox.warbook.resources.screen_compare
 import io.github.danilodox.warbook.resources.screen_player
 import io.github.danilodox.warbook.resources.settings
 import io.github.danilodox.warbook.ui.clan.ClanDetailRoute
@@ -62,6 +63,7 @@ import io.github.danilodox.warbook.ui.clan.ClanTabActions
 import io.github.danilodox.warbook.ui.clan.ClanTabRoute
 import io.github.danilodox.warbook.ui.common.LocalTopBarActions
 import io.github.danilodox.warbook.ui.common.TopBarActions
+import io.github.danilodox.warbook.ui.compare.CompareRoute
 import io.github.danilodox.warbook.ui.me.MeRoute
 import io.github.danilodox.warbook.ui.onboarding.ConfirmScreen
 import io.github.danilodox.warbook.ui.onboarding.OnboardingViewModel
@@ -154,6 +156,7 @@ private fun WarbookNavigation(startRoute: Route) {
 private fun detailTitleOf(destination: NavDestination?): StringResource? = when {
     destination?.hasRoute(Route.Player::class) == true -> Res.string.screen_player
     destination?.hasRoute(Route.ClanDetail::class) == true -> Res.string.screen_clan
+    destination?.hasRoute(Route.Compare::class) == true -> Res.string.screen_compare
     else -> null
 }
 
@@ -213,7 +216,11 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 tag = route.tag,
                 fromSearch = route.fromSearch,
                 onOpenClan = { clanTag -> navController.navigate(Route.ClanDetail(clanTag)) },
+                onCompare = { navController.navigate(Route.Compare(route.tag)) },
             )
+        }
+        composable<Route.Compare> {
+            CompareRoute(it.toRoute<Route.Compare>().tag, onAddAccount = { navController.navigate(Route.Onboarding) })
         }
         composable<Route.ClanDetail> { entry ->
             val route = entry.toRoute<Route.ClanDetail>()

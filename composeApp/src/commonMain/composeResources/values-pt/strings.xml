@@ -185,6 +185,17 @@
 
     <!-- v0.5.0: telas Jogador e Clã -->
     <string name="screen_player">Jogador</string>
+    <string name="screen_compare">Comparar</string>
+    <string name="compare_with_me">Comparar comigo</string>
+    <string name="compare_general">Geral</string>
+    <string name="compare_war_stars">Estrelas de guerra</string>
+    <string name="compare_donations">Doações</string>
+    <string name="compare_me_ahead">Você está à frente em %1$d de %2$d</string>
+    <string name="compare_them_ahead">%1$s em %2$d</string>
+    <plurals name="compare_ties">
+        <item quantity="one">%1$d empate</item>
+        <item quantity="other">%1$d empates</item>
+    </plurals>
     <string name="screen_clan">Clã</string>
     <string name="follow">Seguir</string>
     <string name="following">Seguindo</string>

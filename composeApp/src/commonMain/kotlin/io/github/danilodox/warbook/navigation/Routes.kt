@@ -48,6 +48,10 @@ sealed interface Route {
     @Serializable
     data class Player(val tag: String, val fromSearch: Boolean = false) : Route
 
+    /** T3: a conta ativa contra o jogador [tag]. */
+    @Serializable
+    data class Compare(val tag: String) : Route
+
     /** T2: qualquer clã, aberto de qualquer aba. [fromSearch] = entra nas "Recentes" da busca. */
     @Serializable
     data class ClanDetail(val tag: String, val fromSearch: Boolean = false) : Route

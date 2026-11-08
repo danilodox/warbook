@@ -185,6 +185,17 @@
 
     <!-- v0.5.0: Player and Clan screens -->
     <string name="screen_player">Player</string>
+    <string name="screen_compare">Compare</string>
+    <string name="compare_with_me">Compare with me</string>
+    <string name="compare_general">General</string>
+    <string name="compare_war_stars">War stars</string>
+    <string name="compare_donations">Donations</string>
+    <string name="compare_me_ahead">You are ahead in %1$d of %2$d</string>
+    <string name="compare_them_ahead">%1$s in %2$d</string>
+    <plurals name="compare_ties">
+        <item quantity="one">%1$d tie</item>
+        <item quantity="other">%1$d ties</item>
+    </plurals>
     <string name="screen_clan">Clan</string>
     <string name="follow">Follow</string>
     <string name="following">Following</string>
