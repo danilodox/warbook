@@ -243,9 +243,12 @@
     <string name="clan_search_clans">Search clans</string>
     <string name="search_mode_player">Player</string>
     <string name="search_mode_clan">Clan</string>
-    <string name="search_player_label">Player tag (#…)</string>
+    <string name="search_player_label">Player name or tag (#…)</string>
     <string name="search_clan_label">Clan tag or name</string>
-    <string name="search_nick_notice">Search by name arrives in v0.7. For now, search by tag, shown on the in-game profile (e.g. #2PQ8LV9YC).</string>
+    <string name="search_nick_notice">Name search only finds players who already showed up in Warbook: players opened and members of clans opened in the app. With # it searches by tag, shown on the in-game profile (e.g. #2PQ8LV9YC).</string>
+    <string name="search_nick_too_short">Type at least 3 letters of the name.</string>
+    <string name="search_nick_no_results">No one with that name has shown up in Warbook yet. Try the tag.</string>
+    <string name="search_nick_line">#%1$s · TH %2$d · %3$s</string>
     <string name="search_too_short">Type at least 3 letters of the clan name.</string>
     <string name="search_results">Results</string>
     <string name="search_no_results">No clan found with that name.</string>

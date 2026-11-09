@@ -243,9 +243,12 @@
     <string name="clan_search_clans">Buscar clãs</string>
     <string name="search_mode_player">Jogador</string>
     <string name="search_mode_clan">Clã</string>
-    <string name="search_player_label">Tag do jogador (#…)</string>
+    <string name="search_player_label">Nick ou tag do jogador (#…)</string>
     <string name="search_clan_label">Tag ou nome do clã</string>
-    <string name="search_nick_notice">A busca por nick chega na v0.7. Por enquanto, busque pela tag, que fica no perfil do jogo (ex.: #2PQ8LV9YC).</string>
+    <string name="search_nick_notice">A busca por nick só acha quem já apareceu no Warbook: jogadores abertos e membros de clãs abertos no app. Com # busca pela tag, que fica no perfil do jogo (ex.: #2PQ8LV9YC).</string>
+    <string name="search_nick_too_short">Digite pelo menos 3 letras do nick.</string>
+    <string name="search_nick_no_results">Ninguém com esse nick passou pelo Warbook ainda. Tente pela tag.</string>
+    <string name="search_nick_line">#%1$s · CV %2$d · %3$s</string>
     <string name="search_too_short">Digite pelo menos 3 letras do nome do clã.</string>
     <string name="search_results">Resultados</string>
     <string name="search_no_results">Nenhum clã encontrado com esse nome.</string>

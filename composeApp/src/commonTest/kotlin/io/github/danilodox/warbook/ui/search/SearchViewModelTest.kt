@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.ui.search
 
 import io.github.danilodox.warbook.api.ClanSearchResultDto
+import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.data.ApiResult
 import io.github.danilodox.warbook.data.AppError
 import io.github.danilodox.warbook.data.FollowKind
@@ -30,6 +31,7 @@ class SearchViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val rig = DetailTestRig()
     private val mito = ClanSearchResultDto("8QU0VC", "Os Mito", "https://img/m.png", 20, 48)
+    private val dantas = PlayerSearchResultDto("2PQ8LV9YC", "Dantas", 15, "2YQUC8J0P", "Picuí Raiz", seenAt = 1)
 
     @BeforeTest
     fun setUp() {
@@ -42,7 +44,7 @@ class SearchViewModelTest {
     }
 
     private fun TestScope.viewModel(mode: SearchMode = SearchMode.PLAYER) =
-        SearchViewModel(rig.clans, rig.follows, rig.preferences).also {
+        SearchViewModel(rig.clans, rig.follows, rig.preferences, rig.api).also {
             it.selectMode(mode)
             advanceUntilIdle()
         }
@@ -72,12 +74,55 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun nickAvisaQueChegaNaV07() = runTest(dispatcher) {
-        val viewModel = viewModel().typed("Dantas")
+    fun nickBuscaNoServidorEMostraOsJogadores() = runTest(dispatcher) {
+        rig.api.playerSearches["Dantas"] = ApiResult.Success(listOf(dantas))
+        val viewModel = viewModel().typed(" Dantas ")
 
-        assertEquals(SearchOutcome.NickNotice, viewModel.state.value.outcome)
+        assertEquals(SearchOutcome.PlayerResults(listOf(dantas)), viewModel.state.value.outcome)
+        assertEquals(listOf("Dantas"), rig.api.playerSearchCalls)
         assertNull(viewModel.state.value.open)
         assertTrue(rig.api.playerCalls.isEmpty())
+
+        viewModel.open(SearchTarget(FollowKind.PLAYER, dantas.tag))
+        advanceUntilIdle()
+        assertEquals(SearchTarget(FollowKind.PLAYER, "2PQ8LV9YC"), viewModel.state.value.open)
+    }
+
+    @Test
+    fun nickSoComLetrasDeTagBuscaPorNick() = runTest(dispatcher) {
+        val viewModel = viewModel().typed("Ryu")
+
+        assertEquals(listOf("Ryu"), rig.api.playerSearchCalls)
+        assertEquals(SearchOutcome.PlayerResults(emptyList()), viewModel.state.value.outcome)
+        assertNull(viewModel.state.value.open)
+    }
+
+    @Test
+    fun nickCurtoNaoVaiAoServidor() = runTest(dispatcher) {
+        val viewModel = viewModel().typed("Jo")
+
+        assertEquals(SearchOutcome.TooShort, viewModel.state.value.outcome)
+        assertTrue(rig.api.playerSearchCalls.isEmpty())
+    }
+
+    @Test
+    fun falhaNaBuscaPorNickMostraOErro() = runTest(dispatcher) {
+        rig.api.playerSearches["Dantas"] = ApiResult.Failure(AppError.NETWORK)
+        val viewModel = viewModel().typed("Dantas")
+
+        assertEquals(SearchOutcome.Failed(AppError.NETWORK), viewModel.state.value.outcome)
+    }
+
+    @Test
+    fun trocarDeModoCancelaABuscaPorNick() = runTest(dispatcher) {
+        rig.api.playerSearches["Dantas"] = ApiResult.Success(listOf(dantas))
+        val viewModel = viewModel()
+        viewModel.submit("Dantas")
+
+        viewModel.selectMode(SearchMode.CLAN)
+        advanceUntilIdle()
+
+        assertEquals(SearchOutcome.None, viewModel.state.value.outcome)
     }
 
     @Test

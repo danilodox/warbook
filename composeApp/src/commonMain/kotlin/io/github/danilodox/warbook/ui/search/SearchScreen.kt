@@ -34,6 +34,7 @@ import io.github.danilodox.warbook.data.AppPreferences
 import io.github.danilodox.warbook.data.ClanRepository
 import io.github.danilodox.warbook.data.FollowKind
 import io.github.danilodox.warbook.data.FollowRepository
+import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.ic_tab_search
 import io.github.danilodox.warbook.resources.search_button
@@ -63,7 +64,8 @@ fun SearchRoute(
     val clans: ClanRepository = koinInject()
     val follows: FollowRepository = koinInject()
     val preferences: AppPreferences = koinInject()
-    val viewModel = viewModel { SearchViewModel(clans, follows, preferences) }
+    val api: WarbookRepository = koinInject()
+    val viewModel = viewModel { SearchViewModel(clans, follows, preferences, api) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(openClanMode) {
@@ -132,7 +134,11 @@ private fun SearchField(query: String, mode: SearchMode, onChange: (String) -> U
                 Text(stringResource(Res.string.search_button))
             }
         },
-        textStyle = if (player) WarbookTheme.text.tag.copy(fontSize = 16.sp) else MaterialTheme.typography.bodyLarge,
+        textStyle = if (player && query.trimStart().startsWith("#")) {
+            WarbookTheme.text.tag.copy(fontSize = 16.sp)
+        } else {
+            MaterialTheme.typography.bodyLarge
+        },
         shape = CircleShape,
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
@@ -141,7 +147,8 @@ private fun SearchField(query: String, mode: SearchMode, onChange: (String) -> U
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
         keyboardOptions = KeyboardOptions(
-            capitalization = if (player) KeyboardCapitalization.Characters else KeyboardCapitalization.Words,
+            // Jogador aceita nick (com minúsculas) e tag (o app põe em maiúsculas sozinho).
+            capitalization = if (player) KeyboardCapitalization.None else KeyboardCapitalization.Words,
             autoCorrectEnabled = false,
             imeAction = ImeAction.Search,
         ),

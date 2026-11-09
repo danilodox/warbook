@@ -6,6 +6,7 @@ import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.CwlState
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -73,6 +74,26 @@ class KtorWarbookRepositoryTest {
     @Test
     fun buscaComNomeCurtoNemChamaOServidor() = runTest {
         assertEquals(ApiResult.Failure(AppError.INVALID_QUERY), repository.searchClans(" ab "))
+        assertTrue(server.requests.isEmpty())
+    }
+
+    @Test
+    fun buscaDeJogadorMandaONickAparadoNaQuery() = runTest {
+        server.body = """{"items":[{"tag":"P1","name":"JoÃo","townHallLevel":15,"clanName":"PURY","seenAt":5}]}"""
+
+        val result = repository.searchPlayers("  joao ")
+
+        val items = assertIs<ApiResult.Success<List<PlayerSearchResultDto>>>(result).value
+        assertEquals(listOf("JoÃo"), items.map { it.name })
+        assertEquals("PURY", items.single().clanName)
+        val request = server.requests.last()
+        assertEquals(ApiRoutes.PLAYER_SEARCH, request.url.encodedPath)
+        assertEquals("joao", request.url.parameters[ApiRoutes.PARAM_NAME])
+    }
+
+    @Test
+    fun buscaDeJogadorComNickCurtoNemChamaOServidor() = runTest {
+        assertEquals(ApiResult.Failure(AppError.INVALID_QUERY), repository.searchPlayers(" ab "))
         assertTrue(server.requests.isEmpty())
     }
 

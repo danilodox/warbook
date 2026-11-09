@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.danilodox.warbook.api.ClanSearch
 import io.github.danilodox.warbook.api.ClanSearchResultDto
+import io.github.danilodox.warbook.api.PlayerSearch
+import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.api.TagNormalizer
 import io.github.danilodox.warbook.data.ApiResult
 import io.github.danilodox.warbook.data.AppError
@@ -14,6 +16,7 @@ import io.github.danilodox.warbook.data.FollowRepository
 import io.github.danilodox.warbook.data.FollowResult
 import io.github.danilodox.warbook.data.Followed
 import io.github.danilodox.warbook.data.RecentSearch
+import io.github.danilodox.warbook.data.WarbookRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,15 +39,15 @@ sealed interface SearchOutcome {
     /** Nada buscado: mostra "Seguindo" e "Recentes". */
     data object None : SearchOutcome
 
-    /** Texto que não é tag na busca de jogador: a busca por nick chega na v0.7. */
-    data object NickNotice : SearchOutcome
-
-    /** Nome de clã com menos de [ClanSearch.MIN_LENGTH] letras. */
+    /** Nick ou nome de clã com menos de 3 letras ([PlayerSearch.MIN_LENGTH], [ClanSearch.MIN_LENGTH]). */
     data object TooShort : SearchOutcome
 
     data object Searching : SearchOutcome
 
     data class Results(val clans: List<ClanResult>) : SearchOutcome
+
+    /** Jogadores achados pelo nick no índice do servidor (só quem já apareceu no Warbook). */
+    data class PlayerResults(val players: List<PlayerSearchResultDto>) : SearchOutcome
 
     data class Failed(val error: AppError) : SearchOutcome
 }
@@ -79,8 +82,8 @@ private sealed interface LocalOutcome {
 }
 
 /**
- * Aba Buscar (B1–B2). Jogador: só por tag (com `#` ou só com os caracteres de tag); o resto avisa que o nick
- * chega na v0.7. Clã: por tag (com `#`, ou só caracteres de tag com algum número) ou por nome no servidor.
+ * Aba Buscar (B1–B2). Jogador: por tag (com `#` ou só com os caracteres de tag) ou por nick no índice do
+ * servidor. Clã: por tag (com `#`, ou só caracteres de tag com algum número) ou por nome no servidor.
  * Abrir um jogador ou clã fica para a tela dele, que busca, guarda nas "Recentes" e trata os erros.
  */
 @Suppress("TooManyFunctions") // Uma função por ação da tela.
@@ -88,6 +91,7 @@ class SearchViewModel(
     private val clans: ClanRepository,
     private val follows: FollowRepository,
     private val preferences: AppPreferences,
+    private val api: WarbookRepository,
 ) : ViewModel() {
     private val local = MutableStateFlow(Local())
     private var searchJob: Job? = null
@@ -140,21 +144,32 @@ class SearchViewModel(
     }
 
     private fun submitPlayer(query: String) {
-        val tag = TagNormalizer.normalize(query)
+        val trimmed = query.trim()
+        val tag = TagNormalizer.normalize(trimmed)
         when {
-            tag != null -> open(SearchTarget(FollowKind.PLAYER, tag))
-            query.trim().startsWith("#") -> show(SearchOutcome.Failed(AppError.INVALID_TAG))
-            else -> show(SearchOutcome.NickNotice)
+            looksLikeTag(trimmed, tag) && tag != null -> open(SearchTarget(FollowKind.PLAYER, tag))
+            trimmed.startsWith("#") -> show(SearchOutcome.Failed(AppError.INVALID_TAG))
+            PlayerSearch.normalize(trimmed) == null -> show(SearchOutcome.TooShort)
+            else -> searchByNick(trimmed)
+        }
+    }
+
+    private fun searchByNick(nick: String) {
+        show(SearchOutcome.Searching)
+        searchJob = viewModelScope.launch {
+            val outcome = when (val result = api.searchPlayers(nick)) {
+                is ApiResult.Success -> SearchOutcome.PlayerResults(result.value)
+                is ApiResult.Failure -> SearchOutcome.Failed(result.error)
+            }
+            show(outcome)
         }
     }
 
     private fun submitClan(query: String) {
         val trimmed = query.trim()
         val tag = TagNormalizer.normalize(trimmed)
-        // Sem `#`, só vira tag se tiver número: um nome como "PURY" não é confundido com tag.
-        val looksLikeTag = trimmed.startsWith("#") || (tag != null && tag.any { it.isDigit() })
         when {
-            looksLikeTag && tag != null -> open(SearchTarget(FollowKind.CLAN, tag))
+            looksLikeTag(trimmed, tag) && tag != null -> open(SearchTarget(FollowKind.CLAN, tag))
             trimmed.startsWith("#") -> show(SearchOutcome.Failed(AppError.INVALID_TAG))
             ClanSearch.normalize(trimmed) == null -> show(SearchOutcome.TooShort)
             else -> searchByName(trimmed)
@@ -199,6 +214,13 @@ class SearchViewModel(
     fun clearRecent() {
         viewModelScope.launch { preferences.clearRecentSearches() }
     }
+
+    /**
+     * Sem `#`, só vira tag se tiver número: nicks e nomes como "PURY" ou "Ryu" (só letras de tag) vão para a
+     * busca por nome.
+     */
+    private fun looksLikeTag(trimmed: String, tag: String?): Boolean =
+        trimmed.startsWith("#") || (tag != null && tag.any { it.isDigit() })
 
     private fun show(outcome: SearchOutcome) = local.update { it.copy(outcome = LocalOutcome.Shown(outcome)) }
 }
