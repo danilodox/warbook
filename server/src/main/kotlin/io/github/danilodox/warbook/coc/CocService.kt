@@ -11,8 +11,13 @@ import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.CwlState
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerSearch
+import io.github.danilodox.warbook.api.PlayerSearchResponse
 import io.github.danilodox.warbook.api.WarState
 import io.github.danilodox.warbook.errors.ApiException
+import io.github.danilodox.warbook.index.PlayerIndex
+import io.github.danilodox.warbook.index.membersToIndexed
+import io.github.danilodox.warbook.index.toIndexed
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -27,7 +32,11 @@ import kotlin.time.toJavaDuration
  * Busca na API do jogo e guarda o resultado em memória, para poupar o limite da chave.
  * Só sucessos entram no cache; erros sempre consultam de novo.
  */
-class CocService(private val client: CocClient, ticker: Ticker = Ticker.systemTicker()) {
+class CocService(
+    private val client: CocClient,
+    private val playerIndex: PlayerIndex,
+    ticker: Ticker = Ticker.systemTicker(),
+) {
     private val players = cache<PlayerDto>(PLAYER_TTL, ticker)
     private val clans = cache<ClanDto>(CLAN_TTL, ticker)
     private val clanSearches = cache<ClanSearchResponse>(CLAN_TTL, ticker)
@@ -38,9 +47,18 @@ class CocService(private val client: CocClient, ticker: Ticker = Ticker.systemTi
     private val endedLeagueWars = cache<CocWar>(ENDED_LEAGUE_WAR_TTL, ticker)
     private val leagueWarFetches = Semaphore(MAX_PARALLEL_LEAGUE_WARS)
 
-    suspend fun player(tag: String): PlayerDto = players.getOrFetch(tag) { client.player(tag).toDto() }
+    /** Cada jogador buscado na API (não os que vêm do cache) entra no índice de nicks. */
+    suspend fun player(tag: String): PlayerDto = players.getOrFetch(tag) {
+        client.player(tag).toDto().also { playerIndex.record(listOf(it.toIndexed())) }
+    }
 
-    suspend fun clan(tag: String): ClanDto = clans.getOrFetch(tag) { client.clan(tag).toDto() }
+    /** Os membros de cada clã buscado na API entram no índice de nicks, numa gravação só. */
+    suspend fun clan(tag: String): ClanDto = clans.getOrFetch(tag) {
+        client.clan(tag).toDto().also { playerIndex.record(it.membersToIndexed()) }
+    }
+
+    /** [name] já validado por [PlayerSearch.normalize]. Vai sempre ao banco: o índice muda a cada consulta. */
+    suspend fun searchPlayers(name: String): PlayerSearchResponse = PlayerSearchResponse(playerIndex.search(name))
 
     /** [name] já validado por [ClanSearch.normalize]. Maiúsculas e minúsculas dividem o mesmo cache. */
     suspend fun searchClans(name: String): ClanSearchResponse = clanSearches.getOrFetch(name.lowercase()) {

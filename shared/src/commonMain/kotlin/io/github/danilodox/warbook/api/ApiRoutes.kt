@@ -7,6 +7,9 @@ object ApiRoutes {
 
     const val PARAM_TAG = "tag"
     const val PLAYER = "/v1/players/{$PARAM_TAG}"
+
+    /** `?name=`. Como em [CLAN_SEARCH], `search` não é uma tag válida e o segmento fixo ganha de [PLAYER]. */
+    const val PLAYER_SEARCH = "/v1/players/search"
     const val VERIFY = "/v1/players/{$PARAM_TAG}/verify"
     const val CLAN = "/v1/clans/{$PARAM_TAG}"
 

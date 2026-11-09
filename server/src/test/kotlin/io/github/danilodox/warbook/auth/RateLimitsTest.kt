@@ -6,6 +6,7 @@ import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.module
 import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
+import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.clientWith
 import io.github.danilodox.warbook.testing.issueToken
 import io.github.danilodox.warbook.testing.postVerify
@@ -26,7 +27,7 @@ class RateLimitsTest {
     private val path = ApiRoutes.player(CocFixtures.PLAYER_TAG)
 
     private fun ApplicationTestBuilder.start(limits: RateLimits) =
-        application { module(testConfig, fake.engine, limits = limits) }
+        application { module(testConfig, fake.engine, limits = limits, playerIndex = FakePlayerIndex()) }
 
     @Test
     fun limitePorInstalacaoNaoAtrapalhaOutraInstalacao() = testApplication {

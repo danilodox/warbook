@@ -3,6 +3,7 @@ package io.github.danilodox.warbook.routes
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanSearch
+import io.github.danilodox.warbook.api.PlayerSearch
 import io.github.danilodox.warbook.api.TagNormalizer
 import io.github.danilodox.warbook.api.VerifyRequest
 import io.github.danilodox.warbook.api.VerifyResponse
@@ -18,8 +19,13 @@ import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 
-/** Jogador, clã, guerra atual e CWL. A tag é validada antes de chamar a API do jogo. */
+/** Jogador (por tag e por nick), clã, guerra atual e CWL. A tag é validada antes de chamar a API do jogo. */
 fun Route.cocRoutes(service: CocService) {
+    get(ApiRoutes.PLAYER_SEARCH) {
+        val name = PlayerSearch.normalize(call.request.queryParameters[ApiRoutes.PARAM_NAME].orEmpty())
+            ?: throw ApiException(ApiErrorCode.INVALID_QUERY, "Nick com 3 a 50 letras")
+        call.respond(service.searchPlayers(name))
+    }
     get(ApiRoutes.PLAYER) { call.respond(service.player(call.tag())) }
     get(ApiRoutes.CLAN_SEARCH) {
         val name = ClanSearch.normalize(call.request.queryParameters[ApiRoutes.PARAM_NAME].orEmpty())

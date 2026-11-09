@@ -11,6 +11,7 @@ import io.github.danilodox.warbook.module
 import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.CwlFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
+import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.FakeTicker
 import io.github.danilodox.warbook.testing.authorizedClient
 import io.github.danilodox.warbook.testing.testConfig
@@ -35,7 +36,7 @@ class CwlRoutesTest {
     private val ticker = FakeTicker()
 
     private suspend fun ApplicationTestBuilder.start(): HttpClient {
-        application { module(testConfig, fake.engine, ticker) }
+        application { module(testConfig, fake.engine, ticker, playerIndex = FakePlayerIndex()) }
         return authorizedClient()
     }
 
