@@ -72,7 +72,7 @@ private fun ClanTabScreen(
             SubTabs(tabs, state.tab, viewModel::selectTab)
             // O raid não depende do clã salvo: a sub-aba busca sozinha, com o próprio erro e skeleton.
             if (state.tab == ClanTab.CAPITAL) {
-                ClanCapitalTab(state.clanTag, Modifier.weight(1f))
+                ClanCapitalTab(state.clanTag, state.clan?.value?.name, Modifier.weight(1f))
                 return@Column
             }
             ClanSectionBody(

@@ -19,14 +19,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.danilodox.warbook.api.RaidSeasonDto
 import io.github.danilodox.warbook.api.RaidState
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.WarbookRepository
+import io.github.danilodox.warbook.data.currentTimeMillis
+import io.github.danilodox.warbook.raid.RaidSummary
 import io.github.danilodox.warbook.raid.attackedLess
 import io.github.danilodox.warbook.raid.dayMonthUtc
+import io.github.danilodox.warbook.raid.fullMedals
+import io.github.danilodox.warbook.raid.raidSummaryTextsFor
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.raid_attack_log_title
 import io.github.danilodox.warbook.resources.raid_attacks
@@ -52,18 +57,29 @@ import io.github.danilodox.warbook.ui.me.ProfileSkeleton
 import io.github.danilodox.warbook.ui.me.StaleBanner
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.war.Message
+import io.github.danilodox.warbook.ui.war.SummaryDock
+import io.github.danilodox.warbook.war.SummaryOptions
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 /** Sub-aba Capital de qualquer clã (o seu na aba Clã, os outros na tela Clã). Busca só quando abre. */
 @Composable
-fun ClanCapitalTab(clanTag: String, modifier: Modifier = Modifier) {
+fun ClanCapitalTab(clanTag: String, clanName: String?, modifier: Modifier = Modifier) {
     val accounts: AccountsRepository = koinInject()
     val api: WarbookRepository = koinInject()
     val viewModel = viewModel(key = "clan-raid-$clanTag") { RaidViewModel(clanTag, accounts, api) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(viewModel) { viewModel.onOpen() }
-    RaidScreen(state, onRefresh = viewModel::refresh, onSelectSeason = viewModel::selectSeason, modifier = modifier)
+    Column(modifier.fillMaxSize()) {
+        RaidScreen(state, viewModel::refresh, viewModel::selectSeason, Modifier.weight(1f))
+        val season = state.season
+        if (season != null) {
+            // Igual à Guerra: barra presa embaixo com Copiar e Compartilhar (sem personalizar).
+            val texts = raidSummaryTextsFor(Locale.current.language)
+            val summary = RaidSummary.season(season, clanName, currentTimeMillis(), texts)
+            SummaryDock(summary, parts = emptyList(), options = SummaryOptions(), ended = true, onToggle = {})
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,7 +122,7 @@ private fun RaidContent(state: RaidUiState, onSelectSeason: (Int) -> Unit, modif
         item { MedalsPanel(season) }
         item { SeasonStats(season) }
         if (season.notAttacked.isNotEmpty() || season.attackedLess().isNotEmpty()) {
-            item { MissingCard(season) }
+            item { MissingCard(season, state.accountTag) }
         }
         memberRows(season, state.accountTag)
         clanLog(Res.string.raid_attack_log_title, season.attackLog)
@@ -157,7 +173,7 @@ private fun MedalsPanel(season: RaidSeasonDto) {
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         } else {
-            val full = season.offensiveReward * FULL_ATTACKS + season.defensiveReward
+            val full = season.fullMedals()
             StatRow {
                 StatTile(stringResource(Res.string.raid_medals_per_attack), season.offensiveReward.grouped())
                 StatTile(stringResource(Res.string.raid_medals_defense), season.defensiveReward.grouped())
@@ -166,8 +182,6 @@ private fun MedalsPanel(season: RaidSeasonDto) {
         }
     }
 }
-
-private const val FULL_ATTACKS = 6
 
 @Composable
 private fun SeasonStats(season: RaidSeasonDto) {

@@ -13,3 +13,9 @@ fun RaidSeasonDto.unusedAttacks(): Int =
 
 /** Todo membro tem 5 ataques; o 6º é bônus. */
 const val BASE_ATTACKS = 5
+
+/** Com o ataque bônus, o máximo por membro. */
+const val MAX_ATTACKS = 6
+
+/** Medalhas de quem fez todos os 6 ataques; zero até o raid acabar. */
+fun RaidSeasonDto.fullMedals(): Int = offensiveReward * MAX_ATTACKS + defensiveReward

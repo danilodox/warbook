@@ -65,7 +65,7 @@ fun ClanDetailRoute(tag: String, fromSearch: Boolean, onOpenMember: (String) -> 
         if (state.tab == ClanTab.WAR) {
             ClanWarTab(tag, Modifier.weight(1f))
         } else if (state.tab == ClanTab.CAPITAL) {
-            ClanCapitalTab(tag, Modifier.weight(1f))
+            ClanCapitalTab(tag, state.clan?.value?.name, Modifier.weight(1f))
         } else {
             ClanSectionBody(
                 state = ClanSectionState(state.clan, state.refreshing, state.error),

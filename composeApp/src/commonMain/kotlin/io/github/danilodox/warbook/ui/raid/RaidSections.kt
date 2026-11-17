@@ -46,44 +46,51 @@ import org.jetbrains.compose.resources.stringResource
 
 // Blocos da sub-aba Capital: quem faltou, quem atacou e os clãs do raid.
 
-/** Quem não atacou (só na temporada atual) e quantos ataques sobraram, no mesmo tom de "pendente" da guerra. */
+/**
+ * Quem não atacou (só na temporada atual) e quantos ataques sobraram. Fundo neutro do painel: com muitos nomes,
+ * o vermelho de "pendente" tomava a tela; o destaque fica só no título.
+ */
 @Composable
-internal fun MissingCard(season: RaidSeasonDto) {
-    Panel(color = MaterialTheme.colorScheme.tertiaryContainer) {
-        val onColor = MaterialTheme.colorScheme.onTertiaryContainer
+internal fun MissingCard(season: RaidSeasonDto, accountTag: String?) {
+    Panel {
         Text(
             stringResource(Res.string.raid_unused_attacks, season.unusedAttacks()),
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.ExtraBold),
-            color = onColor,
+            color = MaterialTheme.colorScheme.tertiary,
         )
         if (season.notAttacked.isNotEmpty()) {
             Text(
                 stringResource(Res.string.raid_not_attacked_title, season.notAttacked.size),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = onColor,
             )
-            season.notAttacked.forEach { AbsentRow(it) }
+            season.notAttacked.forEach { AbsentRow(it, isYou = it.tag == accountTag) }
             Text(
                 stringResource(Res.string.raid_not_attacked_hint),
                 style = MaterialTheme.typography.bodySmall,
-                color = onColor,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
 
 @Composable
-private fun AbsentRow(member: RaidAbsentMemberDto) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+private fun AbsentRow(member: RaidAbsentMemberDto, isYou: Boolean) {
+    Row(
+        Modifier.fillMaxWidth().youHighlight(isYou).padding(Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
         TownHallShield(member.townHallLevel)
         Text(
             member.name,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onTertiaryContainer,
+            color = youContentColor(isYou),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
         )
+        if (isYou) YouTag()
     }
 }
 
