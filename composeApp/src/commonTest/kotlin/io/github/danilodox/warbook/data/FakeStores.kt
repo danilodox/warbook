@@ -1,5 +1,6 @@
 package io.github.danilodox.warbook.data
 
+import io.github.danilodox.warbook.api.CapitalRaidsDto
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanMemberDto
 import io.github.danilodox.warbook.api.ClanRole
@@ -155,6 +156,8 @@ class FakeWarbookRepository : WarbookRepository {
     val searchCalls = mutableListOf<String>()
     val playerSearches = mutableMapOf<String, ApiResult<List<PlayerSearchResultDto>>>()
     val playerSearchCalls = mutableListOf<String>()
+    val raids = mutableMapOf<String, ApiResult<CapitalRaidsDto>>()
+    val raidCalls = mutableListOf<String>()
 
     override suspend fun player(rawTag: String): ApiResult<PlayerDto> {
         playerCalls += rawTag
@@ -184,6 +187,11 @@ class FakeWarbookRepository : WarbookRepository {
     override suspend fun currentCwl(rawClanTag: String): ApiResult<CwlDto> {
         cwlCalls += rawClanTag
         return cwls[rawClanTag] ?: ApiResult.Failure(AppError.NOT_FOUND)
+    }
+
+    override suspend fun capitalRaids(rawClanTag: String): ApiResult<CapitalRaidsDto> {
+        raidCalls += rawClanTag
+        return raids[rawClanTag] ?: ApiResult.Failure(AppError.NOT_FOUND)
     }
 
     override suspend fun verify(rawTag: String, gameToken: String): ApiResult<String> {

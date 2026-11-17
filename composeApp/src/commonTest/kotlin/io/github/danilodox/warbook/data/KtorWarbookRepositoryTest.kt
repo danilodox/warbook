@@ -1,12 +1,14 @@
 package io.github.danilodox.warbook.data
 
 import io.github.danilodox.warbook.api.ApiRoutes
+import io.github.danilodox.warbook.api.CapitalRaidsDto
 import io.github.danilodox.warbook.api.ClanRole
 import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.CwlState
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.PlayerSearchResultDto
+import io.github.danilodox.warbook.api.RaidState
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -144,6 +146,20 @@ class KtorWarbookRepositoryTest {
 
         assertEquals(ApiResult.Success(CwlDto(CwlState.NOT_IN_CWL)), result)
         assertEquals(ApiRoutes.currentCwl("2YQUC8J0P"), server.paths.last())
+    }
+
+    @Test
+    fun raidsDaCapitalVemDaRotaDoClaComATagNormalizada() = runTest {
+        server.body = """{"seasons":[{"state":"ENDED","offensiveReward":148,"members":[
+            {"tag":"ABC","name":"Maré Alta","attacks":6,"attackLimit":6,"capitalResourcesLooted":21000,"medals":888}
+        ]}]}"""
+
+        val result = repository.capitalRaids("#2yquc8j0p")
+
+        val season = assertIs<ApiResult.Success<CapitalRaidsDto>>(result).value.seasons.single()
+        assertEquals(RaidState.ENDED, season.state)
+        assertEquals(888, season.members.single().medals)
+        assertEquals(ApiRoutes.capitalRaids("2YQUC8J0P"), server.paths.last())
     }
 
     @Test

@@ -19,12 +19,14 @@ import io.github.danilodox.warbook.resources.clan_invite_title
 import io.github.danilodox.warbook.resources.clan_no_clan_body
 import io.github.danilodox.warbook.resources.clan_no_clan_title
 import io.github.danilodox.warbook.resources.clan_search_clans
+import io.github.danilodox.warbook.resources.clan_tab_capital
 import io.github.danilodox.warbook.resources.clan_tab_info
 import io.github.danilodox.warbook.resources.clan_tab_members
 import io.github.danilodox.warbook.resources.me_add_account
 import io.github.danilodox.warbook.ui.components.SubTabs
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.ProfileSkeleton
+import io.github.danilodox.warbook.ui.raid.ClanCapitalTab
 import io.github.danilodox.warbook.ui.war.Message
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -62,8 +64,17 @@ private fun ClanTabScreen(
             Button(onClick = actions.onSearchClans) { Text(stringResource(Res.string.clan_search_clans)) }
         }
         else -> Column(modifier.fillMaxSize()) {
-            val tabs = listOf(ClanTab.INFO to Res.string.clan_tab_info, ClanTab.MEMBERS to Res.string.clan_tab_members)
+            val tabs = listOf(
+                ClanTab.INFO to Res.string.clan_tab_info,
+                ClanTab.MEMBERS to Res.string.clan_tab_members,
+                ClanTab.CAPITAL to Res.string.clan_tab_capital,
+            )
             SubTabs(tabs, state.tab, viewModel::selectTab)
+            // O raid não depende do clã salvo: a sub-aba busca sozinha, com o próprio erro e skeleton.
+            if (state.tab == ClanTab.CAPITAL) {
+                ClanCapitalTab(state.clanTag, Modifier.weight(1f))
+                return@Column
+            }
             ClanSectionBody(
                 state = ClanSectionState(state.clan, state.refreshing, state.error),
                 onRefresh = viewModel::refresh,
