@@ -55,7 +55,21 @@ dependencies {
     implementation(libs.ktor.clientCio)
     implementation(libs.ktor.clientContentNegotiation)
     implementation(libs.caffeine)
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.javaTime)
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.postgresql)
+    implementation(libs.postgresql)
+    implementation(libs.hikari)
     testImplementation(libs.ktor.serverTestHost)
     testImplementation(libs.ktor.clientMock)
     testImplementation(libs.kotlin.testJunit)
+    // Postgres de verdade nos testes, sem Docker. Só os binários de Windows (PC) e Linux (CI), na mesma
+    // versão do Postgres instalado; o padrão do zonky baixaria também os de macOS e Alpine.
+    testImplementation(libs.embeddedPostgres) {
+        exclude(group = "io.zonky.test.postgres")
+    }
+    testRuntimeOnly(libs.embeddedPostgres.windows)
+    testRuntimeOnly(libs.embeddedPostgres.linux)
 }

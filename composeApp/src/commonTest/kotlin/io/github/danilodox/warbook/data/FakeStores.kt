@@ -8,6 +8,7 @@ import io.github.danilodox.warbook.api.ClanSummaryDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.data.local.AccountDao
 import io.github.danilodox.warbook.data.local.AccountEntity
 import io.github.danilodox.warbook.data.local.ClanCacheDao
@@ -152,6 +153,8 @@ class FakeWarbookRepository : WarbookRepository {
     val searches = mutableMapOf<String, ApiResult<List<ClanSearchResultDto>>>()
     val clanCalls = mutableListOf<String>()
     val searchCalls = mutableListOf<String>()
+    val playerSearches = mutableMapOf<String, ApiResult<List<PlayerSearchResultDto>>>()
+    val playerSearchCalls = mutableListOf<String>()
 
     override suspend fun player(rawTag: String): ApiResult<PlayerDto> {
         playerCalls += rawTag
@@ -166,6 +169,11 @@ class FakeWarbookRepository : WarbookRepository {
     override suspend fun searchClans(rawName: String): ApiResult<List<ClanSearchResultDto>> {
         searchCalls += rawName
         return searches[rawName] ?: ApiResult.Success(emptyList())
+    }
+
+    override suspend fun searchPlayers(rawName: String): ApiResult<List<PlayerSearchResultDto>> {
+        playerSearchCalls += rawName
+        return playerSearches[rawName] ?: ApiResult.Success(emptyList())
     }
 
     override suspend fun currentWar(rawClanTag: String): ApiResult<CurrentWarDto> {

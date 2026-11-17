@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.data.FollowKind
 import io.github.danilodox.warbook.data.RecentSearch
 import io.github.danilodox.warbook.resources.Res
@@ -40,7 +41,10 @@ import io.github.danilodox.warbook.resources.search_clear
 import io.github.danilodox.warbook.resources.search_done
 import io.github.danilodox.warbook.resources.search_edit
 import io.github.danilodox.warbook.resources.search_following_empty
+import io.github.danilodox.warbook.resources.search_nick_line
+import io.github.danilodox.warbook.resources.search_nick_no_results
 import io.github.danilodox.warbook.resources.search_nick_notice
+import io.github.danilodox.warbook.resources.search_nick_too_short
 import io.github.danilodox.warbook.resources.search_no_results
 import io.github.danilodox.warbook.resources.search_player_line
 import io.github.danilodox.warbook.resources.search_recent_title
@@ -59,12 +63,18 @@ import io.github.danilodox.warbook.ui.components.SectionHeader as DsSectionHeade
 
 private val ImageSize = 36.dp
 
-/** O resultado da última busca: aviso, carregando, erro ou a lista de clãs com a estrela de seguir. */
+/**
+ * O resultado da última busca: aviso, carregando, erro, a lista de clãs com a estrela de seguir ou a de
+ * jogadores achados pelo nick.
+ */
 internal fun LazyListScope.outcome(state: SearchUiState, viewModel: SearchViewModel, onRetry: () -> Unit) {
     when (val outcome = state.outcome) {
         SearchOutcome.None -> Unit
-        SearchOutcome.NickNotice -> item { NoticeCard(Res.string.search_nick_notice) }
-        SearchOutcome.TooShort -> item { NoticeCard(Res.string.search_too_short) }
+        SearchOutcome.TooShort -> item {
+            val player = state.mode == SearchMode.PLAYER
+            NoticeCard(if (player) Res.string.search_nick_too_short else Res.string.search_too_short)
+        }
+        is SearchOutcome.PlayerResults -> playerResults(outcome.players, viewModel)
         SearchOutcome.Searching -> item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
         is SearchOutcome.Failed -> item {
             val error = outcome.error
@@ -98,6 +108,33 @@ internal fun LazyListScope.outcome(state: SearchUiState, viewModel: SearchViewMo
                 }
             }
         }
+    }
+}
+
+/**
+ * Jogadores achados pelo nick: nick original, tag, CV e o clã de quando foi visto. Sempre com o aviso de que
+ * só aparece quem já passou pelo Warbook e de que com `#` a busca é pela tag.
+ */
+private fun LazyListScope.playerResults(players: List<PlayerSearchResultDto>, viewModel: SearchViewModel) {
+    item(key = "nick-notice") { NoticeCard(Res.string.search_nick_notice) }
+    if (players.isEmpty()) {
+        item(key = "nick-empty") { NoticeCard(Res.string.search_nick_no_results) }
+        return
+    }
+    item(key = "nick-header") { SectionHeader(Res.string.search_results) }
+    items(players, key = { "nick-${it.tag}" }) { player ->
+        val clanName = player.clanName
+        EntryRow(
+            kind = FollowKind.PLAYER,
+            name = player.name,
+            line = if (clanName == null) {
+                stringResource(Res.string.search_player_line, player.tag, player.townHallLevel)
+            } else {
+                stringResource(Res.string.search_nick_line, player.tag, player.townHallLevel, clanName)
+            },
+            image = EntryImage(url = null, level = player.townHallLevel),
+            onClick = { viewModel.open(SearchTarget(FollowKind.PLAYER, player.tag)) },
+        )
     }
 }
 

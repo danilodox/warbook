@@ -10,6 +10,9 @@ import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerSearch
+import io.github.danilodox.warbook.api.PlayerSearchResponse
+import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.api.TagNormalizer
 import io.github.danilodox.warbook.api.VerifyRequest
 import io.github.danilodox.warbook.api.VerifyResponse
@@ -45,7 +48,7 @@ enum class AppError {
     /** Token de verificação do jogo inválido ou vencido. */
     INVALID_VERIFY_TOKEN,
 
-    /** Nome da busca de clã curto ou longo demais. */
+    /** Nome do clã ou nick da busca curto ou longo demais. */
     INVALID_QUERY,
 
     /** Sem internet ou servidor fora do ar. */
@@ -64,6 +67,9 @@ interface WarbookRepository {
     /** [rawName] como o usuário digitou; com menos de 3 letras nem chama o servidor. */
     suspend fun searchClans(rawName: String): ApiResult<List<ClanSearchResultDto>>
 
+    /** Por nick, no índice do servidor (só quem já apareceu no Warbook). Com menos de 3 letras nem chama. */
+    suspend fun searchPlayers(rawName: String): ApiResult<List<PlayerSearchResultDto>>
+
     suspend fun currentWar(rawClanTag: String): ApiResult<CurrentWarDto>
 
     /** Fora da CWL é sucesso com `NOT_IN_CWL`, não erro. */
@@ -73,6 +79,7 @@ interface WarbookRepository {
     suspend fun verify(rawTag: String, gameToken: String): ApiResult<String>
 }
 
+@Suppress("TooManyFunctions") // Uma função por rota do servidor, mais as de envio e erro.
 class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository {
 
     override suspend fun player(rawTag: String) = get(rawTag, ApiRoutes::player) { it.body<PlayerDto>() }
@@ -83,6 +90,13 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
         val name = ClanSearch.normalize(rawName) ?: return ApiResult.Failure(AppError.INVALID_QUERY)
         return send({ it.body<ClanSearchResponse>().items }) {
             client.get(ApiRoutes.CLAN_SEARCH) { parameter(ApiRoutes.PARAM_NAME, name) }
+        }
+    }
+
+    override suspend fun searchPlayers(rawName: String): ApiResult<List<PlayerSearchResultDto>> {
+        val name = PlayerSearch.normalize(rawName) ?: return ApiResult.Failure(AppError.INVALID_QUERY)
+        return send({ it.body<PlayerSearchResponse>().items }) {
+            client.get(ApiRoutes.PLAYER_SEARCH) { parameter(ApiRoutes.PARAM_NAME, name) }
         }
     }
 

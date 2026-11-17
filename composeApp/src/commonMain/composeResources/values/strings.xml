@@ -35,14 +35,14 @@
     <string name="error_invalid_tag">This tag is not valid. Tags only use the characters 0289PYLQGRJCUV.</string>
     <string name="error_invalid_query">Type 3 to 50 letters of the clan name.</string>
     <string name="error_not_found">No player found with this tag.</string>
-    <string name="error_war_log_private">This clan\'s war log is private.</string>
+    <string name="error_war_log_private">This clan's war log is private.</string>
     <string name="error_api_maintenance">The game is under maintenance. Try again later.</string>
     <string name="error_rate_limited">Too many searches in a row. Wait a moment and try again.</string>
     <string name="error_invalid_verify_token">Invalid or expired token. Generate a new one in the game.</string>
     <string name="error_network">No connection to the Warbook server. Check your internet.</string>
     <string name="error_server">The game server did not respond.</string>
 
-    <string name="onboarding_tagline">Your clan\'s stats and wars</string>
+    <string name="onboarding_tagline">Your clan's stats and wars</string>
     <string name="onboarding_tag_question">What is your player tag?</string>
     <string name="onboarding_tag_hint">It is on your profile, below your name.</string>
     <string name="onboarding_help_title">Where do I find my tag?</string>
@@ -50,7 +50,7 @@
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_explore">Just explore, no account</string>
     <string name="onboarding_confirm_title">Is this you?</string>
-    <string name="onboarding_confirm_yes">Yes, that\'s me</string>
+    <string name="onboarding_confirm_yes">Yes, that's me</string>
     <string name="onboarding_confirm_no">No, change the tag</string>
 
     <string name="verify_title">Verify account</string>
@@ -109,11 +109,11 @@
     <string name="war_tab_current">Current war</string>
     <string name="war_tab_cwl">CWL</string>
     <string name="war_invite_title">Add your account to see your war</string>
-    <string name="war_invite_body">The War tab shows the current war and the CWL of your account\'s clan.</string>
+    <string name="war_invite_body">The War tab shows the current war and the CWL of your account's clan.</string>
     <string name="war_no_clan_title">Your account is not in a clan</string>
     <string name="war_no_clan_body">Join a clan in the game and its war shows up here.</string>
-    <string name="war_private_title">The clan\'s war log is private</string>
-    <string name="war_private_body">Unless it is public, Warbook can\'t see the current war or the CWL.</string>
+    <string name="war_private_title">The clan's war log is private</string>
+    <string name="war_private_body">Unless it is public, Warbook can't see the current war or the CWL.</string>
     <string name="war_private_steps_title">How to make it public</string>
     <string name="war_private_who">Only the leader or a co-leader can change it.</string>
     <string name="war_private_step_1">In the game, open the clan profile.</string>
@@ -175,7 +175,7 @@
     <string name="cwl_not_in_title">The clan is not in the CWL right now</string>
     <string name="cwl_not_in_body">Clan War Leagues happen at the start of each month. When the clan joins, the rounds show up here.</string>
 
-    <string name="settings_fan_notice">This material is unofficial and is not endorsed by Supercell. For more information see Supercell\'s Fan Content Policy.</string>
+    <string name="settings_fan_notice">This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy.</string>
     <string name="fan_policy_link">supercell.com/fan-content-policy</string>
     <string name="settings_appearance">Appearance</string>
     <string name="theme_dark">Dark</string>
@@ -211,7 +211,7 @@
     <string name="clan_war_log">War log</string>
     <string name="clan_war_log_public">Public</string>
     <string name="clan_war_log_private">Private</string>
-    <string name="clan_war_log_private_hint">This clan\'s war log is private, so its war does not show up in Warbook.</string>
+    <string name="clan_war_log_private_hint">This clan's war log is private, so its war does not show up in Warbook.</string>
     <string name="clan_war_frequency">War frequency</string>
     <string name="clan_frequency_always">Always</string>
     <string name="clan_frequency_more_than_once">More than once per week</string>
@@ -237,15 +237,18 @@
     <string name="clan_member_line">%1$s · %2$s trophies</string>
     <string name="clan_member_received">↓ %1$s</string>
     <string name="clan_invite_title">Add your account to see your clan</string>
-    <string name="clan_invite_body">The Clan tab shows the info and members of your account\'s clan.</string>
+    <string name="clan_invite_body">The Clan tab shows the info and members of your account's clan.</string>
     <string name="clan_no_clan_title">Your account is not in a clan</string>
     <string name="clan_no_clan_body">Join a clan in the game and it shows up here. Meanwhile, you can search for clans.</string>
     <string name="clan_search_clans">Search clans</string>
     <string name="search_mode_player">Player</string>
     <string name="search_mode_clan">Clan</string>
-    <string name="search_player_label">Player tag (#…)</string>
+    <string name="search_player_label">Player name or tag (#…)</string>
     <string name="search_clan_label">Clan tag or name</string>
-    <string name="search_nick_notice">Search by name arrives in v0.7. For now, search by tag, shown on the in-game profile (e.g. #2PQ8LV9YC).</string>
+    <string name="search_nick_notice">Name search only finds players who already showed up in Warbook: players opened and members of clans opened in the app. With # it searches by tag, shown on the in-game profile (e.g. #2PQ8LV9YC).</string>
+    <string name="search_nick_too_short">Type at least 3 letters of the name.</string>
+    <string name="search_nick_no_results">No one with that name has shown up in Warbook yet. Try the tag.</string>
+    <string name="search_nick_line">#%1$s · TH %2$d · %3$s</string>
     <string name="search_too_short">Type at least 3 letters of the clan name.</string>
     <string name="search_results">Results</string>
     <string name="search_no_results">No clan found with that name.</string>

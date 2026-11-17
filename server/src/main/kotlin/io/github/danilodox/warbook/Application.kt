@@ -13,7 +13,11 @@ import io.github.danilodox.warbook.coc.CocClient
 import io.github.danilodox.warbook.coc.CocService
 import io.github.danilodox.warbook.config.InvalidConfigException
 import io.github.danilodox.warbook.config.ServerConfig
+import io.github.danilodox.warbook.db.DatabaseUnavailableException
+import io.github.danilodox.warbook.db.WarbookDatabase
 import io.github.danilodox.warbook.errors.installErrorHandling
+import io.github.danilodox.warbook.index.PlayerIndex
+import io.github.danilodox.warbook.index.PostgresPlayerIndex
 import io.github.danilodox.warbook.routes.cocRoutes
 import io.github.danilodox.warbook.routes.verifyRoutes
 import io.ktor.client.engine.HttpClientEngine
@@ -31,15 +35,27 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlin.system.exitProcess
 
 private const val DEFAULT_PORT = 8080
 
 fun main() {
     val config = loadConfigOrExit()
+    val database = connectDatabaseOrExit(config)
     val port = System.getenv("PORT")?.toIntOrNull() ?: DEFAULT_PORT
-    embeddedServer(Netty, port = port, host = "0.0.0.0") { module(config) }
-        .start(wait = true)
+    // Gravações do índice de nicks em segundo plano; uma falha não cancela as outras.
+    val indexWrites = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    embeddedServer(Netty, port = port, host = "0.0.0.0") {
+        monitor.subscribe(ApplicationStopped) {
+            indexWrites.cancel()
+            database.close()
+        }
+        module(config, playerIndex = PostgresPlayerIndex(database.exposed, indexWrites))
+    }.start(wait = true)
 }
 
 /** Sem a configuração completa o servidor não sobe: mostra o que falta e sai. */
@@ -50,16 +66,28 @@ private fun loadConfigOrExit(): ServerConfig = try {
     exitProcess(1)
 }
 
-/** [cocEngine], [ticker] e [limits] são trocados nos testes (MockEngine, relógio do cache, limites baixos). */
+/** Sem o Postgres o servidor também não sobe: diz o que conferir e sai. Aplica as migrations pendentes. */
+private fun connectDatabaseOrExit(config: ServerConfig): WarbookDatabase = try {
+    WarbookDatabase.connect(config.database)
+} catch (e: DatabaseUnavailableException) {
+    System.err.println("Banco indisponível: ${e.message}")
+    exitProcess(1)
+}
+
+/**
+ * [cocEngine], [ticker] e [limits] são trocados nos testes (MockEngine, relógio do cache, limites baixos).
+ * [playerIndex] não tem padrão: o servidor passa o do Postgres; os testes de rota, um falso.
+ */
 fun Application.module(
     config: ServerConfig,
     cocEngine: HttpClientEngine = CIO.create(),
     ticker: Ticker = Ticker.systemTicker(),
     limits: RateLimits = RateLimits(),
+    playerIndex: PlayerIndex,
 ) {
     val cocClient = CocClient(cocEngine, apiKey = config.cocApiKey, baseUrl = config.cocBaseUrl)
     monitor.subscribe(ApplicationStopped) { cocClient.close() }
-    val cocService = CocService(cocClient, ticker)
+    val cocService = CocService(cocClient, playerIndex, ticker)
     val installTokens = InstallTokens(config.jwtSecret)
     val verificationTokens = VerificationTokens(config.jwtSecret)
 

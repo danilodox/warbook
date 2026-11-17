@@ -9,6 +9,7 @@ import io.github.danilodox.warbook.auth.VerificationTokens
 import io.github.danilodox.warbook.module
 import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
+import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.clientWith
 import io.github.danilodox.warbook.testing.issueToken
 import io.github.danilodox.warbook.testing.postVerify
@@ -29,7 +30,9 @@ class VerifyRoutesTest {
 
     private val fake = FakeCoc()
 
-    private fun ApplicationTestBuilder.start() = application { module(testConfig, fake.engine) }
+    private fun ApplicationTestBuilder.start() = application {
+        module(testConfig, fake.engine, playerIndex = FakePlayerIndex())
+    }
 
     private suspend fun HttpResponse.errorCode(): ApiErrorCode =
         Json.decodeFromString(ApiError.serializer(), bodyAsText()).code

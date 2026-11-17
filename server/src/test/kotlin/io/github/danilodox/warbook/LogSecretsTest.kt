@@ -7,6 +7,7 @@ import ch.qos.logback.core.read.ListAppender
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
+import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.clientWith
 import io.github.danilodox.warbook.testing.issueToken
 import io.github.danilodox.warbook.testing.postVerify
@@ -46,7 +47,7 @@ class LogSecretsTest {
             on(CocFixtures.WAR_PATH, HttpStatusCode.Forbidden, CocFixtures.ERROR_INVALID_IP)
             on(CocFixtures.VERIFY_PATH, body = CocFixtures.verifyOk)
         }
-        application { module(testConfig, fake.engine) }
+        application { module(testConfig, fake.engine, playerIndex = FakePlayerIndex()) }
         val token = issueToken()
         val api = clientWith(token)
 
