@@ -11,6 +11,7 @@ import io.github.danilodox.warbook.coc.CocService
 import io.github.danilodox.warbook.module
 import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
+import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.FakeTicker
 import io.github.danilodox.warbook.testing.RaidFixtures
 import io.github.danilodox.warbook.testing.authorizedClient
@@ -34,7 +35,7 @@ class RaidRoutesTest {
     private val ticker = FakeTicker()
 
     private suspend fun ApplicationTestBuilder.start(): HttpClient {
-        application { module(testConfig, fake.engine, ticker) }
+        application { module(testConfig, fake.engine, ticker, playerIndex = FakePlayerIndex()) }
         return authorizedClient()
     }
 
