@@ -18,6 +18,7 @@ object ApiRoutes {
     const val PARAM_NAME = "name"
     const val CURRENT_WAR = "/v1/clans/{$PARAM_TAG}/war/current"
     const val CURRENT_CWL = "/v1/clans/{$PARAM_TAG}/cwl/current"
+    const val CAPITAL_RAIDS = "/v1/clans/{$PARAM_TAG}/capitalraidseasons"
 
     fun player(tag: String): String = "/v1/players/$tag"
 
@@ -27,4 +28,6 @@ object ApiRoutes {
     fun currentWar(clanTag: String): String = "/v1/clans/$clanTag/war/current"
 
     fun currentCwl(clanTag: String): String = "/v1/clans/$clanTag/cwl/current"
+
+    fun capitalRaids(clanTag: String): String = "/v1/clans/$clanTag/capitalraidseasons"
 }

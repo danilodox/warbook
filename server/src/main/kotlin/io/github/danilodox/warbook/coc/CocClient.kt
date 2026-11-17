@@ -64,6 +64,15 @@ class CocClient(engine: HttpClientEngine, private val apiKey: String, baseUrl: S
     internal suspend fun leagueGroup(clanTag: String): CocLeagueGroup =
         send("clans", "#$clanTag", "currentwar", "leaguegroup", specificError = ::warError).body()
 
+    /**
+     * Fins de semana de raid, do mais recente para o mais antigo. Conferido em 2026-11-17: clã com registro de
+     * guerra privado devolve o raid normalmente. Se um dia a API recusar, vira [ApiErrorCode.WAR_LOG_PRIVATE].
+     */
+    internal suspend fun capitalRaidSeasons(clanTag: String, limit: Int): CocRaidSeasonList =
+        send("clans", "#$clanTag", "capitalraidseasons", specificError = ::warError) {
+            url { parameters.append("limit", limit.toString()) }
+        }.body()
+
     /** [warTag] como vem do grupo, com `#`. */
     internal suspend fun leagueWar(warTag: String): CocWar = send("clanwarleagues", "wars", warTag).body()
 

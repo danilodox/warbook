@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Ticker
 import io.github.danilodox.warbook.api.ApiErrorCode
+import io.github.danilodox.warbook.api.CapitalRaidsDto
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanSearch
 import io.github.danilodox.warbook.api.ClanSearchResponse
@@ -42,6 +43,7 @@ class CocService(
     private val clanSearches = cache<ClanSearchResponse>(CLAN_TTL, ticker)
     private val wars = cache<CurrentWarDto>(WAR_TTL, ticker)
     private val cwls = cache<CwlDto>(WAR_TTL, ticker)
+    private val raids = cache<CapitalRaidsDto>(RAID_TTL, ticker)
 
     /** Guerra da CWL encerrada não muda mais: fica bem mais tempo, pelo warTag. */
     private val endedLeagueWars = cache<CocWar>(ENDED_LEAGUE_WAR_TTL, ticker)
@@ -84,6 +86,24 @@ class CocService(
         group.toDto(clanTag, leagueWars.toMap())
     }
 
+    /**
+     * Raids da capital (as [RAID_SEASONS] mais recentes) + quem do clã não atacou no último. O clã vem do
+     * mesmo cache da tela Clã; se ele falhar, o raid sai sem a lista de quem não atacou.
+     */
+    suspend fun capitalRaids(clanTag: String): CapitalRaidsDto = raids.getOrFetch(clanTag) {
+        coroutineScope {
+            val members = async {
+                try {
+                    clan(clanTag).members
+                } catch (_: ApiException) {
+                    emptyList()
+                }
+            }
+            val seasons = client.capitalRaidSeasons(clanTag, RAID_SEASONS)
+            seasons.toDto(members.await())
+        }
+    }
+
     /** Sempre consulta a API: o token do jogo vale uma vez só. */
     suspend fun verifyToken(tag: String, token: String): Boolean = client.verifyToken(tag, token)
 
@@ -100,6 +120,12 @@ class CocService(
         val PLAYER_TTL: Duration = 2.minutes
         val CLAN_TTL: Duration = 5.minutes
         val ENDED_LEAGUE_WAR_TTL: Duration = 24.hours
+
+        /** O raid muda a cada ataque no fim de semana, mas devagar; e a resposta é grande. */
+        val RAID_TTL: Duration = 2.minutes
+
+        /** Um pouco mais de dois meses de fins de semana; a API devolve dezenas se não limitar. */
+        const val RAID_SEASONS = 10
         private const val MAX_ENTRIES = 10_000L
 
         /** Para não estourar o limite por segundo da chave na primeira consulta de um grupo. */
