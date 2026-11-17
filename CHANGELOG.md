@@ -4,9 +4,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.7.0] - 2026-11-17
+
+### Adicionado
+
+- Busca de jogador por nick: Buscar › Jogador aceita o nick (3 a 50 letras) além da tag e mostra até 20 resultados com tag, CV e clã. Só aparecem jogadores que o Warbook já viu (perfis abertos e membros dos clãs abertos), e a tela avisa isso. Acentos, maiúsculas e letras estilizadas (ᴅᴀɴɪʟᴏ, ｄａｎｉｌｏ) não atrapalham.
+- Servidor: `GET /v1/players/search?name=` com o índice de nicks no Postgres (pg_trgm). Fora do tamanho responde `INVALID_QUERY` (400), com o mesmo limite de pedidos da busca de clã. O índice é alimentado em segundo plano por `/v1/players/{tag}` e pelos membros de `/v1/clans/{tag}`, sem varredura.
+- Raids da capital: sub-aba Clã › Capital no seu clã e na tela de qualquer clã. Medalhas de raid em destaque (por ataque, defesa e o total com 6 ataques), ataques de cada membro (x de 5 ou 6) com o Ouro da Capital saqueado, quem não atacou no raid mais recente, ataques sobrando, distritos destruídos, clãs atacados e defesas. As temporadas anteriores ficam em fichas por data.
+- Resumo do raid para o WhatsApp, preso embaixo da Capital como o da Guerra: total de Ouro da Capital, ataques, distritos, medalhas, quem não atacou e quem atacou menos.
+- Servidor: `GET /v1/clans/{tag}/capitalraidseasons` com as últimas 10 temporadas num DTO próprio e cache de 2 minutos. Funciona também com o registro de guerra privado.
+- Textos novos em português e inglês.
+
+### Alterado
+
+- Servidor: agora precisa de um Postgres (`DATABASE_URL`, `DATABASE_USER` e `DATABASE_PASSWORD` no `server/.env`) e não sobe sem ele. As tabelas são criadas pelo Flyway na primeira subida.
+- Buscar › Jogador: texto sem `#` só é tratado como tag quando tem algum número, como já era em Clã. Nicks como "Ryu" vão para a busca por nick.
+
 ### Corrigido
 
 - Tema claro: ao abrir o app, o tema escuro não aparece mais por um instante antes do claro.
+- Textos em inglês: o apóstrofo aparecia com uma barra antes (`don\'t`).
 
 ## [0.6.0] - 2026-11-08
 
@@ -126,7 +143,8 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.6.0...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/danilodox/warbook/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/danilodox/warbook/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/danilodox/warbook/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/danilodox/warbook/compare/v0.4.0...v0.4.1

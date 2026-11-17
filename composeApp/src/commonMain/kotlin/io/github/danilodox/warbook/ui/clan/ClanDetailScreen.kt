@@ -21,6 +21,7 @@ import io.github.danilodox.warbook.data.FollowRepository
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.WarRepository
 import io.github.danilodox.warbook.resources.Res
+import io.github.danilodox.warbook.resources.clan_tab_capital
 import io.github.danilodox.warbook.resources.clan_tab_info
 import io.github.danilodox.warbook.resources.clan_tab_members
 import io.github.danilodox.warbook.resources.clan_tab_war
@@ -29,6 +30,7 @@ import io.github.danilodox.warbook.ui.components.SubTabs
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.ProfileSkeleton
 import io.github.danilodox.warbook.ui.me.StaleBanner
+import io.github.danilodox.warbook.ui.raid.ClanCapitalTab
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.war.WarActions
 import io.github.danilodox.warbook.ui.war.WarScreen
@@ -62,6 +64,8 @@ fun ClanDetailRoute(tag: String, fromSearch: Boolean, onOpenMember: (String) -> 
         ClanTabs(state.tab, viewModel::selectTab)
         if (state.tab == ClanTab.WAR) {
             ClanWarTab(tag, Modifier.weight(1f))
+        } else if (state.tab == ClanTab.CAPITAL) {
+            ClanCapitalTab(tag, state.clan?.value?.name, Modifier.weight(1f))
         } else {
             ClanSectionBody(
                 state = ClanSectionState(state.clan, state.refreshing, state.error),
@@ -121,6 +125,7 @@ private fun ClanTabs(selected: ClanTab, onSelect: (ClanTab) -> Unit) {
         ClanTab.INFO to Res.string.clan_tab_info,
         ClanTab.MEMBERS to Res.string.clan_tab_members,
         ClanTab.WAR to Res.string.clan_tab_war,
+        ClanTab.CAPITAL to Res.string.clan_tab_capital,
     )
     SubTabs(tabs, selected, onSelect)
 }

@@ -261,4 +261,28 @@
     <string name="search_remove">Remove</string>
     <string name="search_recent_title">Recent</string>
     <string name="search_clear">Clear</string>
+
+    <string name="clan_tab_capital">Capital</string>
+    <string name="raid_season_chip">%2$s/%1$s</string>
+    <string name="raid_ongoing">Ongoing</string>
+    <string name="raid_empty_title">No raids yet</string>
+    <string name="raid_empty_body">This clan has no Capital raids in recent weekends.</string>
+    <string name="raid_medals_title">Raid medals</string>
+    <string name="raid_medals_per_attack">Per attack</string>
+    <string name="raid_medals_defense">Defense</string>
+    <string name="raid_medals_full">With 6 attacks</string>
+    <string name="raid_medals_pending">Medals are paid when the raid ends.</string>
+    <string name="raid_attacks">Attacks</string>
+    <string name="raid_districts">Districts</string>
+    <string name="raid_raids">Raids</string>
+    <string name="raid_capital_gold">Capital Gold</string>
+    <string name="raid_unused_attacks">Attacks left: %1$d</string>
+    <string name="raid_not_attacked_title">Didn't attack (%1$d)</string>
+    <string name="raid_not_attacked_hint">In the clan now and not among those who attacked.</string>
+    <string name="raid_members_title">Attacked (%1$d)</string>
+    <string name="raid_member_line">%1$d of %2$d attacks</string>
+    <string name="raid_member_medals">%1$s medals</string>
+    <string name="raid_attack_log_title">Clans attacked</string>
+    <string name="raid_defense_log_title">Defenses</string>
+    <string name="raid_clan_line">%1$d/%2$d districts · %3$d attacks</string>
 </resources>

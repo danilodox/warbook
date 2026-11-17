@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class ClanTab { INFO, MEMBERS, WAR }
+enum class ClanTab { INFO, MEMBERS, WAR, CAPITAL }
 
 data class ClanDetailUiState(
     val loaded: Boolean = false,

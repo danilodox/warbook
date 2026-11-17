@@ -35,6 +35,7 @@ fun Route.cocRoutes(service: CocService) {
     get(ApiRoutes.CLAN) { call.respond(service.clan(call.tag())) }
     get(ApiRoutes.CURRENT_WAR) { call.respond(service.currentWar(call.tag())) }
     get(ApiRoutes.CURRENT_CWL) { call.respond(service.currentCwl(call.tag())) }
+    get(ApiRoutes.CAPITAL_RAIDS) { call.respond(service.capitalRaids(call.tag())) }
 }
 
 /** Verificação de conta. O token do jogo só passa adiante para a API; nunca é guardado nem logado. */

@@ -3,6 +3,7 @@ package io.github.danilodox.warbook.data
 import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
+import io.github.danilodox.warbook.api.CapitalRaidsDto
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanSearch
 import io.github.danilodox.warbook.api.ClanSearchResponse
@@ -75,6 +76,9 @@ interface WarbookRepository {
     /** Fora da CWL é sucesso com `NOT_IN_CWL`, não erro. */
     suspend fun currentCwl(rawClanTag: String): ApiResult<CwlDto>
 
+    /** Raids da capital (as últimas temporadas que a API devolve). Não fica salvo no app. */
+    suspend fun capitalRaids(rawClanTag: String): ApiResult<CapitalRaidsDto>
+
     /** Troca o token do jogo pela prova de verificação assinada pelo servidor. O token não é guardado. */
     suspend fun verify(rawTag: String, gameToken: String): ApiResult<String>
 }
@@ -104,6 +108,9 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
         get(rawClanTag, ApiRoutes::currentWar) { it.body<CurrentWarDto>() }
 
     override suspend fun currentCwl(rawClanTag: String) = get(rawClanTag, ApiRoutes::currentCwl) { it.body<CwlDto>() }
+
+    override suspend fun capitalRaids(rawClanTag: String) =
+        get(rawClanTag, ApiRoutes::capitalRaids) { it.body<CapitalRaidsDto>() }
 
     override suspend fun verify(rawTag: String, gameToken: String): ApiResult<String> {
         val token = gameToken.trim()
