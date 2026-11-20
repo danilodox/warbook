@@ -49,7 +49,7 @@ fun Route.verifyRoutes(service: CocService, tokens: VerificationTokens) {
     }
 }
 
-private fun RoutingCall.tag(): String = TagNormalizer.normalize(parameters[ApiRoutes.PARAM_TAG].orEmpty())
+internal fun RoutingCall.tag(): String = TagNormalizer.normalize(parameters[ApiRoutes.PARAM_TAG].orEmpty())
     ?: throw ApiException(ApiErrorCode.INVALID_TAG, "Tag inválida")
 
 /** Corpo fora do formato, token vazio ou longo demais nem chegam na API do jogo. */

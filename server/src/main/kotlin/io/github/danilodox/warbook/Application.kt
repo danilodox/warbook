@@ -16,9 +16,12 @@ import io.github.danilodox.warbook.config.ServerConfig
 import io.github.danilodox.warbook.db.DatabaseUnavailableException
 import io.github.danilodox.warbook.db.WarbookDatabase
 import io.github.danilodox.warbook.errors.installErrorHandling
+import io.github.danilodox.warbook.history.MonitoringService
+import io.github.danilodox.warbook.history.WarHistoryRepository
 import io.github.danilodox.warbook.index.PlayerIndex
 import io.github.danilodox.warbook.index.PostgresPlayerIndex
 import io.github.danilodox.warbook.routes.cocRoutes
+import io.github.danilodox.warbook.routes.monitoringRoutes
 import io.github.danilodox.warbook.routes.verifyRoutes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
@@ -39,6 +42,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import java.time.Clock
 import kotlin.system.exitProcess
 
 private const val DEFAULT_PORT = 8080
@@ -54,7 +58,11 @@ fun main() {
             indexWrites.cancel()
             database.close()
         }
-        module(config, playerIndex = PostgresPlayerIndex(database.exposed, indexWrites))
+        module(
+            config,
+            playerIndex = PostgresPlayerIndex(database.exposed, indexWrites),
+            warHistory = WarHistoryRepository(database.exposed),
+        )
     }.start(wait = true)
 }
 
@@ -76,20 +84,26 @@ private fun connectDatabaseOrExit(config: ServerConfig): WarbookDatabase = try {
 
 /**
  * [cocEngine], [ticker] e [limits] são trocados nos testes (MockEngine, relógio do cache, limites baixos).
- * [playerIndex] não tem padrão: o servidor passa o do Postgres; os testes de rota, um falso.
+ * [playerIndex] e [warHistory] não têm padrão: o servidor passa os do Postgres; os testes, um falso ou o
+ * embedded-postgres. [clock] é trocado nos testes do monitoramento.
  */
+// É onde o servidor é montado: cada parâmetro é uma peça que os testes trocam.
+@Suppress("LongParameterList")
 fun Application.module(
     config: ServerConfig,
     cocEngine: HttpClientEngine = CIO.create(),
     ticker: Ticker = Ticker.systemTicker(),
     limits: RateLimits = RateLimits(),
     playerIndex: PlayerIndex,
+    warHistory: WarHistoryRepository,
+    clock: Clock = Clock.systemUTC(),
 ) {
     val cocClient = CocClient(cocEngine, apiKey = config.cocApiKey, baseUrl = config.cocBaseUrl)
     monitor.subscribe(ApplicationStopped) { cocClient.close() }
     val cocService = CocService(cocClient, playerIndex, ticker)
     val installTokens = InstallTokens(config.jwtSecret)
     val verificationTokens = VerificationTokens(config.jwtSecret)
+    val monitoring = MonitoringService(warHistory, cocService, verificationTokens, clock)
 
     install(ContentNegotiation) {
         json()
@@ -108,6 +122,7 @@ fun Application.module(
             authenticate(InstallTokens.AUTH_NAME) {
                 rateLimit(RateLimits.PER_INSTALL) {
                     cocRoutes(cocService)
+                    monitoringRoutes(monitoring)
                     rateLimit(RateLimits.VERIFY_PER_IP) {
                         rateLimit(RateLimits.VERIFY_PER_INSTALL) {
                             verifyRoutes(cocService, verificationTokens)

@@ -20,6 +20,9 @@ object ApiRoutes {
     const val CURRENT_CWL = "/v1/clans/{$PARAM_TAG}/cwl/current"
     const val CAPITAL_RAIDS = "/v1/clans/{$PARAM_TAG}/capitalraidseasons"
 
+    /** `GET` estado; `POST` com [MonitoringRequest] ativa, reativa ou renova. */
+    const val MONITORING = "/v1/clans/{$PARAM_TAG}/monitoring"
+
     fun player(tag: String): String = "/v1/players/$tag"
 
     fun verify(tag: String): String = "/v1/players/$tag/verify"
@@ -30,4 +33,6 @@ object ApiRoutes {
     fun currentCwl(clanTag: String): String = "/v1/clans/$clanTag/cwl/current"
 
     fun capitalRaids(clanTag: String): String = "/v1/clans/$clanTag/capitalraidseasons"
+
+    fun monitoring(clanTag: String): String = "/v1/clans/$clanTag/monitoring"
 }

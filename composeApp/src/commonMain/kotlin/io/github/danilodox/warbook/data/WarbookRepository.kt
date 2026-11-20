@@ -166,7 +166,10 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
             ApiErrorCode.RATE_LIMITED -> AppError.RATE_LIMITED
             ApiErrorCode.INVALID_VERIFY_TOKEN -> AppError.INVALID_VERIFY_TOKEN
             ApiErrorCode.INVALID_QUERY -> AppError.INVALID_QUERY
-            ApiErrorCode.UNAUTHORIZED, ApiErrorCode.UPSTREAM_ERROR -> AppError.SERVER
+            // NOT_VERIFIED e NOT_CLAN_MEMBER ganham texto próprio com a tela do monitoramento (Lote 3).
+            ApiErrorCode.UNAUTHORIZED, ApiErrorCode.UPSTREAM_ERROR,
+            ApiErrorCode.NOT_VERIFIED, ApiErrorCode.NOT_CLAN_MEMBER,
+            -> AppError.SERVER
             // Corpo fora do formato (proxy, servidor antigo): decide pelo status.
             null -> if (status == HttpStatusCode.TooManyRequests) AppError.RATE_LIMITED else AppError.SERVER
         }

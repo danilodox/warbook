@@ -20,6 +20,7 @@ class ApiException(val code: ApiErrorCode, override val message: String) : Runti
             ApiErrorCode.UNAUTHORIZED -> HttpStatusCode.Unauthorized
             ApiErrorCode.UPSTREAM_ERROR -> HttpStatusCode.BadGateway
             ApiErrorCode.INVALID_VERIFY_TOKEN, ApiErrorCode.INVALID_QUERY -> HttpStatusCode.BadRequest
+            ApiErrorCode.NOT_VERIFIED, ApiErrorCode.NOT_CLAN_MEMBER -> HttpStatusCode.Forbidden
         }
 }
 

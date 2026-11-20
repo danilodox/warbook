@@ -11,6 +11,7 @@ import io.github.danilodox.warbook.testing.CocFixtures
 import io.github.danilodox.warbook.testing.FakeCoc
 import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.FakeTicker
+import io.github.danilodox.warbook.testing.TestDatabase
 import io.github.danilodox.warbook.testing.authorizedClient
 import io.github.danilodox.warbook.testing.testConfig
 import io.ktor.client.HttpClient
@@ -33,7 +34,7 @@ class PlayerSearchRoutesTest {
     private val index = FakePlayerIndex()
 
     private suspend fun ApplicationTestBuilder.start(): HttpClient {
-        application { module(testConfig, fake.engine, ticker, playerIndex = index) }
+        application { module(testConfig, fake.engine, ticker, playerIndex = index, warHistory = TestDatabase.history) }
         return authorizedClient()
     }
 
@@ -70,7 +71,7 @@ class PlayerSearchRoutesTest {
 
     @Test
     fun buscaPedeToken() = testApplication {
-        application { module(testConfig, fake.engine, ticker, playerIndex = index) }
+        application { module(testConfig, fake.engine, ticker, playerIndex = index, warHistory = TestDatabase.history) }
 
         val response = client.get(ApiRoutes.PLAYER_SEARCH) { parameter(ApiRoutes.PARAM_NAME, "dantas") }
 
