@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.ui.history
 
 import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.MemberActivityDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.WarDetailDto
@@ -160,6 +161,17 @@ class HistoryTest {
         advanceUntilIdle()
 
         assertEquals(listOf(member), viewModel.state.value.value?.members)
+    }
+
+    @Test
+    fun temporadaDaCwlCarrega() = runTest(dispatcher) {
+        val season = CwlSeasonDto(season = "2026-11", rounds = 3, wins = 2, losses = 1)
+        api.cwlSeasons[CLAN] = ApiResult.Success(season)
+
+        val viewModel = CwlSeasonViewModel(CLAN, api)
+        advanceUntilIdle()
+
+        assertEquals(season, viewModel.state.value.value)
     }
 
     private companion object {

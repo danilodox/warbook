@@ -9,6 +9,7 @@ import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.ClanSummaryDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
+import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.MonitoringDto
 import io.github.danilodox.warbook.api.MonitoringState
 import io.github.danilodox.warbook.api.PlayerDto
@@ -245,6 +246,11 @@ class FakeWarbookRepository : WarbookRepository {
 
     override suspend fun clanActivity(rawClanTag: String): ApiResult<ClanActivityDto> =
         activities[rawClanTag] ?: ApiResult.Success(ClanActivityDto(warsCounted = 0, members = emptyList()))
+
+    val cwlSeasons = mutableMapOf<String, ApiResult<CwlSeasonDto>>()
+
+    override suspend fun cwlSeason(rawClanTag: String): ApiResult<CwlSeasonDto> =
+        cwlSeasons[rawClanTag] ?: ApiResult.Success(CwlSeasonDto())
 }
 
 class FakeAppPreferences(explore: Boolean = false) : AppPreferences {

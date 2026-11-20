@@ -153,3 +153,31 @@ data class PlayerHistoryDto(
         const val MAX_WARS = 30
     }
 }
+
+/** Um membro na temporada da CWL: rodadas em que estava escalado, ataques, estrelas e a nota somada. */
+@Serializable
+data class CwlMemberSeasonDto(
+    val tag: String,
+    val name: String,
+    val townHall: Int,
+    val rounds: Int,
+    val attacksUsed: Int,
+    val stars: Int,
+    val total: Double,
+)
+
+/**
+ * `GET /v1/clans/{tag}/cwl/season`: as rodadas encerradas guardadas da temporada mais recente, somadas.
+ * [season] nulo quando não há CWL guardada. [members] da maior nota para a menor.
+ */
+@Serializable
+data class CwlSeasonDto(
+    val season: String? = null,
+    val rounds: Int = 0,
+    val wins: Int = 0,
+    val losses: Int = 0,
+    val ties: Int = 0,
+    val stars: Int = 0,
+    val opponentStars: Int = 0,
+    val members: List<CwlMemberSeasonDto> = emptyList(),
+)

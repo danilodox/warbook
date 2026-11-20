@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +27,8 @@ import io.github.danilodox.warbook.api.ScoredAttackDto
 import io.github.danilodox.warbook.api.WarDetailDto
 import io.github.danilodox.warbook.api.WarKind
 import io.github.danilodox.warbook.data.WarbookRepository
+import io.github.danilodox.warbook.history.WarRecordSummary
+import io.github.danilodox.warbook.history.warRecordSummaryTextsFor
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.decimal_separator
 import io.github.danilodox.warbook.resources.history_attack_target
@@ -44,6 +47,8 @@ import io.github.danilodox.warbook.ui.components.TownHallShield
 import io.github.danilodox.warbook.ui.me.OfflineCard
 import io.github.danilodox.warbook.ui.me.StaleBanner
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.ui.war.SummaryDock
+import io.github.danilodox.warbook.war.SummaryOptions
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -53,7 +58,14 @@ fun WarRecordRoute(clanTag: String, warId: Long, onOpenPlayer: (String) -> Unit,
     val api: WarbookRepository = koinInject()
     val viewModel = viewModel(key = "war-record-$clanTag-$warId") { WarRecordViewModel(clanTag, warId, api) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    WarRecordScreen(state, onRefresh = viewModel::refresh, onOpenPlayer = onOpenPlayer, modifier = modifier)
+    Column(modifier.fillMaxSize()) {
+        WarRecordScreen(state, viewModel::refresh, onOpenPlayer, Modifier.weight(1f))
+        // Igual ao raid: barra presa embaixo com Copiar e Compartilhar, só com a guerra encerrada.
+        val summary = state.value?.let { WarRecordSummary.of(it, warRecordSummaryTextsFor(Locale.current.language)) }
+        if (summary != null) {
+            SummaryDock(summary, parts = emptyList(), options = SummaryOptions(), ended = true, onToggle = {})
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

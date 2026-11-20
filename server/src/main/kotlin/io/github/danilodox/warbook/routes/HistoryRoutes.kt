@@ -17,6 +17,7 @@ fun Route.historyRoutes(service: WarHistoryService) {
     get(ApiRoutes.WAR) { call.respond(service.war(call.tag(), call.warId())) }
     get(ApiRoutes.PLAYER_HISTORY) { call.respond(service.player(call.tag(), call.playerTag())) }
     get(ApiRoutes.ACTIVITY) { call.respond(service.activity(call.tag())) }
+    get(ApiRoutes.CWL_SEASON) { call.respond(service.cwlSeason(call.tag())) }
 }
 
 /** Sem `?limit=`, o padrão; fora de 1 a [WarHistoryDto.MAX_LIMIT], erro. */

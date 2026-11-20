@@ -4,6 +4,7 @@ import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.WarDetailDto
 import io.github.danilodox.warbook.api.WarHistoryDto
@@ -262,6 +263,23 @@ class HistoryRoutesTest {
         assertEquals(2, p1.attacksAvailable)
         assertEquals(1, p1.cwlRounds)
         assertEquals(1, p1.cwlAttacksUsed)
+    }
+
+    @Test
+    fun temporadaDaCwlSomaAsRodadasGuardadas() = testApplication {
+        start()
+        val client = authorizedClient()
+        val empty = client.get(ApiRoutes.cwlSeason(CLAN)).decode(CwlSeasonDto.serializer())
+        assertNull(empty.season, "sem CWL guardada")
+
+        history.saveSnapshot(CLAN, snapshot(daysAgo = 2))
+        history.saveSnapshot(CLAN, snapshot(daysAgo = 4, type = WarType.CWL).copy(cwlSeason = "2026-11"))
+
+        val season = client.get(ApiRoutes.cwlSeason(CLAN)).decode(CwlSeasonDto.serializer())
+
+        assertEquals("2026-11", season.season)
+        assertEquals(1, season.rounds, "a guerra comum fica de fora")
+        assertEquals(1, season.members.single { it.tag == "PQ2" }.attacksUsed)
     }
 
     @Test

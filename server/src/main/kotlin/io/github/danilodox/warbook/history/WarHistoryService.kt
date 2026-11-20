@@ -2,6 +2,7 @@ package io.github.danilodox.warbook.history
 
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.MemberWarScoreDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.PlayerWarEntryDto
@@ -60,16 +61,9 @@ class WarHistoryService(private val history: WarHistoryRepository) {
         cwl = history.recentEndedSnapshots(clanTag, ClanActivityDto.CWL_ROUNDS, WarType.CWL),
     )
 
-    private fun WarRecord.scores(): List<MemberScore> = WarScoring.score(
-        ScoreWar(
-            isCwl = type == WarType.CWL,
-            attacksPerMember = attacksPerMember,
-            members = members.filterNot { it.isOpponent }.map { it.toScore() },
-            opponents = members.filter { it.isOpponent }.map { it.toScore() },
-            attacks = attacks.map { ScoreAttack(it.order, it.attackerTag, it.defenderTag, it.stars, it.destruction) },
-            ended = state == WarState.WAR_ENDED,
-        ),
-    )
+    /** A temporada mais recente da CWL guardada, somada. */
+    suspend fun cwlSeason(clanTag: String): CwlSeasonDto =
+        CwlSeasonSummary.of(history.recentEndedSnapshots(clanTag, ClanActivityDto.CWL_ROUNDS, WarType.CWL))
 
     private fun WarRecord.scoredMembers(): List<MemberWarScoreDto> {
         val ours = members.filterNot { it.isOpponent }.associateBy { it.tag }
@@ -117,8 +111,6 @@ class WarHistoryService(private val history: WarHistoryRepository) {
         opponentName = opponent.name,
     )
 
-    private fun WarRecordMember.toScore() = ScoreMember(tag, townHall, mapPosition)
-
     companion object {
         private const val CENTS = 100.0
 
@@ -136,6 +128,20 @@ class WarHistoryService(private val history: WarHistoryRepository) {
         private fun round2(value: Double): Double = round(value * CENTS) / CENTS
     }
 }
+
+/** Nota de cada membro do nosso lado, pela regra do `shared`. */
+internal fun WarRecord.scores(): List<MemberScore> = WarScoring.score(
+    ScoreWar(
+        isCwl = type == WarType.CWL,
+        attacksPerMember = attacksPerMember,
+        members = members.filterNot { it.isOpponent }.map { it.toScore() },
+        opponents = members.filter { it.isOpponent }.map { it.toScore() },
+        attacks = attacks.map { ScoreAttack(it.order, it.attackerTag, it.defenderTag, it.stars, it.destruction) },
+        ended = state == WarState.WAR_ENDED,
+    ),
+)
+
+private fun WarRecordMember.toScore() = ScoreMember(tag, townHall, mapPosition)
 
 /** Retrato do agendador: tem escalação e ataques, então tem nota. O warlog só tem o placar. */
 private fun WarRecord.isDetailed() = source == WarSource.SNAPSHOT

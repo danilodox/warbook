@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.WarKind
 import io.github.danilodox.warbook.api.WarState
 import io.github.danilodox.warbook.api.WarSummaryDto
@@ -54,13 +55,29 @@ fun WarHistoryRoute(
     val api: WarbookRepository = koinInject()
     val viewModel = viewModel(key = "war-history-$clanTag") { WarHistoryViewModel(clanTag, api) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    LoadScreen(state, onRefresh = viewModel::refresh, modifier = modifier) { history ->
-        if (history.wars.isEmpty()) EmptyHistory() else WarList(history.wars, onOpenWar, onOpenActivity)
+    // A temporada da CWL é um extra: se falhar, o cartão só não aparece.
+    val cwl = viewModel(key = "cwl-season-$clanTag") { CwlSeasonViewModel(clanTag, api) }
+    val season by cwl.state.collectAsStateWithLifecycle()
+    val refresh = {
+        viewModel.refresh()
+        cwl.refresh()
+    }
+    LoadScreen(state, onRefresh = refresh, modifier = modifier) { history ->
+        if (history.wars.isEmpty()) {
+            EmptyHistory()
+        } else {
+            WarList(history.wars, season.value, onOpenWar, onOpenActivity)
+        }
     }
 }
 
 @Composable
-private fun WarList(wars: List<WarSummaryDto>, onOpenWar: (Long) -> Unit, onOpenActivity: () -> Unit) {
+private fun WarList(
+    wars: List<WarSummaryDto>,
+    season: CwlSeasonDto?,
+    onOpenWar: (Long) -> Unit,
+    onOpenActivity: () -> Unit,
+) {
     LazyColumn(
         contentPadding = PaddingValues(Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
@@ -77,6 +94,7 @@ private fun WarList(wars: List<WarSummaryDto>, onOpenWar: (Long) -> Unit, onOpen
                 TextButton(onClick = onOpenActivity) { Text(stringResource(Res.string.history_open_activity)) }
             }
         }
+        if (season?.season != null) item(key = "cwl-season") { CwlSeasonCard(season) }
         items(wars, key = { it.id }) { war ->
             WarRow(war, onClick = { onOpenWar(war.id) }.takeIf { war.detailed })
         }

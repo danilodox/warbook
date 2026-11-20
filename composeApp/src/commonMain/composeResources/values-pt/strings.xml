@@ -333,4 +333,6 @@
     <string name="activity_cwl_header">CWL %1$s: %2$d rodadas guardadas</string>
     <string name="activity_member_wars">Guerra: %1$d/%2$d</string>
     <string name="activity_member_cwl">CWL: %1$d/%2$d</string>
+    <string name="history_cwl_season_title">CWL de %1$s</string>
+    <string name="history_cwl_season_rounds">%1$d de %2$d rodadas</string>
 </resources>

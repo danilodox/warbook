@@ -33,6 +33,7 @@ object ApiRoutes {
     const val PARAM_PLAYER_TAG = "playerTag"
     const val PLAYER_HISTORY = "/v1/clans/{$PARAM_TAG}/players/{$PARAM_PLAYER_TAG}/history"
     const val ACTIVITY = "/v1/clans/{$PARAM_TAG}/activity"
+    const val CWL_SEASON = "/v1/clans/{$PARAM_TAG}/cwl/season"
 
     fun player(tag: String): String = "/v1/players/$tag"
 
@@ -54,4 +55,6 @@ object ApiRoutes {
     fun playerHistory(clanTag: String, playerTag: String): String = "/v1/clans/$clanTag/players/$playerTag/history"
 
     fun activity(clanTag: String): String = "/v1/clans/$clanTag/activity"
+
+    fun cwlSeason(clanTag: String): String = "/v1/clans/$clanTag/cwl/season"
 }

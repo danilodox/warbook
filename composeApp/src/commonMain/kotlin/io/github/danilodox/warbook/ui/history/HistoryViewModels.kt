@@ -3,6 +3,7 @@ package io.github.danilodox.warbook.ui.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.WarDetailDto
 import io.github.danilodox.warbook.api.WarHistoryDto
@@ -76,6 +77,14 @@ class ClanActivityViewModel(clanTag: String, api: WarbookRepository) :
 /** Uma guerra guardada com a nota de cada membro. */
 class WarRecordViewModel(clanTag: String, warId: Long, api: WarbookRepository) :
     LoadViewModel<WarDetailDto>({ api.warDetail(clanTag, warId) }) {
+    init {
+        refresh()
+    }
+}
+
+/** Temporada mais recente da CWL guardada, para o cartão do histórico. */
+class CwlSeasonViewModel(clanTag: String, api: WarbookRepository) :
+    LoadViewModel<CwlSeasonDto>({ api.cwlSeason(clanTag) }) {
     init {
         refresh()
     }
