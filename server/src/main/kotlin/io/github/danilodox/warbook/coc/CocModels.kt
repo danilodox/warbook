@@ -166,6 +166,8 @@ internal data class CocWarAttack(
     val stars: Int,
     val destructionPercentage: Int,
     val order: Int,
+    /** Segundos de ataque. */
+    val duration: Int? = null,
 )
 
 /** `clans/{tag}/currentwar/leaguegroup`: o grupo da CWL. As guerras de cada rodada vêm por `warTags`. */

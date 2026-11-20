@@ -10,8 +10,6 @@ import io.github.danilodox.warbook.testing.TestDatabase
 import io.github.danilodox.warbook.testing.WarlogFixtures
 import io.github.danilodox.warbook.testing.testConfig
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import kotlin.test.AfterTest
@@ -27,7 +25,7 @@ class WarlogImporterTest {
     private val client = CocClient(fake.engine, testConfig.cocApiKey, testConfig.cocBaseUrl)
     private val now = Instant.parse("2026-11-20T12:00:00Z")
     private val history = TestDatabase.history
-    private val importer = WarlogImporter(client, history, CoroutineScope(Job()), MutableClock(now))
+    private val importer = WarlogImporter(client, history, MutableClock(now))
 
     @BeforeTest
     fun setUp() = runBlocking {

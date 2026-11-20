@@ -18,6 +18,7 @@ import io.github.danilodox.warbook.db.WarbookDatabase
 import io.github.danilodox.warbook.errors.installErrorHandling
 import io.github.danilodox.warbook.history.MonitoringService
 import io.github.danilodox.warbook.history.WarHistoryRepository
+import io.github.danilodox.warbook.history.WarScheduler
 import io.github.danilodox.warbook.history.WarlogImporter
 import io.github.danilodox.warbook.index.PlayerIndex
 import io.github.danilodox.warbook.index.PostgresPlayerIndex
@@ -63,6 +64,7 @@ fun main() {
             config,
             playerIndex = PostgresPlayerIndex(database.exposed, indexWrites),
             warHistory = WarHistoryRepository(database.exposed),
+            startWarScheduler = true,
         )
     }.start(wait = true)
 }
@@ -86,7 +88,8 @@ private fun connectDatabaseOrExit(config: ServerConfig): WarbookDatabase = try {
 /**
  * [cocEngine], [ticker] e [limits] são trocados nos testes (MockEngine, relógio do cache, limites baixos).
  * [playerIndex] e [warHistory] não têm padrão: o servidor passa os do Postgres; os testes, um falso ou o
- * embedded-postgres. [clock] é trocado nos testes do monitoramento.
+ * embedded-postgres. [clock] é trocado nos testes do monitoramento. [startWarScheduler] só o servidor de
+ * verdade liga: nos testes o ciclo de hora em hora chamaria a API falsa sozinho.
  */
 // É onde o servidor é montado: cada parâmetro é uma peça que os testes trocam.
 @Suppress("LongParameterList")
@@ -98,16 +101,18 @@ fun Application.module(
     playerIndex: PlayerIndex,
     warHistory: WarHistoryRepository,
     clock: Clock = Clock.systemUTC(),
+    startWarScheduler: Boolean = false,
 ) {
     val cocClient = CocClient(cocEngine, apiKey = config.cocApiKey, baseUrl = config.cocBaseUrl)
     monitor.subscribe(ApplicationStopped) { cocClient.close() }
     val cocService = CocService(cocClient, playerIndex, ticker)
     val installTokens = InstallTokens(config.jwtSecret)
     val verificationTokens = VerificationTokens(config.jwtSecret)
-    // O warlog é importado em segundo plano, no escopo da aplicação (cancelado quando o servidor para).
-    val warlogImporter = WarlogImporter(cocClient, warHistory, scope = this, clock)
+    // O agendador roda no escopo da aplicação: para junto com o servidor.
+    val scheduler = WarScheduler(cocClient, warHistory, WarlogImporter(cocClient, warHistory, clock), this, clock)
+    if (startWarScheduler) scheduler.start()
     val monitoring = MonitoringService(warHistory, cocService, verificationTokens, clock) { clan ->
-        warlogImporter.importInBackground(clan.clanTag)
+        scheduler.checkInBackground(clan)
     }
 
     install(ContentNegotiation) {
