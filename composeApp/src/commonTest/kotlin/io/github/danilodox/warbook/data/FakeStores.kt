@@ -8,6 +8,8 @@ import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.ClanSummaryDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
+import io.github.danilodox.warbook.api.MonitoringDto
+import io.github.danilodox.warbook.api.MonitoringState
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.data.local.AccountDao
@@ -197,6 +199,26 @@ class FakeWarbookRepository : WarbookRepository {
     override suspend fun verify(rawTag: String, gameToken: String): ApiResult<String> {
         verifyCalls += rawTag to gameToken
         return verifyResult
+    }
+
+    val monitorings = mutableMapOf<String, ApiResult<MonitoringDto>>()
+    var visitResult: ApiResult<MonitoringDto> = ApiResult.Success(
+        MonitoringDto(MonitoringState.ACTIVE, activatedAt = 1L),
+    )
+    val visitCalls = mutableListOf<Pair<String, String>>()
+    val monitoringCalls = mutableListOf<String>()
+
+    override suspend fun monitoring(rawClanTag: String): ApiResult<MonitoringDto> {
+        monitoringCalls += rawClanTag
+        return monitorings[rawClanTag] ?: ApiResult.Success(MonitoringDto(MonitoringState.OFF))
+    }
+
+    override suspend fun recordMonitoringVisit(
+        rawClanTag: String,
+        verificationToken: String,
+    ): ApiResult<MonitoringDto> {
+        visitCalls += rawClanTag to verificationToken
+        return visitResult
     }
 }
 

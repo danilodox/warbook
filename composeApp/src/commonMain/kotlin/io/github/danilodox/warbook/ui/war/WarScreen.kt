@@ -124,6 +124,8 @@ fun WarScreen(state: WarUiState, actions: WarActions, modifier: Modifier = Modif
         ) { Button(onClick = actions.onAddAccount) { Text(stringResource(Res.string.me_add_account)) } }
         else -> Column(modifier.fillMaxSize()) {
             TabSelector(state.tab, actions.onSelectTab)
+            // Só para o clã da conta ativa: é quem pode ativar (a tela Clã mostra a guerra de qualquer clã).
+            state.clan?.takeIf { !state.fixedClan }?.let { MonitoringCard(it.tag) }
             val section = if (state.tab == WarTab.CURRENT) state.war else state.cwl
             PullToRefreshBox(
                 isRefreshing = section.refreshing && section.cached != null,

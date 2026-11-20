@@ -285,4 +285,14 @@
     <string name="raid_attack_log_title">Clans attacked</string>
     <string name="raid_defense_log_title">Defenses</string>
     <string name="raid_clan_line">%1$d/%2$d districts · %3$d attacks</string>
+    <!-- War monitoring (G5) -->
+    <string name="monitoring_off_title">War history</string>
+    <string name="monitoring_off_body">Save the clan wars to see how each member performs. Any verified member can turn it on, and no one can turn it off.</string>
+    <string name="monitoring_activate">Turn on</string>
+    <string name="monitoring_reactivate">Resume</string>
+    <string name="monitoring_active">Saving clan wars since %2$s/%1$s.</string>
+    <string name="monitoring_paused">Monitoring paused: no verified member opened the app in 30 days. The history is still saved.</string>
+    <string name="monitoring_verify_hint">To turn it on, verify an account from this clan in the Me tab.</string>
+    <string name="error_not_verified">Verify an account from this clan in the Me tab and try again.</string>
+    <string name="error_not_clan_member">Your verified account is not in this clan. If you just joined, try again in a few minutes.</string>
 </resources>

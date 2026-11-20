@@ -10,6 +10,8 @@ import io.github.danilodox.warbook.api.ClanSearchResponse
 import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
+import io.github.danilodox.warbook.api.MonitoringDto
+import io.github.danilodox.warbook.api.MonitoringRequest
 import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.api.PlayerSearch
 import io.github.danilodox.warbook.api.PlayerSearchResponse
@@ -52,6 +54,12 @@ enum class AppError {
     /** Nome do clã ou nick da busca curto ou longo demais. */
     INVALID_QUERY,
 
+    /** Sem conta verificada (ou prova recusada) para ativar o monitoramento. */
+    NOT_VERIFIED,
+
+    /** A conta verificada não está no clã. */
+    NOT_CLAN_MEMBER,
+
     /** Sem internet ou servidor fora do ar. */
     NETWORK,
 
@@ -81,6 +89,12 @@ interface WarbookRepository {
 
     /** Troca o token do jogo pela prova de verificação assinada pelo servidor. O token não é guardado. */
     suspend fun verify(rawTag: String, gameToken: String): ApiResult<String>
+
+    /** Estado do monitoramento do clã (qualquer um vê). */
+    suspend fun monitoring(rawClanTag: String): ApiResult<MonitoringDto>
+
+    /** Ativa, reativa ou renova o monitoramento com a prova de um membro verificado. */
+    suspend fun recordMonitoringVisit(rawClanTag: String, verificationToken: String): ApiResult<MonitoringDto>
 }
 
 @Suppress("TooManyFunctions") // Uma função por rota do servidor, mais as de envio e erro.
@@ -122,6 +136,17 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
             }
         }
     }
+
+    override suspend fun monitoring(rawClanTag: String) =
+        get(rawClanTag, ApiRoutes::monitoring) { it.body<MonitoringDto>() }
+
+    override suspend fun recordMonitoringVisit(rawClanTag: String, verificationToken: String) =
+        call(rawClanTag, { it.body<MonitoringDto>() }) { tag ->
+            client.post(ApiRoutes.monitoring(tag)) {
+                contentType(ContentType.Application.Json)
+                setBody(MonitoringRequest(verificationToken))
+            }
+        }
 
     private suspend fun <T> get(rawTag: String, path: (String) -> String, decode: suspend (HttpResponse) -> T) =
         call(rawTag, decode) { tag -> client.get(path(tag)) }
@@ -166,10 +191,9 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
             ApiErrorCode.RATE_LIMITED -> AppError.RATE_LIMITED
             ApiErrorCode.INVALID_VERIFY_TOKEN -> AppError.INVALID_VERIFY_TOKEN
             ApiErrorCode.INVALID_QUERY -> AppError.INVALID_QUERY
-            // NOT_VERIFIED e NOT_CLAN_MEMBER ganham texto próprio com a tela do monitoramento (Lote 3).
-            ApiErrorCode.UNAUTHORIZED, ApiErrorCode.UPSTREAM_ERROR,
-            ApiErrorCode.NOT_VERIFIED, ApiErrorCode.NOT_CLAN_MEMBER,
-            -> AppError.SERVER
+            ApiErrorCode.NOT_VERIFIED -> AppError.NOT_VERIFIED
+            ApiErrorCode.NOT_CLAN_MEMBER -> AppError.NOT_CLAN_MEMBER
+            ApiErrorCode.UNAUTHORIZED, ApiErrorCode.UPSTREAM_ERROR -> AppError.SERVER
             // Corpo fora do formato (proxy, servidor antigo): decide pelo status.
             null -> if (status == HttpStatusCode.TooManyRequests) AppError.RATE_LIMITED else AppError.SERVER
         }

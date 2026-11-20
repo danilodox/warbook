@@ -18,6 +18,7 @@ import io.github.danilodox.warbook.db.WarbookDatabase
 import io.github.danilodox.warbook.errors.installErrorHandling
 import io.github.danilodox.warbook.history.MonitoringService
 import io.github.danilodox.warbook.history.WarHistoryRepository
+import io.github.danilodox.warbook.history.WarlogImporter
 import io.github.danilodox.warbook.index.PlayerIndex
 import io.github.danilodox.warbook.index.PostgresPlayerIndex
 import io.github.danilodox.warbook.routes.cocRoutes
@@ -103,7 +104,11 @@ fun Application.module(
     val cocService = CocService(cocClient, playerIndex, ticker)
     val installTokens = InstallTokens(config.jwtSecret)
     val verificationTokens = VerificationTokens(config.jwtSecret)
-    val monitoring = MonitoringService(warHistory, cocService, verificationTokens, clock)
+    // O warlog é importado em segundo plano, no escopo da aplicação (cancelado quando o servidor para).
+    val warlogImporter = WarlogImporter(cocClient, warHistory, scope = this, clock)
+    val monitoring = MonitoringService(warHistory, cocService, verificationTokens, clock) { clan ->
+        warlogImporter.importInBackground(clan.clanTag)
+    }
 
     install(ContentNegotiation) {
         json()

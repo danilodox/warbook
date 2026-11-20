@@ -285,4 +285,14 @@
     <string name="raid_attack_log_title">Clãs atacados</string>
     <string name="raid_defense_log_title">Defesas</string>
     <string name="raid_clan_line">%1$d/%2$d distritos · %3$d ataques</string>
+    <!-- Monitoramento de guerras (G5) -->
+    <string name="monitoring_off_title">Histórico de guerras</string>
+    <string name="monitoring_off_body">Guarde as guerras do clã para ver o desempenho de cada um. Qualquer membro verificado ativa e ninguém desliga.</string>
+    <string name="monitoring_activate">Ativar</string>
+    <string name="monitoring_reactivate">Reativar</string>
+    <string name="monitoring_active">Guardando as guerras do clã desde %1$s/%2$s.</string>
+    <string name="monitoring_paused">Monitoramento pausado: 30 dias sem um membro verificado abrir o app. O histórico continua guardado.</string>
+    <string name="monitoring_verify_hint">Para ativar, verifique uma conta deste clã na aba Eu.</string>
+    <string name="error_not_verified">Verifique uma conta deste clã na aba Eu e tente de novo.</string>
+    <string name="error_not_clan_member">Sua conta verificada não está neste clã. Se acabou de entrar, tente de novo em alguns minutos.</string>
 </resources>

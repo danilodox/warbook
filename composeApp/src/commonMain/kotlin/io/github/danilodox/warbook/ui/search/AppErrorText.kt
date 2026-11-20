@@ -8,7 +8,9 @@ import io.github.danilodox.warbook.resources.error_invalid_query
 import io.github.danilodox.warbook.resources.error_invalid_tag
 import io.github.danilodox.warbook.resources.error_invalid_verify_token
 import io.github.danilodox.warbook.resources.error_network
+import io.github.danilodox.warbook.resources.error_not_clan_member
 import io.github.danilodox.warbook.resources.error_not_found
+import io.github.danilodox.warbook.resources.error_not_verified
 import io.github.danilodox.warbook.resources.error_rate_limited
 import io.github.danilodox.warbook.resources.error_server
 import io.github.danilodox.warbook.resources.error_war_log_private
@@ -35,6 +37,8 @@ internal val AppError.message: StringResource
         AppError.RATE_LIMITED -> Res.string.error_rate_limited
         AppError.INVALID_VERIFY_TOKEN -> Res.string.error_invalid_verify_token
         AppError.INVALID_QUERY -> Res.string.error_invalid_query
+        AppError.NOT_VERIFIED -> Res.string.error_not_verified
+        AppError.NOT_CLAN_MEMBER -> Res.string.error_not_clan_member
         AppError.NETWORK -> Res.string.error_network
         AppError.SERVER -> Res.string.error_server
     }

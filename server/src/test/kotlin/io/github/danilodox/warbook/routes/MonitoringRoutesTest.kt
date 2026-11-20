@@ -13,6 +13,7 @@ import io.github.danilodox.warbook.testing.FakeCoc
 import io.github.danilodox.warbook.testing.FakePlayerIndex
 import io.github.danilodox.warbook.testing.MutableClock
 import io.github.danilodox.warbook.testing.TestDatabase
+import io.github.danilodox.warbook.testing.WarlogFixtures
 import io.github.danilodox.warbook.testing.authorizedClient
 import io.github.danilodox.warbook.testing.issueToken
 import io.github.danilodox.warbook.testing.testConfig
@@ -27,6 +28,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -34,6 +37,8 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class MonitoringRoutesTest {
 
@@ -96,6 +101,24 @@ class MonitoringRoutesTest {
         )
         assertEquals(expected, response.dto())
         assertEquals(expected, client.status())
+    }
+
+    @Test
+    fun primeiraAtivacaoImportaOWarlogEmSegundoPlano() = testApplication {
+        start()
+        fake.on(CocFixtures.CLAN_PATH, body = CocFixtures.clan)
+        fake.on(WarlogFixtures.PATH, body = WarlogFixtures.warLog)
+        val client = authorizedClient()
+
+        client.activate(proofFor())
+        // A importação não segura a resposta; espera ela terminar (até 5 s).
+        withTimeout(5.seconds) {
+            while (!client.status().warlogImported) delay(20.milliseconds)
+        }
+        client.activate(proofFor())
+
+        assertEquals(3, TestDatabase.history.recentWars(CocFixtures.CLAN_TAG, 10).size)
+        assertEquals(1, fake.requests.count { it.url.encodedPath == WarlogFixtures.PATH }, "só na primeira vez")
     }
 
     @Test

@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.AppPreferences
+import io.github.danilodox.warbook.data.MonitoringRepository
 import io.github.danilodox.warbook.data.WarbookHttpClients
 import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.navigation.Route
@@ -87,6 +88,9 @@ fun App() {
     val httpClients: WarbookHttpClients = koinInject()
     // Primeira abertura: já pede o token da instalação, sem esperar a primeira busca.
     LaunchedEffect(Unit) { httpClients.tokens.warmUp() }
+    // Membro verificado abriu o app: adia a pausa do monitoramento (e tira da pausa) dos clãs já ativados.
+    val monitoring: MonitoringRepository = koinInject()
+    LaunchedEffect(Unit) { monitoring.recordVisits() }
 
     val accounts: AccountsRepository = koinInject()
     val preferences: AppPreferences = koinInject()
