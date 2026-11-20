@@ -11,7 +11,10 @@ import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.MonitoringDto
 import io.github.danilodox.warbook.api.MonitoringState
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.PlayerSearchResultDto
+import io.github.danilodox.warbook.api.WarDetailDto
+import io.github.danilodox.warbook.api.WarHistoryDto
 import io.github.danilodox.warbook.data.local.AccountDao
 import io.github.danilodox.warbook.data.local.AccountEntity
 import io.github.danilodox.warbook.data.local.ClanCacheDao
@@ -220,6 +223,22 @@ class FakeWarbookRepository : WarbookRepository {
         visitCalls += rawClanTag to verificationToken
         return visitResult
     }
+
+    val histories = mutableMapOf<String, ApiResult<WarHistoryDto>>()
+    val warDetails = mutableMapOf<Pair<String, Long>, ApiResult<WarDetailDto>>()
+    val playerHistories = mutableMapOf<Pair<String, String>, ApiResult<PlayerHistoryDto>>()
+    val historyCalls = mutableListOf<String>()
+
+    override suspend fun warHistory(rawClanTag: String): ApiResult<WarHistoryDto> {
+        historyCalls += rawClanTag
+        return histories[rawClanTag] ?: ApiResult.Success(WarHistoryDto(emptyList()))
+    }
+
+    override suspend fun warDetail(rawClanTag: String, warId: Long): ApiResult<WarDetailDto> =
+        warDetails[rawClanTag to warId] ?: ApiResult.Failure(AppError.NOT_FOUND)
+
+    override suspend fun playerHistory(rawClanTag: String, rawPlayerTag: String): ApiResult<PlayerHistoryDto> =
+        playerHistories[rawClanTag to rawPlayerTag] ?: ApiResult.Failure(AppError.NOT_FOUND)
 }
 
 class FakeAppPreferences(explore: Boolean = false) : AppPreferences {

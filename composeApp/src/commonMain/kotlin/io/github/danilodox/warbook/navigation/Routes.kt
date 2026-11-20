@@ -56,6 +56,14 @@ sealed interface Route {
     @Serializable
     data class ClanDetail(val tag: String, val fromSearch: Boolean = false) : Route
 
+    /** G5: guerras guardadas do clã [clanTag]. */
+    @Serializable
+    data class WarHistory(val clanTag: String) : Route
+
+    /** G5: uma guerra guardada, com a nota de cada membro. */
+    @Serializable
+    data class WarRecord(val clanTag: String, val warId: Long) : Route
+
     /** O3: verificação opcional. Fica fora do onboarding para abrir também pelas Configurações. */
     @Serializable
     data class Verify(val tag: String, val fromOnboarding: Boolean) : Route

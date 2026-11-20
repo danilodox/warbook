@@ -295,4 +295,26 @@
     <string name="monitoring_verify_hint">Para ativar, verifique uma conta deste clã na aba Eu.</string>
     <string name="error_not_verified">Verifique uma conta deste clã na aba Eu e tente de novo.</string>
     <string name="error_not_clan_member">Sua conta verificada não está neste clã. Se acabou de entrar, tente de novo em alguns minutos.</string>
+    <string name="decimal_separator">,</string>
+    <string name="monitoring_open_history">Ver histórico</string>
+    <string name="screen_war_history">Histórico de guerras</string>
+    <string name="screen_war_record">Guerra</string>
+    <string name="history_empty_title">Nenhuma guerra guardada ainda</string>
+    <string name="history_empty_body">A próxima guerra do clã entra aqui sozinha.</string>
+    <string name="history_record">%1$d V · %2$d D · %3$d E</string>
+    <string name="history_result_win">Vitória</string>
+    <string name="history_result_lose">Derrota</string>
+    <string name="history_result_tie">Empate</string>
+    <string name="history_in_progress">Em andamento</string>
+    <string name="history_cwl">CWL</string>
+    <string name="history_score_only">Só o placar</string>
+    <string name="history_date">%1$s/%2$s</string>
+    <string name="history_vs">contra %1$s</string>
+    <string name="history_attack_target">#%1$d %2$s</string>
+    <string name="history_missed">Ataques não usados: %1$d (%2$s)</string>
+    <string name="history_no_attacks">Não atacou</string>
+    <string name="history_mark_mirror">Espelho</string>
+    <string name="history_mark_easy">Alvo fácil</string>
+    <string name="history_mark_cleanup">Limpeza</string>
+    <string name="history_score_note">Nota do ataque: estrelas + destruição/100, ajustada pela diferença de CV (espelho é neutro). Ataque não usado: −2 na guerra e −3 na CWL.</string>
 </resources>

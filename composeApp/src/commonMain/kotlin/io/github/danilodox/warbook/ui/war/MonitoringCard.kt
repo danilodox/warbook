@@ -7,6 +7,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import io.github.danilodox.warbook.resources.monitoring_activate
 import io.github.danilodox.warbook.resources.monitoring_active
 import io.github.danilodox.warbook.resources.monitoring_off_body
 import io.github.danilodox.warbook.resources.monitoring_off_title
+import io.github.danilodox.warbook.resources.monitoring_open_history
 import io.github.danilodox.warbook.resources.monitoring_paused
 import io.github.danilodox.warbook.resources.monitoring_reactivate
 import io.github.danilodox.warbook.resources.monitoring_verify_hint
@@ -31,28 +33,48 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-/** Cartão do monitoramento do clã [clanTag]: estado, Ativar e Reativar. Some se o estado não carregar. */
+/**
+ * Cartão do monitoramento do clã [clanTag]: estado, Ativar, Reativar e, com o histórico já ligado, "Ver
+ * histórico" ([onOpenHistory] recebe a tag). Some se o estado não carregar.
+ */
 @Composable
-fun MonitoringCard(clanTag: String, modifier: Modifier = Modifier) {
+fun MonitoringCard(clanTag: String, onOpenHistory: (String) -> Unit, modifier: Modifier = Modifier) {
     val repository: MonitoringRepository = koinInject()
     val viewModel = viewModel(key = "monitoring-$clanTag") { MonitoringViewModel(clanTag, repository) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    MonitoringCardContent(state, onActivate = viewModel::activate, modifier = modifier)
+    MonitoringCardContent(
+        state,
+        onActivate = viewModel::activate,
+        onOpenHistory = { onOpenHistory(clanTag) },
+        modifier = modifier,
+    )
 }
 
 @Composable
-fun MonitoringCardContent(state: MonitoringUiState, onActivate: () -> Unit, modifier: Modifier = Modifier) {
+fun MonitoringCardContent(
+    state: MonitoringUiState,
+    onActivate: () -> Unit,
+    onOpenHistory: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val status = state.status ?: return
     Panel(modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm)) {
         when (status.state) {
-            MonitoringState.ACTIVE -> Text(
-                stringResource(
-                    Res.string.monitoring_active,
-                    sinceDay(status.activatedAt),
-                    sinceMonth(status.activatedAt),
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            MonitoringState.ACTIVE -> Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(
+                        Res.string.monitoring_active,
+                        sinceDay(status.activatedAt),
+                        sinceMonth(status.activatedAt),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = onOpenHistory) { Text(stringResource(Res.string.monitoring_open_history)) }
+            }
             MonitoringState.PAUSED -> ActionRow(
                 text = stringResource(Res.string.monitoring_paused),
                 button = Res.string.monitoring_reactivate,
@@ -68,6 +90,10 @@ fun MonitoringCardContent(state: MonitoringUiState, onActivate: () -> Unit, modi
                     onActivate = onActivate,
                 )
             }
+        }
+        // Pausado continua com o histórico guardado: dá para ver.
+        if (status.state == MonitoringState.PAUSED) {
+            TextButton(onClick = onOpenHistory) { Text(stringResource(Res.string.monitoring_open_history)) }
         }
         if (status.state != MonitoringState.ACTIVE && !state.canActivate) {
             Text(

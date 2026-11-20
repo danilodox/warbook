@@ -57,6 +57,8 @@ import io.github.danilodox.warbook.resources.ic_share
 import io.github.danilodox.warbook.resources.screen_clan
 import io.github.danilodox.warbook.resources.screen_compare
 import io.github.danilodox.warbook.resources.screen_player
+import io.github.danilodox.warbook.resources.screen_war_history
+import io.github.danilodox.warbook.resources.screen_war_record
 import io.github.danilodox.warbook.resources.settings
 import io.github.danilodox.warbook.ui.clan.ClanDetailRoute
 import io.github.danilodox.warbook.ui.clan.ClanTabActions
@@ -75,7 +77,6 @@ import io.github.danilodox.warbook.ui.settings.SettingsRoute
 import io.github.danilodox.warbook.ui.theme.SystemBarsAppearance
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
-import io.github.danilodox.warbook.ui.war.WarRoute
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
@@ -165,6 +166,8 @@ private fun detailTitleOf(destination: NavDestination?): StringResource? = when 
     destination?.hasRoute(Route.Player::class) == true -> Res.string.screen_player
     destination?.hasRoute(Route.ClanDetail::class) == true -> Res.string.screen_clan
     destination?.hasRoute(Route.Compare::class) == true -> Res.string.screen_compare
+    destination?.hasRoute(Route.WarHistory::class) == true -> Res.string.screen_war_history
+    destination?.hasRoute(Route.WarRecord::class) == true -> Res.string.screen_war_record
     else -> null
 }
 
@@ -216,7 +219,7 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 ),
             )
         }
-        composable<Route.War> { WarRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
+        warDestinations(navController)
         searchDestination(navController)
         composable<Route.Player> { entry ->
             val route = entry.toRoute<Route.Player>()

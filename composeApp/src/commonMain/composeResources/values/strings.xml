@@ -295,4 +295,26 @@
     <string name="monitoring_verify_hint">To turn it on, verify an account from this clan in the Me tab.</string>
     <string name="error_not_verified">Verify an account from this clan in the Me tab and try again.</string>
     <string name="error_not_clan_member">Your verified account is not in this clan. If you just joined, try again in a few minutes.</string>
+    <string name="decimal_separator">.</string>
+    <string name="monitoring_open_history">See history</string>
+    <string name="screen_war_history">War history</string>
+    <string name="screen_war_record">War</string>
+    <string name="history_empty_title">No saved wars yet</string>
+    <string name="history_empty_body">The clan's next war will show up here on its own.</string>
+    <string name="history_record">%1$d W · %2$d L · %3$d T</string>
+    <string name="history_result_win">Win</string>
+    <string name="history_result_lose">Loss</string>
+    <string name="history_result_tie">Tie</string>
+    <string name="history_in_progress">In progress</string>
+    <string name="history_cwl">CWL</string>
+    <string name="history_score_only">Score only</string>
+    <string name="history_date">%2$s/%1$s</string>
+    <string name="history_vs">vs %1$s</string>
+    <string name="history_attack_target">#%1$d %2$s</string>
+    <string name="history_missed">Unused attacks: %1$d (%2$s)</string>
+    <string name="history_no_attacks">No attacks</string>
+    <string name="history_mark_mirror">Mirror</string>
+    <string name="history_mark_easy">Easy target</string>
+    <string name="history_mark_cleanup">Cleanup</string>
+    <string name="history_score_note">Attack score: stars + destruction/100, adjusted by the Town Hall difference (mirror is neutral). Unused attack: −2 in war and −3 in CWL.</string>
 </resources>

@@ -65,9 +65,9 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-/** Aba Guerra. [onAddAccount] abre o onboarding (convite de quem não tem conta). */
+/** Aba Guerra. [onAddAccount] abre o onboarding (convite de quem não tem conta); [onOpenHistory], o histórico. */
 @Composable
-fun WarRoute(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
+fun WarRoute(onAddAccount: () -> Unit, onOpenHistory: (String) -> Unit, modifier: Modifier = Modifier) {
     val accounts: AccountsRepository = koinInject()
     val profiles: ProfileRepository = koinInject()
     val wars: WarRepository = koinInject()
@@ -85,6 +85,7 @@ fun WarRoute(onAddAccount: () -> Unit, modifier: Modifier = Modifier) {
             onRefresh = viewModel::refresh,
             onAddAccount = onAddAccount,
             onToggleSummaryPart = viewModel::toggleSummaryPart,
+            onOpenHistory = onOpenHistory,
         ),
         modifier = modifier,
     )
@@ -96,6 +97,7 @@ data class WarActions(
     val onRefresh: () -> Unit,
     val onAddAccount: () -> Unit,
     val onToggleSummaryPart: (SummaryPart) -> Unit = {},
+    val onOpenHistory: (String) -> Unit = {},
 )
 
 /**
@@ -125,7 +127,9 @@ fun WarScreen(state: WarUiState, actions: WarActions, modifier: Modifier = Modif
         else -> Column(modifier.fillMaxSize()) {
             TabSelector(state.tab, actions.onSelectTab)
             // Só para o clã da conta ativa: é quem pode ativar (a tela Clã mostra a guerra de qualquer clã).
-            state.clan?.takeIf { !state.fixedClan }?.let { MonitoringCard(it.tag) }
+            state.clan?.takeIf {
+                !state.fixedClan
+            }?.let { MonitoringCard(it.tag, onOpenHistory = actions.onOpenHistory) }
             val section = if (state.tab == WarTab.CURRENT) state.war else state.cwl
             PullToRefreshBox(
                 isRefreshing = section.refreshing && section.cached != null,

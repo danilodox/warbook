@@ -13,12 +13,15 @@ import io.github.danilodox.warbook.api.CwlDto
 import io.github.danilodox.warbook.api.MonitoringDto
 import io.github.danilodox.warbook.api.MonitoringRequest
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.PlayerSearch
 import io.github.danilodox.warbook.api.PlayerSearchResponse
 import io.github.danilodox.warbook.api.PlayerSearchResultDto
 import io.github.danilodox.warbook.api.TagNormalizer
 import io.github.danilodox.warbook.api.VerifyRequest
 import io.github.danilodox.warbook.api.VerifyResponse
+import io.github.danilodox.warbook.api.WarDetailDto
+import io.github.danilodox.warbook.api.WarHistoryDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -67,6 +70,7 @@ enum class AppError {
     SERVER,
 }
 
+@Suppress("TooManyFunctions") // Uma função por rota do servidor.
 interface WarbookRepository {
     /** [rawTag] como o usuário digitou; é normalizada aqui. */
     suspend fun player(rawTag: String): ApiResult<PlayerDto>
@@ -95,6 +99,15 @@ interface WarbookRepository {
 
     /** Ativa, reativa ou renova o monitoramento com a prova de um membro verificado. */
     suspend fun recordMonitoringVisit(rawClanTag: String, verificationToken: String): ApiResult<MonitoringDto>
+
+    /** Guerras guardadas do clã, da mais recente para a mais antiga. */
+    suspend fun warHistory(rawClanTag: String): ApiResult<WarHistoryDto>
+
+    /** Uma guerra guardada, com a nota de cada membro. */
+    suspend fun warDetail(rawClanTag: String, warId: Long): ApiResult<WarDetailDto>
+
+    /** Histórico do jogador nas guerras guardadas do clã. */
+    suspend fun playerHistory(rawClanTag: String, rawPlayerTag: String): ApiResult<PlayerHistoryDto>
 }
 
 @Suppress("TooManyFunctions") // Uma função por rota do servidor, mais as de envio e erro.
@@ -147,6 +160,16 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
                 setBody(MonitoringRequest(verificationToken))
             }
         }
+
+    override suspend fun warHistory(rawClanTag: String) = get(rawClanTag, ApiRoutes::wars) { it.body<WarHistoryDto>() }
+
+    override suspend fun warDetail(rawClanTag: String, warId: Long) =
+        get(rawClanTag, { tag -> ApiRoutes.war(tag, warId) }) { it.body<WarDetailDto>() }
+
+    override suspend fun playerHistory(rawClanTag: String, rawPlayerTag: String): ApiResult<PlayerHistoryDto> {
+        val player = TagNormalizer.normalize(rawPlayerTag) ?: return ApiResult.Failure(AppError.INVALID_TAG)
+        return get(rawClanTag, { tag -> ApiRoutes.playerHistory(tag, player) }) { it.body<PlayerHistoryDto>() }
+    }
 
     private suspend fun <T> get(rawTag: String, path: (String) -> String, decode: suspend (HttpResponse) -> T) =
         call(rawTag, decode) { tag -> client.get(path(tag)) }
