@@ -55,8 +55,10 @@ import io.github.danilodox.warbook.resources.ic_arrow_back
 import io.github.danilodox.warbook.resources.ic_settings
 import io.github.danilodox.warbook.resources.ic_share
 import io.github.danilodox.warbook.resources.screen_clan
+import io.github.danilodox.warbook.resources.screen_clan_activity
 import io.github.danilodox.warbook.resources.screen_compare
 import io.github.danilodox.warbook.resources.screen_player
+import io.github.danilodox.warbook.resources.screen_player_performance
 import io.github.danilodox.warbook.resources.screen_war_history
 import io.github.danilodox.warbook.resources.screen_war_record
 import io.github.danilodox.warbook.resources.settings
@@ -168,6 +170,8 @@ private fun detailTitleOf(destination: NavDestination?): StringResource? = when 
     destination?.hasRoute(Route.Compare::class) == true -> Res.string.screen_compare
     destination?.hasRoute(Route.WarHistory::class) == true -> Res.string.screen_war_history
     destination?.hasRoute(Route.WarRecord::class) == true -> Res.string.screen_war_record
+    destination?.hasRoute(Route.PlayerPerformance::class) == true -> Res.string.screen_player_performance
+    destination?.hasRoute(Route.ClanActivity::class) == true -> Res.string.screen_clan_activity
     else -> null
 }
 

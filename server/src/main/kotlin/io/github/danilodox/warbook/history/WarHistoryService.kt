@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.history
 
 import io.github.danilodox.warbook.api.ApiErrorCode
+import io.github.danilodox.warbook.api.ClanActivityDto
 import io.github.danilodox.warbook.api.MemberWarScoreDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.PlayerWarEntryDto
@@ -53,7 +54,11 @@ class WarHistoryService(private val history: WarHistoryRepository) {
         )
     }
 
-    private fun WarRecord.isDetailed() = source == WarSource.SNAPSHOT
+    /** Atividade dos membros: as últimas guerras comuns e a última temporada da CWL guardadas. */
+    suspend fun activity(clanTag: String): ClanActivityDto = ClanActivity.of(
+        wars = history.recentEndedSnapshots(clanTag, ClanActivityDto.WARS, WarType.WAR),
+        cwl = history.recentEndedSnapshots(clanTag, ClanActivityDto.CWL_ROUNDS, WarType.CWL),
+    )
 
     private fun WarRecord.scores(): List<MemberScore> = WarScoring.score(
         ScoreWar(
@@ -112,27 +117,6 @@ class WarHistoryService(private val history: WarHistoryRepository) {
         opponentName = opponent.name,
     )
 
-    private fun WarRecord.toSummary() = WarSummaryDto(
-        id = requireNotNull(id) { "guerra lida do banco sem id" },
-        kind = type.toKind(),
-        state = state,
-        endTime = endTime.toEpochMilli(),
-        teamSize = teamSize,
-        attacksPerMember = attacksPerMember,
-        stars = clan.stars,
-        destruction = clan.destruction,
-        opponentStars = opponent.stars,
-        opponentDestruction = opponent.destruction,
-        detailed = isDetailed(),
-        opponentTag = opponent.tag,
-        opponentName = opponent.name,
-        opponentBadgeUrl = opponent.badgeUrl,
-        result = result?.let { WarOutcome.valueOf(it.name) },
-        cwlSeason = cwlSeason,
-    )
-
-    private fun WarType.toKind() = WarKind.valueOf(name)
-
     private fun WarRecordMember.toScore() = ScoreMember(tag, townHall, mapPosition)
 
     companion object {
@@ -152,3 +136,27 @@ class WarHistoryService(private val history: WarHistoryRepository) {
         private fun round2(value: Double): Double = round(value * CENTS) / CENTS
     }
 }
+
+/** Retrato do agendador: tem escalação e ataques, então tem nota. O warlog só tem o placar. */
+private fun WarRecord.isDetailed() = source == WarSource.SNAPSHOT
+
+private fun WarType.toKind() = WarKind.valueOf(name)
+
+private fun WarRecord.toSummary() = WarSummaryDto(
+    id = requireNotNull(id) { "guerra lida do banco sem id" },
+    kind = type.toKind(),
+    state = state,
+    endTime = endTime.toEpochMilli(),
+    teamSize = teamSize,
+    attacksPerMember = attacksPerMember,
+    stars = clan.stars,
+    destruction = clan.destruction,
+    opponentStars = opponent.stars,
+    opponentDestruction = opponent.destruction,
+    detailed = isDetailed(),
+    opponentTag = opponent.tag,
+    opponentName = opponent.name,
+    opponentBadgeUrl = opponent.badgeUrl,
+    result = result?.let { WarOutcome.valueOf(it.name) },
+    cwlSeason = cwlSeason,
+)

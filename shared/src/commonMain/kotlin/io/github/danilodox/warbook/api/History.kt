@@ -76,6 +76,43 @@ data class MemberWarScoreDto(
 @Serializable
 data class WarDetailDto(val war: WarSummaryDto, val members: List<MemberWarScoreDto>)
 
+/**
+ * Atividade de um membro: nas [ClanActivityDto.WARS] últimas guerras comuns encerradas, em quantas estava
+ * escalado e quantos ataques usou; na última temporada da CWL guardada, em quantas rodadas estava e em
+ * quantas atacou.
+ */
+@Serializable
+data class MemberActivityDto(
+    val tag: String,
+    val name: String,
+    val townHall: Int,
+    val wars: Int,
+    val attacksUsed: Int,
+    val attacksAvailable: Int,
+    val cwlRounds: Int,
+    val cwlAttacksUsed: Int,
+)
+
+/**
+ * `GET /v1/clans/{tag}/activity`. Os membros são os que aparecem nessas guerras (com o nome mais recente),
+ * de quem mais deixou de atacar para quem menos. [warsCounted]: quantas guerras comuns entraram (até
+ * [WARS]); [cwlRounds]: rodadas guardadas da temporada [cwlSeason].
+ */
+@Serializable
+data class ClanActivityDto(
+    val warsCounted: Int,
+    val members: List<MemberActivityDto>,
+    val cwlRounds: Int = 0,
+    val cwlSeason: String? = null,
+) {
+    companion object {
+        const val WARS = 10
+
+        /** Rodadas de uma temporada da CWL. */
+        const val CWL_ROUNDS = 7
+    }
+}
+
 /** Uma guerra encerrada do jogador. */
 @Serializable
 data class PlayerWarEntryDto(

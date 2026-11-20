@@ -1,5 +1,8 @@
 package io.github.danilodox.warbook.ui.history
 
+import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.MemberActivityDto
+import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.WarDetailDto
 import io.github.danilodox.warbook.api.WarHistoryDto
 import io.github.danilodox.warbook.api.WarKind
@@ -125,6 +128,38 @@ class HistoryTest {
         advanceUntilIdle()
 
         assertEquals(detail, viewModel.state.value.value)
+    }
+
+    @Test
+    fun desempenhoCarregaOHistoricoDoJogador() = runTest(dispatcher) {
+        val history = PlayerHistoryDto(
+            tag = "PQ2",
+            wars = emptyList(),
+            attacksUsed = 18,
+            attacksAvailable = 20,
+            easyTargets = 2,
+            cleanups = 1,
+            name = "Dantas",
+            average = 2.5,
+            trend = 0.4,
+        )
+        api.playerHistories[CLAN to "PQ2"] = ApiResult.Success(history)
+
+        val viewModel = PlayerPerformanceViewModel(CLAN, "PQ2", api)
+        advanceUntilIdle()
+
+        assertEquals(history, viewModel.state.value.value)
+    }
+
+    @Test
+    fun atividadeCarregaOsMembros() = runTest(dispatcher) {
+        val member = MemberActivityDto("PQ2", "Dantas", 15, wars = 10, attacksUsed = 17, attacksAvailable = 20, 7, 6)
+        api.activities[CLAN] = ApiResult.Success(ClanActivityDto(10, listOf(member), cwlRounds = 7, "2026-11"))
+
+        val viewModel = ClanActivityViewModel(CLAN, api)
+        advanceUntilIdle()
+
+        assertEquals(listOf(member), viewModel.state.value.value?.members)
     }
 
     private companion object {

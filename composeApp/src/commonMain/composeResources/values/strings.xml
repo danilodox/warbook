@@ -317,4 +317,20 @@
     <string name="history_mark_easy">Easy target</string>
     <string name="history_mark_cleanup">Cleanup</string>
     <string name="history_score_note">Attack score: stars + destruction/100, adjusted by the Town Hall difference (mirror is neutral). Unused attack: −2 in war and −3 in CWL.</string>
+    <string name="screen_player_performance">Performance</string>
+    <string name="screen_clan_activity">Activity</string>
+    <string name="history_open_activity">Member activity</string>
+    <string name="performance_average">Average per war</string>
+    <string name="performance_trend">Trend: %1$s (last 5 vs the 5 before)</string>
+    <string name="performance_trend_none">Not enough wars yet to show a trend.</string>
+    <string name="performance_attacks">Attacks used: %1$d of %2$d</string>
+    <string name="performance_marks">Easy targets: %1$d · Cleanups: %2$d</string>
+    <string name="performance_wars_title">Wars (%1$d)</string>
+    <string name="performance_war_attacks">%1$d/%2$d attacks</string>
+    <string name="performance_open_profile">See profile</string>
+    <string name="performance_empty">No scored wars for this player in this clan yet.</string>
+    <string name="activity_wars_header">Last %1$d wars</string>
+    <string name="activity_cwl_header">CWL %1$s: %2$d rounds saved</string>
+    <string name="activity_member_wars">War: %1$d/%2$d</string>
+    <string name="activity_member_cwl">CWL: %1$d/%2$d</string>
 </resources>

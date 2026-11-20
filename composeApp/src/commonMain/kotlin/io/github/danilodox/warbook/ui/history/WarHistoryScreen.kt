@@ -10,11 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.danilodox.warbook.api.WarHistoryDto
 import io.github.danilodox.warbook.api.WarKind
 import io.github.danilodox.warbook.api.WarState
 import io.github.danilodox.warbook.api.WarSummaryDto
@@ -33,53 +31,36 @@ import io.github.danilodox.warbook.resources.history_cwl
 import io.github.danilodox.warbook.resources.history_empty_body
 import io.github.danilodox.warbook.resources.history_empty_title
 import io.github.danilodox.warbook.resources.history_in_progress
+import io.github.danilodox.warbook.resources.history_open_activity
 import io.github.danilodox.warbook.resources.history_record
 import io.github.danilodox.warbook.resources.history_score_only
 import io.github.danilodox.warbook.ui.components.Panel
 import io.github.danilodox.warbook.ui.components.StarIcon
-import io.github.danilodox.warbook.ui.me.OfflineCard
-import io.github.danilodox.warbook.ui.me.StaleBanner
 import io.github.danilodox.warbook.ui.theme.Spacing
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-/** Histórico de guerras do clã [clanTag]. [onOpenWar] abre uma guerra com nota (as do warlog não abrem). */
+/**
+ * Histórico de guerras do clã [clanTag]. [onOpenWar] abre uma guerra com nota (as do warlog não abrem);
+ * [onOpenActivity], a atividade dos membros.
+ */
 @Composable
-fun WarHistoryRoute(clanTag: String, onOpenWar: (Long) -> Unit, modifier: Modifier = Modifier) {
+fun WarHistoryRoute(
+    clanTag: String,
+    onOpenWar: (Long) -> Unit,
+    onOpenActivity: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val api: WarbookRepository = koinInject()
     val viewModel = viewModel(key = "war-history-$clanTag") { WarHistoryViewModel(clanTag, api) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    WarHistoryScreen(state, onRefresh = viewModel::refresh, onOpenWar = onOpenWar, modifier = modifier)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun WarHistoryScreen(
-    state: LoadState<WarHistoryDto>,
-    onRefresh: () -> Unit,
-    onOpenWar: (Long) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val wars = state.value?.wars
-    val error = state.error
-    PullToRefreshBox(
-        isRefreshing = state.loading && wars != null,
-        onRefresh = onRefresh,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        when {
-            wars != null -> Column(Modifier.fillMaxSize()) {
-                if (error != null) StaleBanner(error, state.fetchedAt, onRefresh)
-                if (wars.isEmpty()) EmptyHistory() else WarList(wars, onOpenWar)
-            }
-            error != null -> OfflineCard(error, onRetry = onRefresh)
-            else -> HistorySkeleton()
-        }
+    LoadScreen(state, onRefresh = viewModel::refresh, modifier = modifier) { history ->
+        if (history.wars.isEmpty()) EmptyHistory() else WarList(history.wars, onOpenWar, onOpenActivity)
     }
 }
 
 @Composable
-private fun WarList(wars: List<WarSummaryDto>, onOpenWar: (Long) -> Unit) {
+private fun WarList(wars: List<WarSummaryDto>, onOpenWar: (Long) -> Unit, onOpenActivity: () -> Unit) {
     LazyColumn(
         contentPadding = PaddingValues(Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
@@ -87,11 +68,14 @@ private fun WarList(wars: List<WarSummaryDto>, onOpenWar: (Long) -> Unit) {
     ) {
         item {
             val count = wars.recordCount()
-            Text(
-                stringResource(Res.string.history_record, count.wins, count.losses, count.ties),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = Spacing.xs),
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(Res.string.history_record, count.wins, count.losses, count.ties),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = onOpenActivity) { Text(stringResource(Res.string.history_open_activity)) }
+            }
         }
         items(wars, key = { it.id }) { war ->
             WarRow(war, onClick = { onOpenWar(war.id) }.takeIf { war.detailed })

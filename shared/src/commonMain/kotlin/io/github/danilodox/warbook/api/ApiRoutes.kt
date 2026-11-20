@@ -1,6 +1,8 @@
 package io.github.danilodox.warbook.api
 
 /** Rotas do servidor, compartilhadas entre o app e o servidor. Tags vão sem `#` e já normalizadas. */
+// Catálogo: uma função por rota com parâmetro; dividir só espalharia as rotas.
+@Suppress("TooManyFunctions")
 object ApiRoutes {
     const val HEALTH = "/health"
     const val INSTALLS = "/v1/installs"
@@ -30,6 +32,7 @@ object ApiRoutes {
     const val WAR = "/v1/clans/{$PARAM_TAG}/wars/{$PARAM_WAR_ID}"
     const val PARAM_PLAYER_TAG = "playerTag"
     const val PLAYER_HISTORY = "/v1/clans/{$PARAM_TAG}/players/{$PARAM_PLAYER_TAG}/history"
+    const val ACTIVITY = "/v1/clans/{$PARAM_TAG}/activity"
 
     fun player(tag: String): String = "/v1/players/$tag"
 
@@ -49,4 +52,6 @@ object ApiRoutes {
     fun war(clanTag: String, warId: Long): String = "/v1/clans/$clanTag/wars/$warId"
 
     fun playerHistory(clanTag: String, playerTag: String): String = "/v1/clans/$clanTag/players/$playerTag/history"
+
+    fun activity(clanTag: String): String = "/v1/clans/$clanTag/activity"
 }

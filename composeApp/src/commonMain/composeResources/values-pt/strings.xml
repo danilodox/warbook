@@ -317,4 +317,20 @@
     <string name="history_mark_easy">Alvo fácil</string>
     <string name="history_mark_cleanup">Limpeza</string>
     <string name="history_score_note">Nota do ataque: estrelas + destruição/100, ajustada pela diferença de CV (espelho é neutro). Ataque não usado: −2 na guerra e −3 na CWL.</string>
+    <string name="screen_player_performance">Desempenho</string>
+    <string name="screen_clan_activity">Atividade</string>
+    <string name="history_open_activity">Atividade dos membros</string>
+    <string name="performance_average">Média por guerra</string>
+    <string name="performance_trend">Tendência: %1$s (últimas 5 contra as 5 anteriores)</string>
+    <string name="performance_trend_none">Ainda poucas guerras para mostrar a tendência.</string>
+    <string name="performance_attacks">Ataques usados: %1$d de %2$d</string>
+    <string name="performance_marks">Alvo fácil: %1$d · Limpeza: %2$d</string>
+    <string name="performance_wars_title">Guerras (%1$d)</string>
+    <string name="performance_war_attacks">%1$d/%2$d ataques</string>
+    <string name="performance_open_profile">Ver perfil</string>
+    <string name="performance_empty">Nenhuma guerra com nota deste jogador neste clã ainda.</string>
+    <string name="activity_wars_header">Últimas %1$d guerras</string>
+    <string name="activity_cwl_header">CWL %1$s: %2$d rodadas guardadas</string>
+    <string name="activity_member_wars">Guerra: %1$d/%2$d</string>
+    <string name="activity_member_cwl">CWL: %1$d/%2$d</string>
 </resources>

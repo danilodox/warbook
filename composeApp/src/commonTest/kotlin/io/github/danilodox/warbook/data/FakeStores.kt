@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.data
 
 import io.github.danilodox.warbook.api.CapitalRaidsDto
+import io.github.danilodox.warbook.api.ClanActivityDto
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanMemberDto
 import io.github.danilodox.warbook.api.ClanRole
@@ -239,6 +240,11 @@ class FakeWarbookRepository : WarbookRepository {
 
     override suspend fun playerHistory(rawClanTag: String, rawPlayerTag: String): ApiResult<PlayerHistoryDto> =
         playerHistories[rawClanTag to rawPlayerTag] ?: ApiResult.Failure(AppError.NOT_FOUND)
+
+    val activities = mutableMapOf<String, ApiResult<ClanActivityDto>>()
+
+    override suspend fun clanActivity(rawClanTag: String): ApiResult<ClanActivityDto> =
+        activities[rawClanTag] ?: ApiResult.Success(ClanActivityDto(warsCounted = 0, members = emptyList()))
 }
 
 class FakeAppPreferences(explore: Boolean = false) : AppPreferences {

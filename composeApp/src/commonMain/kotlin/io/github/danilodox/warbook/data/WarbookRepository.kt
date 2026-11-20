@@ -4,6 +4,7 @@ import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
 import io.github.danilodox.warbook.api.CapitalRaidsDto
+import io.github.danilodox.warbook.api.ClanActivityDto
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanSearch
 import io.github.danilodox.warbook.api.ClanSearchResponse
@@ -108,6 +109,9 @@ interface WarbookRepository {
 
     /** Histórico do jogador nas guerras guardadas do clã. */
     suspend fun playerHistory(rawClanTag: String, rawPlayerTag: String): ApiResult<PlayerHistoryDto>
+
+    /** Atividade dos membros nas guerras guardadas do clã. */
+    suspend fun clanActivity(rawClanTag: String): ApiResult<ClanActivityDto>
 }
 
 @Suppress("TooManyFunctions") // Uma função por rota do servidor, mais as de envio e erro.
@@ -170,6 +174,9 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
         val player = TagNormalizer.normalize(rawPlayerTag) ?: return ApiResult.Failure(AppError.INVALID_TAG)
         return get(rawClanTag, { tag -> ApiRoutes.playerHistory(tag, player) }) { it.body<PlayerHistoryDto>() }
     }
+
+    override suspend fun clanActivity(rawClanTag: String) =
+        get(rawClanTag, ApiRoutes::activity) { it.body<ClanActivityDto>() }
 
     private suspend fun <T> get(rawTag: String, path: (String) -> String, decode: suspend (HttpResponse) -> T) =
         call(rawTag, decode) { tag -> client.get(path(tag)) }

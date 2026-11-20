@@ -129,15 +129,16 @@ class WarHistoryRepository(private val database: Database) {
     }
 
     /**
-     * Retratos de guerras encerradas (com escalação e ataques), da mais recente para a mais antiga. Membros e
-     * ataques vêm em duas consultas para todas as guerras de uma vez.
+     * Retratos de guerras encerradas (com escalação e ataques), da mais recente para a mais antiga; só do
+     * [type] se vier. Membros e ataques vêm em duas consultas para todas as guerras de uma vez.
      */
-    suspend fun recentEndedSnapshots(clanTag: String, limit: Int): List<WarRecord> = io {
+    suspend fun recentEndedSnapshots(clanTag: String, limit: Int, type: WarType? = null): List<WarRecord> = io {
         val rows = WarsTable.selectAll()
             .where {
-                (WarsTable.clanTag eq clanTag) and
+                val ended = (WarsTable.clanTag eq clanTag) and
                     (WarsTable.dataSource eq WarSource.SNAPSHOT.name) and
                     (WarsTable.state eq WarState.WAR_ENDED.name)
+                if (type == null) ended else ended and (WarsTable.warType eq type.name)
             }
             .orderBy(WarsTable.endTime, SortOrder.DESC)
             .limit(limit)

@@ -3,6 +3,7 @@ package io.github.danilodox.warbook.routes
 import io.github.danilodox.warbook.api.ApiError
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ApiRoutes
+import io.github.danilodox.warbook.api.ClanActivityDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.WarDetailDto
 import io.github.danilodox.warbook.api.WarHistoryDto
@@ -243,6 +244,24 @@ class HistoryRoutesTest {
         assertTrue(player.wars.isEmpty())
         assertNull(player.average)
         assertNull(player.name)
+    }
+
+    @Test
+    fun atividadeSoComGuerrasComunsEncerradasEACwl() = testApplication {
+        start()
+        history.saveSnapshot(CLAN, snapshot(daysAgo = 0, state = WarState.IN_WAR))
+        history.saveSnapshot(CLAN, snapshot(daysAgo = 2))
+        history.saveSnapshot(CLAN, snapshot(daysAgo = 4, type = WarType.CWL).copy(cwlSeason = "2026-11"))
+
+        val activity = authorizedClient().get(ApiRoutes.activity(CLAN)).decode(ClanActivityDto.serializer())
+
+        assertEquals(1, activity.warsCounted, "a guerra em andamento fica de fora")
+        assertEquals("2026-11", activity.cwlSeason)
+        val p1 = activity.members.single { it.tag == "PQ2" }
+        assertEquals(1, p1.attacksUsed)
+        assertEquals(2, p1.attacksAvailable)
+        assertEquals(1, p1.cwlRounds)
+        assertEquals(1, p1.cwlAttacksUsed)
     }
 
     @Test

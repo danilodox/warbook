@@ -2,6 +2,8 @@ package io.github.danilodox.warbook.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.WarDetailDto
 import io.github.danilodox.warbook.api.WarHistoryDto
 import io.github.danilodox.warbook.data.ApiResult
@@ -50,6 +52,22 @@ abstract class LoadViewModel<T>(
 /** Lista de guerras guardadas do clã. */
 class WarHistoryViewModel(clanTag: String, api: WarbookRepository) :
     LoadViewModel<WarHistoryDto>({ api.warHistory(clanTag) }) {
+    init {
+        refresh()
+    }
+}
+
+/** Desempenho do jogador [playerTag] nas guerras guardadas do clã. */
+class PlayerPerformanceViewModel(clanTag: String, playerTag: String, api: WarbookRepository) :
+    LoadViewModel<PlayerHistoryDto>({ api.playerHistory(clanTag, playerTag) }) {
+    init {
+        refresh()
+    }
+}
+
+/** Atividade dos membros do clã. */
+class ClanActivityViewModel(clanTag: String, api: WarbookRepository) :
+    LoadViewModel<ClanActivityDto>({ api.clanActivity(clanTag) }) {
     init {
         refresh()
     }
