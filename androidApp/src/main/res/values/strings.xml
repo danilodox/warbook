@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Warbook</string>
+    <string name="app_name" translatable="false">Warbook</string>
+    <string name="widget_war_description">War score, time left and attacks still to use.</string>
 </resources>

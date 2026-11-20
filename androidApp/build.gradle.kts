@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":composeApp"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.glance.appwidget)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
 
