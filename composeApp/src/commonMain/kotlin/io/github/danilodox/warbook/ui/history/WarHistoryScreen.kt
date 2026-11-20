@@ -33,6 +33,7 @@ import io.github.danilodox.warbook.resources.history_empty_body
 import io.github.danilodox.warbook.resources.history_empty_title
 import io.github.danilodox.warbook.resources.history_in_progress
 import io.github.danilodox.warbook.resources.history_open_activity
+import io.github.danilodox.warbook.resources.history_open_planner
 import io.github.danilodox.warbook.resources.history_record
 import io.github.danilodox.warbook.resources.history_score_only
 import io.github.danilodox.warbook.ui.components.Panel
@@ -43,13 +44,14 @@ import org.koin.compose.koinInject
 
 /**
  * Histórico de guerras do clã [clanTag]. [onOpenWar] abre uma guerra com nota (as do warlog não abrem);
- * [onOpenActivity], a atividade dos membros.
+ * [onOpenActivity], a atividade dos membros; [onOpenPlanner], o planejador da CWL.
  */
 @Composable
 fun WarHistoryRoute(
     clanTag: String,
     onOpenWar: (Long) -> Unit,
     onOpenActivity: () -> Unit,
+    onOpenPlanner: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val api: WarbookRepository = koinInject()
@@ -66,7 +68,7 @@ fun WarHistoryRoute(
         if (history.wars.isEmpty()) {
             EmptyHistory()
         } else {
-            WarList(history.wars, season.value, onOpenWar, onOpenActivity)
+            WarList(history.wars, season.value, onOpenWar, onOpenActivity, onOpenPlanner)
         }
     }
 }
@@ -77,6 +79,7 @@ private fun WarList(
     season: CwlSeasonDto?,
     onOpenWar: (Long) -> Unit,
     onOpenActivity: () -> Unit,
+    onOpenPlanner: () -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(Spacing.lg),
@@ -85,13 +88,15 @@ private fun WarList(
     ) {
         item {
             val count = wars.recordCount()
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Column {
                 Text(
                     stringResource(Res.string.history_record, count.wins, count.losses, count.ties),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f),
                 )
-                TextButton(onClick = onOpenActivity) { Text(stringResource(Res.string.history_open_activity)) }
+                Row {
+                    TextButton(onClick = onOpenActivity) { Text(stringResource(Res.string.history_open_activity)) }
+                    TextButton(onClick = onOpenPlanner) { Text(stringResource(Res.string.history_open_planner)) }
+                }
             }
         }
         if (season?.season != null) item(key = "cwl-season") { CwlSeasonCard(season) }

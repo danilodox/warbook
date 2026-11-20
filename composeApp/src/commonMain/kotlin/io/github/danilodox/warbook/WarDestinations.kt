@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import io.github.danilodox.warbook.navigation.Route
 import io.github.danilodox.warbook.ui.history.ClanActivityRoute
+import io.github.danilodox.warbook.ui.history.CwlPlannerRoute
 import io.github.danilodox.warbook.ui.history.PlayerPerformanceRoute
 import io.github.danilodox.warbook.ui.history.WarHistoryRoute
 import io.github.danilodox.warbook.ui.history.WarRecordRoute
@@ -28,8 +29,10 @@ internal fun NavGraphBuilder.warDestinations(navController: NavHostController) {
             clanTag,
             onOpenWar = { warId -> navController.navigate(Route.WarRecord(clanTag, warId)) },
             onOpenActivity = { navController.navigate(Route.ClanActivity(clanTag)) },
+            onOpenPlanner = { navController.navigate(Route.CwlPlanner(clanTag)) },
         )
     }
+    composable<Route.CwlPlanner> { entry -> CwlPlannerRoute(entry.toRoute<Route.CwlPlanner>().clanTag) }
     composable<Route.WarRecord> { entry ->
         val route = entry.toRoute<Route.WarRecord>()
         WarRecordRoute(

@@ -335,4 +335,11 @@
     <string name="activity_member_cwl">CWL: %1$d/%2$d</string>
     <string name="history_cwl_season_title">CWL %1$s</string>
     <string name="history_cwl_season_rounds">%1$d of %2$d rounds</string>
+    <string name="screen_cwl_planner">CWL planner</string>
+    <string name="history_open_planner">Plan CWL</string>
+    <string name="planner_size">%1$d × %1$d</string>
+    <string name="planner_selected">%1$d of %2$d picked</string>
+    <string name="planner_restore">Restore suggestion</string>
+    <string name="planner_no_history">No history</string>
+    <string name="planner_hint">Suggested by average score × attendance in the last %1$d stored wars. Tap to remove or add.</string>
 </resources>

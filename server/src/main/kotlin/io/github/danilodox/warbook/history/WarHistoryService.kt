@@ -2,6 +2,7 @@ package io.github.danilodox.warbook.history
 
 import io.github.danilodox.warbook.api.ApiErrorCode
 import io.github.danilodox.warbook.api.ClanActivityDto
+import io.github.danilodox.warbook.api.CwlPlannerDto
 import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.MemberWarScoreDto
 import io.github.danilodox.warbook.api.PlayerHistoryDto
@@ -64,6 +65,10 @@ class WarHistoryService(private val history: WarHistoryRepository) {
     /** A temporada mais recente da CWL guardada, somada. */
     suspend fun cwlSeason(clanTag: String): CwlSeasonDto =
         CwlSeasonSummary.of(history.recentEndedSnapshots(clanTag, ClanActivityDto.CWL_ROUNDS, WarType.CWL))
+
+    /** Estatísticas das últimas guerras guardadas para o planejador da CWL. */
+    suspend fun planner(clanTag: String): CwlPlannerDto =
+        PlannerStats.of(history.recentEndedSnapshots(clanTag, CwlPlannerDto.WARS))
 
     private fun WarRecord.scoredMembers(): List<MemberWarScoreDto> {
         val ours = members.filterNot { it.isOpponent }.associateBy { it.tag }

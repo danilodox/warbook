@@ -181,3 +181,25 @@ data class CwlSeasonDto(
     val opponentStars: Int = 0,
     val members: List<CwlMemberSeasonDto> = emptyList(),
 )
+
+/** Estatísticas de um membro nas guerras guardadas, para o planejador da CWL. [average] nulo sem nota. */
+@Serializable
+data class PlannerStatsDto(
+    val tag: String,
+    val name: String,
+    val wars: Int,
+    val attacksUsed: Int,
+    val attacksAvailable: Int,
+    val average: Double? = null,
+)
+
+/**
+ * `GET /v1/clans/{tag}/cwl/planner`: estatísticas de quem aparece nas [WARS] guerras encerradas mais recentes
+ * (comuns e CWL). O app cruza com os membros atuais do clã.
+ */
+@Serializable
+data class CwlPlannerDto(val warsCounted: Int, val members: List<PlannerStatsDto>) {
+    companion object {
+        const val WARS = 30
+    }
+}

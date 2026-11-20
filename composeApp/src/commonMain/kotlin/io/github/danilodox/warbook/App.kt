@@ -57,6 +57,7 @@ import io.github.danilodox.warbook.resources.ic_share
 import io.github.danilodox.warbook.resources.screen_clan
 import io.github.danilodox.warbook.resources.screen_clan_activity
 import io.github.danilodox.warbook.resources.screen_compare
+import io.github.danilodox.warbook.resources.screen_cwl_planner
 import io.github.danilodox.warbook.resources.screen_player
 import io.github.danilodox.warbook.resources.screen_player_performance
 import io.github.danilodox.warbook.resources.screen_war_history
@@ -172,6 +173,7 @@ private fun detailTitleOf(destination: NavDestination?): StringResource? = when 
     destination?.hasRoute(Route.WarRecord::class) == true -> Res.string.screen_war_record
     destination?.hasRoute(Route.PlayerPerformance::class) == true -> Res.string.screen_player_performance
     destination?.hasRoute(Route.ClanActivity::class) == true -> Res.string.screen_clan_activity
+    destination?.hasRoute(Route.CwlPlanner::class) == true -> Res.string.screen_cwl_planner
     else -> null
 }
 

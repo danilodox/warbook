@@ -72,6 +72,10 @@ sealed interface Route {
     @Serializable
     data class ClanActivity(val clanTag: String) : Route
 
+    /** G5: planejador da CWL do clã [clanTag]. */
+    @Serializable
+    data class CwlPlanner(val clanTag: String) : Route
+
     /** O3: verificação opcional. Fica fora do onboarding para abrir também pelas Configurações. */
     @Serializable
     data class Verify(val tag: String, val fromOnboarding: Boolean) : Route

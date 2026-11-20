@@ -11,6 +11,7 @@ import io.github.danilodox.warbook.api.ClanSearchResponse
 import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
+import io.github.danilodox.warbook.api.CwlPlannerDto
 import io.github.danilodox.warbook.api.CwlSeasonDto
 import io.github.danilodox.warbook.api.MonitoringDto
 import io.github.danilodox.warbook.api.MonitoringRequest
@@ -116,6 +117,9 @@ interface WarbookRepository {
 
     /** Temporada mais recente da CWL guardada, somada; `season` nulo sem CWL guardada. */
     suspend fun cwlSeason(rawClanTag: String): ApiResult<CwlSeasonDto>
+
+    /** Estatísticas das últimas guerras guardadas para o planejador da CWL. */
+    suspend fun cwlPlanner(rawClanTag: String): ApiResult<CwlPlannerDto>
 }
 
 @Suppress("TooManyFunctions") // Uma função por rota do servidor, mais as de envio e erro.
@@ -184,6 +188,9 @@ class KtorWarbookRepository(private val client: HttpClient) : WarbookRepository 
 
     override suspend fun cwlSeason(rawClanTag: String) =
         get(rawClanTag, ApiRoutes::cwlSeason) { it.body<CwlSeasonDto>() }
+
+    override suspend fun cwlPlanner(rawClanTag: String) =
+        get(rawClanTag, ApiRoutes::cwlPlanner) { it.body<CwlPlannerDto>() }
 
     private suspend fun <T> get(rawTag: String, path: (String) -> String, decode: suspend (HttpResponse) -> T) =
         call(rawTag, decode) { tag -> client.get(path(tag)) }
