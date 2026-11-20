@@ -3,7 +3,8 @@ package io.github.danilodox.warbook.testing
 /**
  * CWL de exemplo: grupo de 4 clãs (o nosso é [CocFixtures.CLAN_TAG]) e 3 rodadas.
  * R1 encerrada (W1: nós 20 × 15 BBB; W2: CCC 18 × 18 DDD, CCC vence na destruição).
- * R2 em guerra (W3: BBB 5 × 8 nós, com o nosso clã do lado `opponent`; W4: CCC 3 × 4 DDD). R3 não sorteada.
+ * R2 em guerra, termina 1 dia depois (W3: BBB 5 × 8 nós, com o nosso clã do lado `opponent`;
+ * W4: CCC 3 × 4 DDD). R3 não sorteada.
  */
 object CwlFixtures {
     private const val OURS = "#${CocFixtures.CLAN_TAG}"
@@ -33,16 +34,16 @@ object CwlFixtures {
     val wars = mapOf(
         "W1" to war("warEnded", side(OURS, "Picuí Raiz", 20, 80.0, true), side("#BBB", "Os Mito", 15, 70.0)),
         "W2" to war("warEnded", side("#CCC", "Clã do Norte", 18, 75.0), side("#DDD", "Sertão War", 18, 60.0)),
-        "W3" to war("inWar", side("#BBB", "Os Mito", 5, 30.0), side(OURS, "Picuí Raiz", 8, 40.0, true)),
-        "W4" to war("inWar", side("#CCC", "Clã do Norte", 3, 10.0), side("#DDD", "Sertão War", 4, 12.0)),
+        "W3" to war("inWar", side("#BBB", "Os Mito", 5, 30.0), side(OURS, "Picuí Raiz", 8, 40.0, true), endDay = 4),
+        "W4" to war("inWar", side("#CCC", "Clã do Norte", 3, 10.0), side("#DDD", "Sertão War", 4, 12.0), endDay = 4),
     )
 
     /** Guerra de CWL: sem `attacksPerMember`, como na API. */
-    private fun war(state: String, clan: String, opponent: String) = """
+    private fun war(state: String, clan: String, opponent: String, endDay: Int = 3) = """
         {
           "state": "$state", "teamSize": 15,
           "preparationStartTime": "20261101T120000.000Z", "startTime": "20261102T120000.000Z",
-          "endTime": "20261103T120000.000Z", "warStartTime": "20261102T120000.000Z",
+          "endTime": "2026110${endDay}T120000.000Z", "warStartTime": "20261102T120000.000Z",
           "clan": $clan, "opponent": $opponent
         }
     """.trimIndent()

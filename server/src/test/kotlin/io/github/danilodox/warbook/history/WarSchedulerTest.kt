@@ -87,7 +87,7 @@ class WarSchedulerTest {
         val saved = history.recentWars(CocFixtures.CLAN_TAG, 1).single()
         assertEquals(WarSource.SNAPSHOT, saved.source)
         assertEquals(end, saved.endTime)
-        assertEquals(listOf(end - 4.minutes, end + 1.minutes), scheduler.pendingChecks(CocFixtures.CLAN_TAG))
+        assertEquals(listOf(end - 4.minutes, end + 1.minutes), scheduler.scheduled.pending(CocFixtures.CLAN_TAG))
     }
 
     @Test
@@ -97,7 +97,7 @@ class WarSchedulerTest {
         scheduler.checkWar(CocFixtures.CLAN_TAG)
         scheduler.checkWar(CocFixtures.CLAN_TAG)
 
-        assertEquals(2, scheduler.pendingChecks(CocFixtures.CLAN_TAG).size)
+        assertEquals(2, scheduler.scheduled.pending(CocFixtures.CLAN_TAG).size)
         assertEquals(1, history.recentWars(CocFixtures.CLAN_TAG, 10).size)
     }
 
@@ -107,7 +107,7 @@ class WarSchedulerTest {
 
         assertEquals(WarState.WAR_ENDED, scheduler.checkWar(CocFixtures.CLAN_TAG))
 
-        assertTrue(scheduler.pendingChecks(CocFixtures.CLAN_TAG).isEmpty())
+        assertTrue(scheduler.scheduled.pending(CocFixtures.CLAN_TAG).isEmpty())
         assertEquals(WarResult.WIN, history.recentWars(CocFixtures.CLAN_TAG, 1).single().result)
     }
 

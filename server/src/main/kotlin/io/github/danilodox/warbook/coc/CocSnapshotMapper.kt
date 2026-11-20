@@ -56,6 +56,9 @@ internal fun CocWar.toSnapshot(origin: SnapshotOrigin): WarRecord? {
     )
 }
 
+/** `true` se [clanTag] (sem `#`) é um dos lados da guerra. */
+internal fun CocWar.involves(clanTag: String): Boolean = "#$clanTag" == clan?.tag || "#$clanTag" == opponent?.tag
+
 private fun CocWar.sides(clanTag: String): Pair<CocWarClan, CocWarClan>? {
     val ours = clan
     val theirs = opponent
