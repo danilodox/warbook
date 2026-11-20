@@ -24,6 +24,9 @@ object TestDatabase {
 
     /** Esvazia as tabelas entre um teste e outro (o schema continua). */
     fun clean() {
-        transaction(database) { exec("TRUNCATE player_index") }
+        transaction(database) {
+            exec("TRUNCATE player_index")
+            exec("TRUNCATE war_attacks, war_members, wars, monitored_clans RESTART IDENTITY")
+        }
     }
 }
