@@ -22,11 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.danilodox.warbook.api.CwlPlannerDto
 import io.github.danilodox.warbook.data.WarbookRepository
+import io.github.danilodox.warbook.history.LineupSummary
+import io.github.danilodox.warbook.history.lineupSummaryTextsFor
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.decimal_separator
 import io.github.danilodox.warbook.resources.performance_war_attacks
@@ -39,6 +42,8 @@ import io.github.danilodox.warbook.score.CwlPlanner
 import io.github.danilodox.warbook.score.PlannerCandidate
 import io.github.danilodox.warbook.ui.components.TownHallShield
 import io.github.danilodox.warbook.ui.theme.Spacing
+import io.github.danilodox.warbook.ui.war.SummaryDock
+import io.github.danilodox.warbook.war.SummaryOptions
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -49,14 +54,22 @@ fun CwlPlannerRoute(clanTag: String, modifier: Modifier = Modifier) {
     val viewModel = viewModel(key = "cwl-planner-$clanTag") { CwlPlannerViewModel(clanTag, api) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val selection by viewModel.selection.collectAsStateWithLifecycle()
-    LoadScreen(state, onRefresh = viewModel::refresh, modifier = modifier) { candidates ->
-        CwlPlannerContent(
-            candidates = candidates,
-            selection = selection,
-            onSize = viewModel::setSize,
-            onToggle = viewModel::toggle,
-            onRestore = viewModel::restore,
-        )
+    Column(modifier.fillMaxSize()) {
+        LoadScreen(state, onRefresh = viewModel::refresh, modifier = Modifier.weight(1f)) { candidates ->
+            CwlPlannerContent(
+                candidates = candidates,
+                selection = selection,
+                onSize = viewModel::setSize,
+                onToggle = viewModel::toggle,
+                onRestore = viewModel::restore,
+            )
+        }
+        // Igual às outras telas: a escalação vai para o WhatsApp pela barra presa embaixo.
+        val texts = lineupSummaryTextsFor(Locale.current.language)
+        val summary = state.value?.let { LineupSummary.of(it, selection.selected, selection.size, texts) }
+        if (summary != null) {
+            SummaryDock(summary, parts = emptyList(), options = SummaryOptions(), ended = true, onToggle = {})
+        }
     }
 }
 
