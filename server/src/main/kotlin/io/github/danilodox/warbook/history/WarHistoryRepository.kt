@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
@@ -125,6 +126,29 @@ class WarHistoryRepository(private val database: Database) {
             .where { (WarsTable.id eq warId) and (WarsTable.clanTag eq clanTag) }
             .singleOrNull() ?: return@io null
         row.toWarRecord(withDetails = true)
+    }
+
+    /**
+     * Retratos de guerras encerradas (com escalação e ataques), da mais recente para a mais antiga. Membros e
+     * ataques vêm em duas consultas para todas as guerras de uma vez.
+     */
+    suspend fun recentEndedSnapshots(clanTag: String, limit: Int): List<WarRecord> = io {
+        val rows = WarsTable.selectAll()
+            .where {
+                (WarsTable.clanTag eq clanTag) and
+                    (WarsTable.dataSource eq WarSource.SNAPSHOT.name) and
+                    (WarsTable.state eq WarState.WAR_ENDED.name)
+            }
+            .orderBy(WarsTable.endTime, SortOrder.DESC)
+            .limit(limit)
+            .toList()
+        val ids = rows.map { it[WarsTable.id] }
+        val members = membersOf(ids)
+        val attacks = attacksOf(ids)
+        rows.map { row ->
+            val id = row[WarsTable.id]
+            row.toWarRecord().copy(members = members[id].orEmpty(), attacks = attacks[id].orEmpty())
+        }
     }
 
     /** warTags da CWL que já têm o retrato final: o agendador não precisa buscar de novo. */
@@ -253,32 +277,44 @@ class WarHistoryRepository(private val database: Database) {
         )
     }
 
-    private fun members(warId: Long) = WarMembersTable.selectAll()
-        .where { WarMembersTable.warId eq warId }
-        .orderBy(WarMembersTable.isOpponent to SortOrder.ASC, WarMembersTable.mapPosition to SortOrder.ASC)
-        .map {
-            WarRecordMember(
-                tag = it[WarMembersTable.tag],
-                isOpponent = it[WarMembersTable.isOpponent],
-                name = it[WarMembersTable.name],
-                townHall = it[WarMembersTable.townHall].toInt(),
-                mapPosition = it[WarMembersTable.mapPosition].toInt(),
-            )
-        }
+    private fun members(warId: Long) = membersOf(listOf(warId))[warId].orEmpty()
 
-    private fun attacks(warId: Long) = WarAttacksTable.selectAll()
-        .where { WarAttacksTable.warId eq warId }
+    private fun attacks(warId: Long) = attacksOf(listOf(warId))[warId].orEmpty()
+
+    /** Escalação de cada guerra de [warIds]: nosso lado primeiro, na ordem do mapa. */
+    private fun membersOf(warIds: List<Long>): Map<Long, List<WarRecordMember>> = WarMembersTable.selectAll()
+        .where { WarMembersTable.warId inList warIds }
+        .orderBy(WarMembersTable.isOpponent to SortOrder.ASC, WarMembersTable.mapPosition to SortOrder.ASC)
+        .groupBy(
+            { it[WarMembersTable.warId] },
+            {
+                WarRecordMember(
+                    tag = it[WarMembersTable.tag],
+                    isOpponent = it[WarMembersTable.isOpponent],
+                    name = it[WarMembersTable.name],
+                    townHall = it[WarMembersTable.townHall].toInt(),
+                    mapPosition = it[WarMembersTable.mapPosition].toInt(),
+                )
+            },
+        )
+
+    /** Ataques de cada guerra de [warIds], em ordem. */
+    private fun attacksOf(warIds: List<Long>): Map<Long, List<WarRecordAttack>> = WarAttacksTable.selectAll()
+        .where { WarAttacksTable.warId inList warIds }
         .orderBy(WarAttacksTable.order)
-        .map {
-            WarRecordAttack(
-                order = it[WarAttacksTable.order].toInt(),
-                attackerTag = it[WarAttacksTable.attackerTag],
-                defenderTag = it[WarAttacksTable.defenderTag],
-                stars = it[WarAttacksTable.stars].toInt(),
-                destruction = it[WarAttacksTable.destruction].toInt(),
-                duration = it[WarAttacksTable.duration]?.toInt(),
-            )
-        }
+        .groupBy(
+            { it[WarAttacksTable.warId] },
+            {
+                WarRecordAttack(
+                    order = it[WarAttacksTable.order].toInt(),
+                    attackerTag = it[WarAttacksTable.attackerTag],
+                    defenderTag = it[WarAttacksTable.defenderTag],
+                    stars = it[WarAttacksTable.stars].toInt(),
+                    destruction = it[WarAttacksTable.destruction].toInt(),
+                    duration = it[WarAttacksTable.duration]?.toInt(),
+                )
+            },
+        )
 
     private fun Instant.utc(): OffsetDateTime = atOffset(ZoneOffset.UTC)
 }

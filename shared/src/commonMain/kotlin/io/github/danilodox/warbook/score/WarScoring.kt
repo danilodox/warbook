@@ -1,5 +1,6 @@
 package io.github.danilodox.warbook.score
 
+import kotlinx.serialization.Serializable
 import kotlin.math.round
 
 // Pontuação de cada ataque numa guerra (G5). Regra pura: entra a guerra, sai a nota de cada membro.
@@ -29,6 +30,7 @@ data class ScoreWar(
     val ended: Boolean,
 )
 
+@Serializable
 enum class AttackMark {
     /** Mesma posição no mapa: neutro (fator 1). */
     MIRROR,

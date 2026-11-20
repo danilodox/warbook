@@ -18,11 +18,13 @@ import io.github.danilodox.warbook.db.WarbookDatabase
 import io.github.danilodox.warbook.errors.installErrorHandling
 import io.github.danilodox.warbook.history.MonitoringService
 import io.github.danilodox.warbook.history.WarHistoryRepository
+import io.github.danilodox.warbook.history.WarHistoryService
 import io.github.danilodox.warbook.history.WarScheduler
 import io.github.danilodox.warbook.history.WarlogImporter
 import io.github.danilodox.warbook.index.PlayerIndex
 import io.github.danilodox.warbook.index.PostgresPlayerIndex
 import io.github.danilodox.warbook.routes.cocRoutes
+import io.github.danilodox.warbook.routes.historyRoutes
 import io.github.danilodox.warbook.routes.monitoringRoutes
 import io.github.danilodox.warbook.routes.verifyRoutes
 import io.ktor.client.engine.HttpClientEngine
@@ -133,6 +135,7 @@ fun Application.module(
                 rateLimit(RateLimits.PER_INSTALL) {
                     cocRoutes(cocService)
                     monitoringRoutes(monitoring)
+                    historyRoutes(WarHistoryService(warHistory))
                     rateLimit(RateLimits.VERIFY_PER_IP) {
                         rateLimit(RateLimits.VERIFY_PER_INSTALL) {
                             verifyRoutes(cocService, verificationTokens)

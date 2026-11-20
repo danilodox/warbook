@@ -23,6 +23,14 @@ object ApiRoutes {
     /** `GET` estado; `POST` com [MonitoringRequest] ativa, reativa ou renova. */
     const val MONITORING = "/v1/clans/{$PARAM_TAG}/monitoring"
 
+    /** `?limit=` (padrão [WarHistoryDto.DEFAULT_LIMIT], no máximo [WarHistoryDto.MAX_LIMIT]). */
+    const val WARS = "/v1/clans/{$PARAM_TAG}/wars"
+    const val PARAM_LIMIT = "limit"
+    const val PARAM_WAR_ID = "warId"
+    const val WAR = "/v1/clans/{$PARAM_TAG}/wars/{$PARAM_WAR_ID}"
+    const val PARAM_PLAYER_TAG = "playerTag"
+    const val PLAYER_HISTORY = "/v1/clans/{$PARAM_TAG}/players/{$PARAM_PLAYER_TAG}/history"
+
     fun player(tag: String): String = "/v1/players/$tag"
 
     fun verify(tag: String): String = "/v1/players/$tag/verify"
@@ -35,4 +43,10 @@ object ApiRoutes {
     fun capitalRaids(clanTag: String): String = "/v1/clans/$clanTag/capitalraidseasons"
 
     fun monitoring(clanTag: String): String = "/v1/clans/$clanTag/monitoring"
+
+    fun wars(clanTag: String): String = "/v1/clans/$clanTag/wars"
+
+    fun war(clanTag: String, warId: Long): String = "/v1/clans/$clanTag/wars/$warId"
+
+    fun playerHistory(clanTag: String, playerTag: String): String = "/v1/clans/$clanTag/players/$playerTag/history"
 }
