@@ -5,9 +5,9 @@ import androidx.compose.ui.unit.dp
 
 // Paleta "livro de guerra" (design.md, v0.6.0): dourado = ação e destaque, couro = apoio,
 // vermelho-sangue = guerra (pendentes, inimigo). Erro em laranja queimado para não se confundir com a guerra.
-// Cores fixas da marca, sem Material You.
+// Cores fixas da marca, sem Material You. Públicas porque o widget (androidApp) usa as mesmas cores.
 
-internal object DarkTokens {
+object DarkTokens {
     val primary = Color(0xFFE8BC5E)
     val onPrimary = Color(0xFF3F2B00)
     val primaryContainer = Color(0xFF5C4300)
@@ -41,7 +41,7 @@ internal object DarkTokens {
     val successContainer = Color(0xFF1F4D22)
 }
 
-internal object LightTokens {
+object LightTokens {
     val primary = Color(0xFF7A5900)
     val onPrimary = Color(0xFFFFFFFF)
     val primaryContainer = Color(0xFFFFDFA6)

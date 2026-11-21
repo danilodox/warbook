@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.8.1] - 2026-11-21
+
+### Corrigido
+
+- Widget: abre em 3×1 no launcher. Antes ocupava 3×2, porque a altura mínima pedia duas células. Em uma linha mostra o placar, o tempo e os ataques que faltam; aumentado, mostra o layout completo.
+- Widget: tem prévia na lista de widgets, com uma guerra de exemplo. No Android 15 ou mais novo ela é gerada pelo próprio widget; nas versões anteriores é uma imagem, em claro e escuro, em português e inglês.
+- Widget: as cores vêm do tema do app, sem cópia à mão, e seguem o tema escolhido nas Configurações (escuro, claro ou o do aparelho). Trocar o tema redesenha o widget na hora.
+- Servidor: quando a API do jogo recusa a conexão (acontece às vezes num dos IPs dela), tenta de novo até 2 vezes antes de dar erro. Timeout e erros da API continuam sem nova tentativa.
+
 ## [0.8.0] - 2026-11-20
 
 ### Adicionado
@@ -164,7 +173,9 @@ Recomeço do projeto em Kotlin Multiplatform. O app Android antigo fica na tag `
 - CI no GitHub Actions: lint, testes, build do app e do servidor, Gitleaks e Trivy.
 - `versionName` e `versionCode` derivados da tag git.
 
-[Não lançado]: https://github.com/danilodox/warbook/compare/v0.7.0...HEAD
+[Não lançado]: https://github.com/danilodox/warbook/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/danilodox/warbook/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/danilodox/warbook/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/danilodox/warbook/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/danilodox/warbook/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/danilodox/warbook/compare/v0.4.1...v0.5.0

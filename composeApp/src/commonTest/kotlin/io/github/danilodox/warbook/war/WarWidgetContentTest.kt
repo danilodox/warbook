@@ -37,6 +37,25 @@ class WarWidgetContentTest {
     }
 
     @Test
+    fun previaTemOFormatoDeUmaGuerraEmAndamento() {
+        val data = WarWidgetContent.preview(texts, pt)
+
+        assertEquals("Seu clã × Adversário", data.title)
+        assertEquals("⭐ 24 × 21 · 82,5% × 74,0%", data.score)
+        assertEquals(pt.endsIn(pt.duration(5 * HOUR + 20 * MINUTE)), data.status)
+        assertEquals("Faltam 7 ataques (4 membros)", data.pending)
+    }
+
+    @Test
+    fun previaEmIngles() {
+        val data = WarWidgetContent.preview(EnglishWarWidgetTexts, summaryTextsFor("en"))
+
+        assertEquals("Your clan × Opponent", data.title)
+        assertEquals("⭐ 24 × 21 · 82.5% × 74.0%", data.score)
+        assertEquals("7 attacks left (4 members)", data.pending)
+    }
+
+    @Test
     fun encerradaMostraOResultado() {
         val data = widget(testWar(state = WarState.WAR_ENDED))
 
