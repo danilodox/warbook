@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -59,6 +61,7 @@ data class UnitItem(
 
 private const val GRID_COLUMNS = 5
 private val HERO_PORTRAIT = 44.dp
+private val CAROUSEL_CELL = 64.dp
 
 /** Barra de nível: dourada em progresso, couro no máximo. */
 @Composable
@@ -136,6 +139,24 @@ fun UnitGrid(
                 repeat(GRID_COLUMNS - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
+    }
+}
+
+/**
+ * As mesmas células de [UnitGrid] numa fileira que rola na horizontal, com tamanho fixo:
+ * a última fica cortada na borda e mostra que há mais.
+ */
+@Composable
+fun UnitCarousel(
+    items: List<UnitItem>,
+    modifier: Modifier = Modifier,
+    icon: @Composable (UnitItem) -> Unit = { UnitIcon(it) },
+) {
+    LazyRow(
+        modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs + Spacing.xxs),
+    ) {
+        items(items, key = { it.key }) { item -> UnitCell(item, icon, Modifier.size(CAROUSEL_CELL)) }
     }
 }
 

@@ -10,7 +10,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 - Perfil (abas Eu e Jogador): o máximo de cada herói, equipamento, tropa, feitiço, máquina e pet agora é o que o CV do jogador permite, e não mais o máximo do jogo. O nível aparece como "nível/máximo do CV", e quem já chegou nele ganha um ✓ dourado. O título de cada seção diz quantos estão no máximo do CV.
 - Tabela de níveis por CV (`files/unit_levels.json`), gerada por `tools/gerar_niveis_cv.py` a partir do `static_data.json` do clashy.py (MIT). Ela também diz de qual herói é cada equipamento. Depois de uma atualização do jogo, basta rodar o script de novo. Unidade que não estiver na tabela usa o máximo do jogo.
-- Equipamentos de herói agrupados por herói, cada grupo com retrato, nome e quantos estão no máximo.
+- Equipamentos de herói agrupados por herói: cada herói numa linha com retrato, nome e quantos estão no máximo, e os equipamentos num carrossel horizontal.
 - Ícones do Fan Kit para 42 dos 43 equipamentos (o Noble Iron não está no kit e segue com a sigla) e para Arremessador, Druida, Bruxa das Ruínas, Golem Meteoro, Esquadrão Barch, Esquadrão Mago Gigante, Esmagador de Pedras, Lançador de Tropas, Aerotáxi, Água-viva Brava, Corvo Cobiçoso e Feitiço Raiva Líquida.
 - Nomes em português dos equipamentos e das unidades novas, com as traduções oficiais do jogo.
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import io.github.danilodox.warbook.resources.Res
 import io.github.danilodox.warbook.resources.me_equipment_other
 import io.github.danilodox.warbook.resources.me_group_maxed
-import io.github.danilodox.warbook.ui.components.UnitGrid
+import io.github.danilodox.warbook.ui.components.UnitCarousel
 import io.github.danilodox.warbook.ui.components.UnitItem
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.theme.tabular
@@ -49,7 +49,7 @@ internal fun groupEquipment(
     }
 }
 
-/** Um grupo: retrato e nome do herói, quantos no máximo do CV, e a grade dos equipamentos. */
+/** Um grupo: retrato e nome do herói, quantos no máximo do CV, e os equipamentos num carrossel. */
 @Composable
 internal fun EquipmentGroupBlock(group: EquipmentGroup, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
@@ -78,6 +78,6 @@ internal fun EquipmentGroupBlock(group: EquipmentGroup, modifier: Modifier = Mod
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        UnitGrid(group.items)
+        UnitCarousel(group.items)
     }
 }
