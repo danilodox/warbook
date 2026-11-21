@@ -6,6 +6,7 @@ import io.github.danilodox.warbook.data.AppPreferences
 import io.github.danilodox.warbook.di.AppInfo
 import io.github.danilodox.warbook.di.initKoin
 import io.github.danilodox.warbook.widget.WarWidget
+import io.github.danilodox.warbook.widget.WidgetPreviews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,6 +25,7 @@ class WarbookApplication : Application() {
             androidContext(this@WarbookApplication)
         }
         redrawWidgetsOnThemeChange()
+        scope.launch { WidgetPreviews.publishIfNeeded(this@WarbookApplication, BuildConfig.VERSION_CODE) }
     }
 
     /**

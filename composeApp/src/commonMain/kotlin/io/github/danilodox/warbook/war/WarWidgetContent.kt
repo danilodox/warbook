@@ -20,6 +20,10 @@ interface WarWidgetTexts {
     val noWar: String
     val matchmaking: String
     val allAttacked: String
+
+    /** Nomes de mentira da prévia na lista de widgets. */
+    val sampleClan: String
+    val sampleOpponent: String
 }
 
 object PortugueseWarWidgetTexts : WarWidgetTexts {
@@ -29,6 +33,8 @@ object PortugueseWarWidgetTexts : WarWidgetTexts {
     override val noWar = "Sem guerra agora"
     override val matchmaking = "Procurando adversário"
     override val allAttacked = "Todo mundo atacou"
+    override val sampleClan = "Seu clã"
+    override val sampleOpponent = "Adversário"
 }
 
 object EnglishWarWidgetTexts : WarWidgetTexts {
@@ -38,6 +44,8 @@ object EnglishWarWidgetTexts : WarWidgetTexts {
     override val noWar = "No war right now"
     override val matchmaking = "Searching for an opponent"
     override val allAttacked = "Everyone attacked"
+    override val sampleClan = "Your clan"
+    override val sampleOpponent = "Opponent"
 }
 
 fun warWidgetTextsFor(languageCode: String): WarWidgetTexts =
@@ -54,6 +62,20 @@ sealed interface WidgetWar {
 
 object WarWidgetContent {
 
+    /**
+     * Guerra de exemplo para a prévia na lista de widgets (Android 15+): o mesmo formato de uma guerra em
+     * andamento, com nomes e números fixos.
+     */
+    fun preview(texts: WarWidgetTexts, summary: SummaryTexts): WarWidgetData = WarWidgetData(
+        title = "${texts.sampleClan} × ${texts.sampleOpponent}",
+        status = summary.endsIn(summary.duration(PREVIEW_REMAINING_MS)),
+        score = score(PREVIEW_OUR_STARS, PREVIEW_THEIR_STARS, PREVIEW_OUR_PERCENT, PREVIEW_THEIR_PERCENT, summary),
+        pending = summary.pendingTitle(PREVIEW_PENDING_ATTACKS, PREVIEW_PENDING_MEMBERS),
+    )
+
+    private fun score(ours: Int, theirs: Int, oursPercent: Double, theirsPercent: Double, summary: SummaryTexts) =
+        "⭐ $ours × $theirs · ${summary.decimal(oursPercent)}% × ${summary.decimal(theirsPercent)}%"
+
     fun of(widget: WidgetWar, now: Long, texts: WarWidgetTexts, summary: SummaryTexts): WarWidgetData = when (widget) {
         WidgetWar.NoAccount -> WarWidgetData(texts.appName, texts.noAccount)
         WidgetWar.NoClan -> WarWidgetData(texts.appName, texts.noClan)
@@ -68,8 +90,7 @@ object WarWidgetContent {
             return WarWidgetData(texts.appName, status)
         }
         val title = "${ours.name} × ${theirs.name}"
-        val score = "⭐ ${ours.stars} × ${theirs.stars} · " +
-            "${summary.decimal(ours.destructionPercentage)}% × ${summary.decimal(theirs.destructionPercentage)}%"
+        val score = score(ours.stars, theirs.stars, ours.destructionPercentage, theirs.destructionPercentage, summary)
         return when (war.state) {
             WarState.PREPARATION ->
                 WarWidgetData(title, summary.preparation(summary.duration((war.startTime ?: now) - now)))
@@ -116,3 +137,12 @@ class WarWidgetLoader(
         }
     }
 }
+
+// Guerra de exemplo da prévia: 5h 20min para acabar, 7 ataques de 4 membros faltando.
+private const val PREVIEW_REMAINING_MS = (5 * 60 + 20) * 60_000L
+private const val PREVIEW_OUR_STARS = 24
+private const val PREVIEW_THEIR_STARS = 21
+private const val PREVIEW_OUR_PERCENT = 82.5
+private const val PREVIEW_THEIR_PERCENT = 74.0
+private const val PREVIEW_PENDING_ATTACKS = 7
+private const val PREVIEW_PENDING_MEMBERS = 4

@@ -3,12 +3,15 @@
   Widget da guerra atual. 30 min é o mínimo que o Android aceita no updatePeriodMillis.
   Tamanho padrão 3×1: o Launcher3 nunca usa menos células do que o minWidth/minHeight pedem, então o
   minHeight tem de caber numa célula (40 dp, pela conta 70 × n − 30 do Android); com 80 dp abria em 3×2.
+  Prévia: no Android 15+ ela é gerada pelo próprio widget (WidgetPreviews); abaixo disso vale o previewImage,
+  recortado da prévia gerada no emulador (claro/escuro, inglês/português). Mudou o layout ou o tema: recapturar.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_war_description"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="180dp"
     android:minHeight="40dp"
+    android:previewImage="@drawable/widget_war_preview"
     android:minResizeWidth="110dp"
     android:minResizeHeight="40dp"
     android:resizeMode="horizontal|vertical"

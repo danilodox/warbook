@@ -15,6 +15,7 @@ import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.PreviewSizeMode
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -32,6 +33,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import io.github.danilodox.warbook.MainActivity
 import io.github.danilodox.warbook.data.AppPreferences
+import io.github.danilodox.warbook.data.ThemeMode
 import io.github.danilodox.warbook.data.currentTimeMillis
 import io.github.danilodox.warbook.war.WarWidgetContent
 import io.github.danilodox.warbook.war.WarWidgetData
@@ -75,6 +77,16 @@ class WarWidget : GlanceAppWidget() {
             WarWidgetLayout(data, colors)
         }
     }
+
+    // Prévia gerada na lista de widgets (Android 15+, ver WidgetPreviews): guerra de exemplo, no tema do aparelho,
+    // porque a lista segue o sistema e a prévia só é refeita quando muda a versão ou o idioma.
+    override val previewSizeMode: PreviewSizeMode = SizeMode.Responsive(setOf(Compact, Tall))
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        val language = Locale.getDefault().language
+        val data = WarWidgetContent.preview(warWidgetTextsFor(language), summaryTextsFor(language))
+        provideContent { WarWidgetLayout(data, WidgetColors(ThemeMode.SYSTEM)) }
+    }
 }
 
 class WarWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -110,15 +122,12 @@ private fun CompactContent(data: WarWidgetData, colors: WidgetColors) {
     }
     Text(score, style = TextStyle(color = colors.gold, fontSize = 13.sp, fontWeight = FontWeight.Bold), maxLines = 1)
     Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            data.status,
-            modifier = GlanceModifier.defaultWeight(),
-            style = TextStyle(color = colors.muted, fontSize = 11.sp),
-            maxLines = 1,
-        )
+        // O tempo fica inteiro; os pendentes vêm logo depois e são cortados se faltar espaço.
+        Text(data.status, style = TextStyle(color = colors.muted, fontSize = 11.sp), maxLines = 1)
         data.pending?.let {
             Text(
                 " · $it",
+                modifier = GlanceModifier.defaultWeight(),
                 style = TextStyle(color = colors.war, fontSize = 11.sp, fontWeight = FontWeight.Medium),
                 maxLines = 1,
             )
