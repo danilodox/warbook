@@ -5,6 +5,7 @@ import io.github.danilodox.warbook.errors.ApiException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -22,8 +23,13 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.net.ConnectException
 
 private const val TIMEOUT_MS = 10_000L
+
+/** Novas tentativas quando a API recusa a conexão (até 3 chamadas), esperando 200 ms e depois 400 ms. */
+internal const val CONNECT_RETRIES = 2
+private const val CONNECT_RETRY_DELAY_MS = 200L
 
 /** Erro específico de uma chamada; `null` cai no tratamento comum. Recebe o status e o `reason` da API. */
 private typealias SpecificError = (HttpStatusCode, String?) -> ApiException?
@@ -42,6 +48,18 @@ class CocClient(engine: HttpClientEngine, private val apiKey: String, baseUrl: S
         expectSuccess = false
         install(ContentNegotiation) { json(json) }
         install(HttpTimeout) { requestTimeoutMillis = TIMEOUT_MS }
+        // Um dos IPs da API (visto com 54.164.119.43) às vezes recusa a conexão e a nova tentativa passa.
+        // Só conexão recusada: aí nada chegou à API, então repetir é seguro até no POST do verifytoken.
+        // Timeout e status de erro (5xx incluído) não se repetem; caem no tratamento de sempre.
+        install(HttpRequestRetry) {
+            noRetry()
+            retryOnExceptionIf(maxRetries = CONNECT_RETRIES) { _, cause ->
+                (cause is ConnectException).also { refused ->
+                    if (refused) log.info("API do jogo recusou a conexão; tentando de novo")
+                }
+            }
+            delayMillis { retry -> CONNECT_RETRY_DELAY_MS * retry }
+        }
         defaultRequest { url(baseUrl.trimEnd('/') + "/") }
     }
 
