@@ -60,6 +60,12 @@ class CocClient(engine: HttpClientEngine, private val apiKey: String, baseUrl: S
     internal suspend fun currentWar(clanTag: String): CocWar =
         send("clans", "#$clanTag", "currentwar", specificError = ::warError).body()
 
+    /** Guerras passadas, da mais recente para a mais antiga; só o placar de cada uma. */
+    internal suspend fun warLog(clanTag: String, limit: Int): CocWarLog =
+        send("clans", "#$clanTag", "warlog", specificError = ::warError) {
+            url { parameters.append("limit", limit.toString()) }
+        }.body()
+
     /** Fora da CWL a API responde 404 ([ApiErrorCode.NOT_FOUND]). */
     internal suspend fun leagueGroup(clanTag: String): CocLeagueGroup =
         send("clans", "#$clanTag", "currentwar", "leaguegroup", specificError = ::warError).body()

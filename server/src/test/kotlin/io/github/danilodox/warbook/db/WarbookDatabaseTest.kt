@@ -31,15 +31,18 @@ class WarbookDatabaseTest {
 
     @Test
     fun migrationRodadaDuasVezesNaoMudaNada() {
+        val before = appliedMigrations()
+
         WarbookDatabase.migrate(TestDatabase.dataSource)
 
-        val applied = transaction(TestDatabase.database) {
-            exec("SELECT count(*) FROM flyway_schema_history WHERE success") { rs ->
-                rs.next()
-                rs.getInt(1)
-            }
+        assertEquals(before, appliedMigrations())
+    }
+
+    private fun appliedMigrations(): Int? = transaction(TestDatabase.database) {
+        exec("SELECT count(*) FROM flyway_schema_history WHERE success") { rs ->
+            rs.next()
+            rs.getInt(1)
         }
-        assertEquals(1, applied)
     }
 
     @Test

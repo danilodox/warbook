@@ -1,6 +1,7 @@
 package io.github.danilodox.warbook.data
 
 import io.github.danilodox.warbook.api.CapitalRaidsDto
+import io.github.danilodox.warbook.api.ClanActivityDto
 import io.github.danilodox.warbook.api.ClanDto
 import io.github.danilodox.warbook.api.ClanMemberDto
 import io.github.danilodox.warbook.api.ClanRole
@@ -8,8 +9,15 @@ import io.github.danilodox.warbook.api.ClanSearchResultDto
 import io.github.danilodox.warbook.api.ClanSummaryDto
 import io.github.danilodox.warbook.api.CurrentWarDto
 import io.github.danilodox.warbook.api.CwlDto
+import io.github.danilodox.warbook.api.CwlPlannerDto
+import io.github.danilodox.warbook.api.CwlSeasonDto
+import io.github.danilodox.warbook.api.MonitoringDto
+import io.github.danilodox.warbook.api.MonitoringState
 import io.github.danilodox.warbook.api.PlayerDto
+import io.github.danilodox.warbook.api.PlayerHistoryDto
 import io.github.danilodox.warbook.api.PlayerSearchResultDto
+import io.github.danilodox.warbook.api.WarDetailDto
+import io.github.danilodox.warbook.api.WarHistoryDto
 import io.github.danilodox.warbook.data.local.AccountDao
 import io.github.danilodox.warbook.data.local.AccountEntity
 import io.github.danilodox.warbook.data.local.ClanCacheDao
@@ -198,6 +206,57 @@ class FakeWarbookRepository : WarbookRepository {
         verifyCalls += rawTag to gameToken
         return verifyResult
     }
+
+    val monitorings = mutableMapOf<String, ApiResult<MonitoringDto>>()
+    var visitResult: ApiResult<MonitoringDto> = ApiResult.Success(
+        MonitoringDto(MonitoringState.ACTIVE, activatedAt = 1L),
+    )
+    val visitCalls = mutableListOf<Pair<String, String>>()
+    val monitoringCalls = mutableListOf<String>()
+
+    override suspend fun monitoring(rawClanTag: String): ApiResult<MonitoringDto> {
+        monitoringCalls += rawClanTag
+        return monitorings[rawClanTag] ?: ApiResult.Success(MonitoringDto(MonitoringState.OFF))
+    }
+
+    override suspend fun recordMonitoringVisit(
+        rawClanTag: String,
+        verificationToken: String,
+    ): ApiResult<MonitoringDto> {
+        visitCalls += rawClanTag to verificationToken
+        return visitResult
+    }
+
+    val histories = mutableMapOf<String, ApiResult<WarHistoryDto>>()
+    val warDetails = mutableMapOf<Pair<String, Long>, ApiResult<WarDetailDto>>()
+    val playerHistories = mutableMapOf<Pair<String, String>, ApiResult<PlayerHistoryDto>>()
+    val historyCalls = mutableListOf<String>()
+
+    override suspend fun warHistory(rawClanTag: String): ApiResult<WarHistoryDto> {
+        historyCalls += rawClanTag
+        return histories[rawClanTag] ?: ApiResult.Success(WarHistoryDto(emptyList()))
+    }
+
+    override suspend fun warDetail(rawClanTag: String, warId: Long): ApiResult<WarDetailDto> =
+        warDetails[rawClanTag to warId] ?: ApiResult.Failure(AppError.NOT_FOUND)
+
+    override suspend fun playerHistory(rawClanTag: String, rawPlayerTag: String): ApiResult<PlayerHistoryDto> =
+        playerHistories[rawClanTag to rawPlayerTag] ?: ApiResult.Failure(AppError.NOT_FOUND)
+
+    val activities = mutableMapOf<String, ApiResult<ClanActivityDto>>()
+
+    override suspend fun clanActivity(rawClanTag: String): ApiResult<ClanActivityDto> =
+        activities[rawClanTag] ?: ApiResult.Success(ClanActivityDto(warsCounted = 0, members = emptyList()))
+
+    val cwlSeasons = mutableMapOf<String, ApiResult<CwlSeasonDto>>()
+
+    override suspend fun cwlSeason(rawClanTag: String): ApiResult<CwlSeasonDto> =
+        cwlSeasons[rawClanTag] ?: ApiResult.Success(CwlSeasonDto())
+
+    val planners = mutableMapOf<String, ApiResult<CwlPlannerDto>>()
+
+    override suspend fun cwlPlanner(rawClanTag: String): ApiResult<CwlPlannerDto> =
+        planners[rawClanTag] ?: ApiResult.Success(CwlPlannerDto(warsCounted = 0, members = emptyList()))
 }
 
 class FakeAppPreferences(explore: Boolean = false) : AppPreferences {

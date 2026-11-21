@@ -4,6 +4,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 
 ## [Não lançado]
 
+## [0.8.0] - 2026-11-20
+
+### Adicionado
+
+- Monitoramento de guerras: qualquer membro verificado liga o monitoramento do clã no cartão da aba Guerra. O Warbook importa na hora o registro de guerra do clã e passa a guardar cada guerra nova. Um clã pausado volta sozinho quando um membro verificado abre o app.
+- Servidor: agendador que roda de hora em hora e tira um retrato completo de cada guerra 4 minutos antes do fim e logo depois que ela acaba, incluindo as rodadas da CWL. Ao subir, ele recupera as guerras que terminaram com o servidor desligado.
+- Nota de cada ataque, calculada no `shared`: estrelas e destruição pesadas pela diferença de CV. Atacar o espelho vale fator 1,0. Alvo fácil e limpeza só contam quando o CV do alvo é menor que o do atacante. Cada ataque não usado vale −2.
+- Histórico de guerras do clã: placar geral (vitórias, derrotas e empates) e a lista das guerras guardadas. O detalhe de cada guerra mostra o mapa com a nota de cada membro, quem não atacou e os alvos fáceis.
+- Desempenho do jogador: média das notas, tendência, ataques usados e quantos foram em alvo fácil ou limpeza.
+- Atividade dos membros: quantos ataques cada membro usou nas últimas guerras, com quem ficou devendo no topo.
+- Planejador da CWL: sugere a escalação de 15 ou 30 pela nota × presença nas últimas 30 guerras guardadas. Tocar num membro tira ou põe na escalação, com contador e "Restaurar sugestão".
+- Resumos para o WhatsApp: fim de guerra (resultado, melhores notas, quem não atacou e alvos fáceis), temporada da CWL (rodadas, placar e os melhores do clã) e escalação do planejador (com os reservas).
+- Widget Android da guerra atual: placar, tempo que falta e quantos ataques ainda faltam. Atualiza a cada 30 minutos, o mínimo do Android, e abre o app ao tocar.
+- Servidor: rotas `/v1/clans/{tag}/monitoring`, `/v1/clans/{tag}/wars`, `/v1/clans/{tag}/wars/{id}`, `/v1/clans/{tag}/players/{playerTag}/history`, `/v1/clans/{tag}/activity`, `/v1/clans/{tag}/cwl/season` e `/v1/clans/{tag}/cwl/planner`.
+- Textos novos em português e inglês.
+
+### Alterado
+
+- Servidor: migração V2 do Flyway cria as tabelas `monitored_clans`, `wars`, `war_members` e `war_attacks`. Ela roda sozinha na primeira subida.
+- Dependência nova no Android: Glance 1.2.0, usado no widget.
+
 ## [0.7.0] - 2026-11-17
 
 ### Adicionado

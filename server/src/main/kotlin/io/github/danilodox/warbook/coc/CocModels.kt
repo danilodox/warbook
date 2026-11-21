@@ -122,6 +122,20 @@ internal data class CocWar(
 )
 
 @Serializable
+internal data class CocWarLog(val items: List<CocWarLogEntry> = emptyList())
+
+/** Guerra do warlog: só o placar. `result` vem nulo nas entradas da CWL. */
+@Serializable
+internal data class CocWarLogEntry(
+    val result: String? = null,
+    val endTime: String? = null,
+    val teamSize: Int = 0,
+    val attacksPerMember: Int = 0,
+    val clan: CocWarClan? = null,
+    val opponent: CocWarClan? = null,
+)
+
+@Serializable
 internal data class CocWarClan(
     val tag: String? = null,
     val name: String? = null,
@@ -152,6 +166,8 @@ internal data class CocWarAttack(
     val stars: Int,
     val destructionPercentage: Int,
     val order: Int,
+    /** Segundos de ataque. */
+    val duration: Int? = null,
 )
 
 /** `clans/{tag}/currentwar/leaguegroup`: o grupo da CWL. As guerras de cada rodada vêm por `warTags`. */

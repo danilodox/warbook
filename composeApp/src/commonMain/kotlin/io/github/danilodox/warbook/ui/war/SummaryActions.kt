@@ -159,7 +159,7 @@ private fun CustomizeSheet(
 }
 
 @Composable
-private fun CopyAndShare(summary: String, modifier: Modifier = Modifier) {
+internal fun CopyAndShare(summary: String, modifier: Modifier = Modifier) {
     val clipboard = LocalClipboard.current
     val share = rememberTextSharer()
     val scope = rememberCoroutineScope()

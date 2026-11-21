@@ -9,6 +9,7 @@ import io.github.danilodox.warbook.data.DataStoreInstallTokenStore
 import io.github.danilodox.warbook.data.FollowRepository
 import io.github.danilodox.warbook.data.InstallTokenStore
 import io.github.danilodox.warbook.data.KtorWarbookRepository
+import io.github.danilodox.warbook.data.MonitoringRepository
 import io.github.danilodox.warbook.data.ProfileRepository
 import io.github.danilodox.warbook.data.RoomAccountsRepository
 import io.github.danilodox.warbook.data.RoomCacheScope
@@ -44,6 +45,7 @@ fun appModule(appInfo: AppInfo): Module = module {
     single<AccountsRepository> { RoomAccountsRepository(dao = get(), profiles = get(), api = get()) }
     single<WarRepository> { RoomWarRepository(cache = get(), api = get(), scope = get()) }
     single<ClanRepository> { RoomClanRepository(cache = get(), api = get(), scope = get(), followed = get()) }
+    single { MonitoringRepository(api = get(), accounts = get()) }
     single<FollowRepository> { RoomFollowRepository(dao = get(), profiles = get(), clans = get(), wars = get()) }
 }
 

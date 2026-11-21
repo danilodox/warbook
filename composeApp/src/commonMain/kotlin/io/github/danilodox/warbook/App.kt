@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.danilodox.warbook.data.AccountsRepository
 import io.github.danilodox.warbook.data.AppPreferences
+import io.github.danilodox.warbook.data.MonitoringRepository
 import io.github.danilodox.warbook.data.WarbookHttpClients
 import io.github.danilodox.warbook.data.WarbookRepository
 import io.github.danilodox.warbook.navigation.Route
@@ -54,8 +55,13 @@ import io.github.danilodox.warbook.resources.ic_arrow_back
 import io.github.danilodox.warbook.resources.ic_settings
 import io.github.danilodox.warbook.resources.ic_share
 import io.github.danilodox.warbook.resources.screen_clan
+import io.github.danilodox.warbook.resources.screen_clan_activity
 import io.github.danilodox.warbook.resources.screen_compare
+import io.github.danilodox.warbook.resources.screen_cwl_planner
 import io.github.danilodox.warbook.resources.screen_player
+import io.github.danilodox.warbook.resources.screen_player_performance
+import io.github.danilodox.warbook.resources.screen_war_history
+import io.github.danilodox.warbook.resources.screen_war_record
 import io.github.danilodox.warbook.resources.settings
 import io.github.danilodox.warbook.ui.clan.ClanDetailRoute
 import io.github.danilodox.warbook.ui.clan.ClanTabActions
@@ -74,7 +80,6 @@ import io.github.danilodox.warbook.ui.settings.SettingsRoute
 import io.github.danilodox.warbook.ui.theme.SystemBarsAppearance
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
 import io.github.danilodox.warbook.ui.verify.VerifyRoute
-import io.github.danilodox.warbook.ui.war.WarRoute
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
@@ -87,6 +92,9 @@ fun App() {
     val httpClients: WarbookHttpClients = koinInject()
     // Primeira abertura: já pede o token da instalação, sem esperar a primeira busca.
     LaunchedEffect(Unit) { httpClients.tokens.warmUp() }
+    // Membro verificado abriu o app: adia a pausa do monitoramento (e tira da pausa) dos clãs já ativados.
+    val monitoring: MonitoringRepository = koinInject()
+    LaunchedEffect(Unit) { monitoring.recordVisits() }
 
     val accounts: AccountsRepository = koinInject()
     val preferences: AppPreferences = koinInject()
@@ -161,6 +169,11 @@ private fun detailTitleOf(destination: NavDestination?): StringResource? = when 
     destination?.hasRoute(Route.Player::class) == true -> Res.string.screen_player
     destination?.hasRoute(Route.ClanDetail::class) == true -> Res.string.screen_clan
     destination?.hasRoute(Route.Compare::class) == true -> Res.string.screen_compare
+    destination?.hasRoute(Route.WarHistory::class) == true -> Res.string.screen_war_history
+    destination?.hasRoute(Route.WarRecord::class) == true -> Res.string.screen_war_record
+    destination?.hasRoute(Route.PlayerPerformance::class) == true -> Res.string.screen_player_performance
+    destination?.hasRoute(Route.ClanActivity::class) == true -> Res.string.screen_clan_activity
+    destination?.hasRoute(Route.CwlPlanner::class) == true -> Res.string.screen_cwl_planner
     else -> null
 }
 
@@ -212,7 +225,7 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 ),
             )
         }
-        composable<Route.War> { WarRoute(onAddAccount = { navController.navigate(Route.Onboarding) }) }
+        warDestinations(navController)
         searchDestination(navController)
         composable<Route.Player> { entry ->
             val route = entry.toRoute<Route.Player>()

@@ -4,6 +4,7 @@ import io.github.danilodox.warbook.api.PlayerDto
 import io.github.danilodox.warbook.data.local.AccountDao
 import io.github.danilodox.warbook.data.local.AccountEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /** Conta do usuário no app. A verificação é opcional e fica na prova assinada pelo servidor. */
@@ -30,6 +31,14 @@ interface AccountsRepository {
 
     /** Verifica com o token do jogo e guarda a prova. O token do jogo não é guardado. */
     suspend fun verify(tag: String, gameToken: String): ApiResult<Unit>
+
+    /** Contas verificadas com o clã conhecido, com a prova (para o monitoramento). A ativa vem primeiro. */
+    suspend fun verifiedMembers(): List<VerifiedMember>
+}
+
+/** Conta verificada de um clã: [proof] é a prova assinada pelo servidor (nunca o token do jogo). */
+data class VerifiedMember(val tag: String, val clanTag: String, val proof: String) {
+    override fun toString(): String = "VerifiedMember(tag=$tag, clanTag=$clanTag, proof=***)"
 }
 
 class RoomAccountsRepository(
@@ -71,6 +80,14 @@ class RoomAccountsRepository(
                 ApiResult.Success(Unit)
             }
             is ApiResult.Failure -> result
+        }
+
+    override suspend fun verifiedMembers(): List<VerifiedMember> = dao.observeAll().first()
+        .sortedByDescending { it.isActive }
+        .mapNotNull { account ->
+            val proof = account.verificationToken ?: return@mapNotNull null
+            val clanTag = account.clanTag ?: return@mapNotNull null
+            VerifiedMember(account.tag, clanTag, proof)
         }
 }
 

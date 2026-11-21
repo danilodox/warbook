@@ -34,6 +34,12 @@ enum class ApiErrorCode {
 
     /** Nome da busca curto ou longo demais. HTTP 400. */
     INVALID_QUERY,
+
+    /** Prova de verificação ausente, inválida ou de outro servidor. HTTP 403. */
+    NOT_VERIFIED,
+
+    /** A conta verificada não é membro do clã. HTTP 403. */
+    NOT_CLAN_MEMBER,
 }
 
 /** Resposta de `POST /v1/installs`: token que o app manda em `Authorization: Bearer`. */
