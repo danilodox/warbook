@@ -8,7 +8,9 @@ import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
+import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.core.lessEq
 import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
@@ -18,6 +20,7 @@ import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
+import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -172,9 +175,18 @@ class WarHistoryRepository(private val database: Database) {
         .singleOrNull()
         ?.toMonitoredClan()
 
+    /**
+     * A mesma guerra pelo fim, com [SAME_WAR_WINDOW] de folga: o warlog e a `currentwar` podem dar o fim com
+     * 1 s de diferença. Duas guerras do clã nunca acabam tão perto. Com mais de uma, o retrato vem primeiro.
+     */
     private fun findWarRow(clanTag: String, endTime: Instant): ResultRow? = WarsTable.selectAll()
-        .where { (WarsTable.clanTag eq clanTag) and (WarsTable.endTime eq endTime.utc()) }
-        .singleOrNull()
+        .where {
+            (WarsTable.clanTag eq clanTag) and
+                (WarsTable.endTime greaterEq endTime.minus(SAME_WAR_WINDOW).utc()) and
+                (WarsTable.endTime lessEq endTime.plus(SAME_WAR_WINDOW).utc())
+        }
+        .orderBy(WarsTable.dataSource, SortOrder.ASC) // "SNAPSHOT" antes de "WARLOG".
+        .firstOrNull()
 
     private fun ResultRow.isEndedSnapshot() =
         this[WarsTable.dataSource] == WarSource.SNAPSHOT.name && this[WarsTable.state] == WarState.WAR_ENDED.name
@@ -319,3 +331,6 @@ class WarHistoryRepository(private val database: Database) {
 
     private fun Instant.utc(): OffsetDateTime = atOffset(ZoneOffset.UTC)
 }
+
+/** Folga para achar a mesma guerra pelo fim (warlog e `currentwar` diferem em até 1 s). */
+private val SAME_WAR_WINDOW: Duration = Duration.ofMinutes(2)

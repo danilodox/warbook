@@ -261,6 +261,33 @@ class WarHistoryRepositoryTest {
     }
 
     @Test
+    fun warlogComOFimUmSegundoDiferenteEAMesmaGuerra() = runBlocking {
+        // Caso real: o warlog deu 15:14:50 e a currentwar 15:14:49 para a mesma guerra.
+        activate()
+        repo.saveWarlog(CLAN, listOf(warlog(end.plusSeconds(1))))
+
+        val id = repo.saveSnapshot(CLAN, snapshot(state = WarState.WAR_ENDED))
+
+        val wars = repo.recentWars(CLAN, 10)
+        assertEquals(1, wars.size)
+        assertEquals(WarSource.SNAPSHOT, wars.single().source)
+        assertEquals(end, wars.single().endTime, "fica o fim do retrato")
+        assertEquals(id, wars.single().id)
+    }
+
+    @Test
+    fun warlogDepoisDoRetratoComOFimDiferenteNaoDuplica() = runBlocking {
+        activate()
+        repo.saveSnapshot(CLAN, snapshot(state = WarState.WAR_ENDED))
+
+        repo.saveWarlog(CLAN, listOf(warlog(end.minusSeconds(1)), warlog(end.minus(2, ChronoUnit.DAYS))))
+
+        val wars = repo.recentWars(CLAN, 10)
+        assertEquals(2, wars.size, "a guerra de 2 dias antes é outra")
+        assertEquals(WarSource.SNAPSHOT, wars.first().source)
+    }
+
+    @Test
     fun guerrasDaMaisRecenteParaAMaisAntigaComLimite() = runBlocking {
         activate()
         val ends = (1..5).map { end.minus(it.toLong(), ChronoUnit.DAYS) }
