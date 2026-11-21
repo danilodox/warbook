@@ -15,7 +15,8 @@ class UnitNamesTest {
 
     @Test
     fun foraDaTabelaFicaONomeDaApi() {
-        assertEquals("Giant Gauntlet", UnitNames.display("Giant Gauntlet", "pt"))
+        assertEquals("Party Wizard", UnitNames.display("Party Wizard", "pt"))
+        assertEquals("Manopla Agigantadora", UnitNames.display("Giant Gauntlet", "pt"))
         assertEquals("Unidade Nova", UnitNames.display("Unidade Nova", "pt"))
     }
 
