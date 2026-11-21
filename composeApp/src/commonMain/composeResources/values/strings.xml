@@ -76,13 +76,16 @@
     <string name="me_equipment">Hero equipment</string>
     <string name="me_troops">Troops</string>
     <string name="me_spells_sieges">Spells and machines</string>
-    <string name="me_maxed_count">%1$d of %2$d maxed</string>
+    <string name="me_maxed_count">%1$d of %2$d maxed for TH</string>
+    <string name="me_group_maxed">%1$d of %2$d maxed</string>
+    <string name="me_equipment_other">Other</string>
     <string name="me_pets">Pets</string>
     <string name="me_season">Season</string>
     <string name="me_donations">Donated</string>
     <string name="me_received">Received</string>
     <string name="me_attack_wins">Attacks won</string>
     <string name="unit_level">%1$d/%2$d</string>
+    <string name="unit_full_th">maxed for TH</string>
 
     <string name="accounts_title">Your accounts</string>
     <string name="accounts_active">active</string>

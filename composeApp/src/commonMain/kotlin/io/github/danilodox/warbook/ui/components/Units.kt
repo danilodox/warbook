@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,24 +24,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.danilodox.warbook.resources.Res
+import io.github.danilodox.warbook.resources.ic_check
+import io.github.danilodox.warbook.resources.unit_full_th
 import io.github.danilodox.warbook.resources.unit_level
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.theme.tabular
 import io.github.danilodox.warbook.ui.units.UnitIcon
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Uma unidade do perfil já com o nome que aparece na tela. */
-data class UnitItem(val key: String, val name: String, val level: Int, val maxLevel: Int) {
-    val isMax: Boolean get() = maxLevel in 1..level
-    val progress: Float get() = if (maxLevel <= 0) 0f else (level.toFloat() / maxLevel).coerceIn(0f, 1f)
+/**
+ * Uma unidade do perfil já com o nome que aparece na tela.
+ * [maxLevel] é o máximo do jogo (da API); [townHallMax] o que o CV do jogador permite (tabela própria,
+ * igual a [maxLevel] quando a unidade não está na tabela). "No máximo" é sempre em relação ao CV.
+ */
+data class UnitItem(
+    val key: String,
+    val name: String,
+    val level: Int,
+    val maxLevel: Int,
+    val townHallMax: Int = maxLevel,
+) {
+    val isMax: Boolean get() = townHallMax in 1..level
+    val isGameMax: Boolean get() = maxLevel in 1..level
+    val progress: Float get() = if (townHallMax <= 0) 0f else (level.toFloat() / townHallMax).coerceIn(0f, 1f)
 }
 
 private const val GRID_COLUMNS = 5
+private val HERO_PORTRAIT = 44.dp
 
 /** Barra de nível: dourada em progresso, couro no máximo. */
 @Composable
@@ -60,24 +78,49 @@ fun HeroRow(item: UnitItem, modifier: Modifier = Modifier, icon: @Composable (Un
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
-        Box(Modifier.size(38.dp), contentAlignment = Alignment.Center) { icon(item) }
+        // Retrato num quadro fixo: todos os heróis com o mesmo tamanho, com ou sem ícone.
+        Box(
+            Modifier
+                .size(HERO_PORTRAIT)
+                .clip(MaterialTheme.shapes.small)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            contentAlignment = Alignment.Center,
+        ) { icon(item) }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            Row(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(item.name, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                Text(
-                    stringResource(Res.string.unit_level, item.level, item.maxLevel),
-                    style = MaterialTheme.typography.bodySmall.tabular(),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                LevelText(item)
             }
             LevelBar(item.progress, item.isMax)
         }
     }
 }
 
+/** "nível/máximo do CV"; no máximo do CV, dourado e com ✓. */
+@Composable
+fun LevelText(item: UnitItem, modifier: Modifier = Modifier) {
+    val color = if (item.isMax) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+    val full = stringResource(Res.string.unit_full_th)
+    Row(
+        modifier.semantics(mergeDescendants = true) { if (item.isMax) stateDescription = full },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xxs),
+    ) {
+        if (item.isMax) {
+            Icon(painterResource(Res.drawable.ic_check), contentDescription = null, Modifier.size(14.dp), tint = color)
+        }
+        Text(
+            stringResource(Res.string.unit_level, item.level, item.townHallMax),
+            style = MaterialTheme.typography.bodySmall.tabular(),
+            fontWeight = if (item.isMax) FontWeight.Bold else null,
+            color = color,
+        )
+    }
+}
+
 /**
  * Tropas, pets, feitiços e máquinas em grade de 5, com o nível no canto.
- * Borda e etiqueta douradas = nível máximo.
+ * Borda e etiqueta douradas com ✓ = no máximo do CV.
  * É uma grade simples (linhas de [Row]) para caber dentro de uma `LazyColumn`.
  */
 @Composable
@@ -100,7 +143,9 @@ fun UnitGrid(
 private fun UnitCell(item: UnitItem, icon: @Composable (UnitItem) -> Unit, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     val shape = MaterialTheme.shapes.small
-    val description = "${item.name} ${stringResource(Res.string.unit_level, item.level, item.maxLevel)}"
+    val level = stringResource(Res.string.unit_level, item.level, item.townHallMax)
+    val full = stringResource(Res.string.unit_full_th)
+    val description = if (item.isMax) "${item.name} $level, $full" else "${item.name} $level"
     Box(
         modifier
             .aspectRatio(1f)
@@ -118,12 +163,20 @@ private fun UnitCell(item: UnitItem, icon: @Composable (UnitItem) -> Unit, modif
             shape = MaterialTheme.shapes.extraSmall,
             modifier = Modifier.align(Alignment.BottomStart),
         ) {
-            Text(
-                item.level.toString(),
-                style = MaterialTheme.typography.labelSmall.tabular().copy(fontSize = 10.sp, letterSpacing = 0.sp),
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(horizontal = Spacing.xs),
-            )
+            Row(
+                Modifier.padding(horizontal = Spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(1.dp),
+            ) {
+                if (item.isMax) {
+                    Icon(painterResource(Res.drawable.ic_check), contentDescription = null, Modifier.size(9.dp))
+                }
+                Text(
+                    item.level.toString(),
+                    style = MaterialTheme.typography.labelSmall.tabular().copy(fontSize = 10.sp, letterSpacing = 0.sp),
+                    fontWeight = FontWeight.ExtraBold,
+                )
+            }
         }
     }
 }
