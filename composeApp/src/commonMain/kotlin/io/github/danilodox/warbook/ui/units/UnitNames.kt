@@ -2,7 +2,7 @@ package io.github.danilodox.warbook.ui.units
 
 /**
  * Nome em português de cada unidade, a partir do nome que a API do jogo entrega (sempre em inglês).
- * Fora da tabela (unidade nova, equipamento de herói) fica o nome da API.
+ * Fora da tabela (unidade nova) fica o nome da API.
  */
 object UnitNames {
     fun display(apiName: String, language: String): String =
@@ -39,6 +39,10 @@ object UnitNames {
         "Apprentice Warden" to "Guardião Aprendiz",
         "Druid" to "Druida",
         "Furnace" to "Fornalha",
+        "Ruin Witch" to "Bruxa das Ruínas",
+        "Meteor Golem" to "Golem Meteoro",
+        "Barch Squad" to "Equipe Barbarqueira",
+        "Giant Wizard Squad" to "Equipe dos Gigantes e Magos",
     )
 
     private val superTroops = mapOf(
@@ -79,6 +83,7 @@ object UnitNames {
         "Overgrowth Spell" to "Feitiço de Supercrescimento",
         "Ice Block Spell" to "Feitiço de Bloco de Gelo",
         "Bag of Frostmites" to "Saco de Ácaros Gélidos",
+        "Angry Spell" to "Feitiço Raiva Líquida",
     )
 
     private val heroes = mapOf(
@@ -99,6 +104,7 @@ object UnitNames {
         "Flame Flinger" to "Lança-Chamas",
         "Battle Drill" to "Broca de Batalha",
         "Troop Launcher" to "Lançador de Tropas",
+        "Sky Wagon" to "Aerotáxi",
     )
 
     private val pets = mapOf(
@@ -113,7 +119,56 @@ object UnitNames {
         "Spirit Fox" to "Raposa Espiritual",
         "Angry Jelly" to "Água-viva Brava",
         "Sneezy" to "Sneezy",
+        "Greedy Raven" to "Corvo Cobiçoso",
     )
 
-    private val portuguese: Map<String, String> = troops + superTroops + spells + heroes + sieges + pets
+    /** Nomes oficiais do jogo (translations.json do clashy.py). */
+    private val equipment = mapOf(
+        "Barbarian Puppet" to "Boneco de Bárbaro",
+        "Rage Vial" to "Frasco de Fúria",
+        "Archer Puppet" to "Boneco de Arqueira",
+        "Invisibility Vial" to "Frasco de Invisibilidade",
+        "Eternal Tome" to "Tomo Eterno",
+        "Life Gem" to "Gema da Vida",
+        "Seeking Shield" to "Escudo Escaldante",
+        "Royal Gem" to "Gema Real",
+        "Earthquake Boots" to "Bota Terremoto",
+        "Hog Rider Puppet" to "Boneco do Corredor",
+        "Giant Gauntlet" to "Manopla Agigantadora",
+        "Vampstache" to "Bigode Vampiro",
+        "Haste Vial" to "Frasco de Aceleração",
+        "Rocket Spear" to "Lança Brutal",
+        "Spiky Ball" to "Bola de espinhos",
+        "Frozen Arrow" to "Flecha Congelante",
+        "Monolith Arrow" to "Flecha Monolítica",
+        "Giant Arrow" to "Flecha Gigante",
+        "Heroic Torch" to "Tocha heroica",
+        "Healer Puppet" to "Boneco de Curadora",
+        "Fireball" to "Bola de Fogo",
+        "Rage Gem" to "Gema de Fúria",
+        "Snake Bracelet" to "Bracelete ofídico",
+        "Healing Tome" to "Tomo de Cura",
+        "Dark Crown" to "Coroa Sombria",
+        "Magic Mirror" to "Espelho Mágico",
+        "Electro Boots" to "Par de botas elétricas",
+        "Lavaloon Puppet" to "Boneco de Lavalão",
+        "Henchmen Puppet" to "Marionete de capanga",
+        "Dark Orb" to "Orbe sombrio",
+        "Metal Pants" to "Calça de metal",
+        "Noble Iron" to "Ferro Nobre",
+        "Action Figure" to "Boneco Gigante",
+        "Meteor Staff" to "Bastão de meteoros",
+        "Frost Flake" to "Floco de neve",
+        "Stick Horse" to "Cavalo de pau",
+        "Fire Heart" to "Coração em Chamas",
+        "Rocket Backpack" to "Mochila-foguete",
+        "Stun Blaster" to "Choque Atordoante",
+        "Flame Blower" to "Fole Flamejante",
+        "Electro Fangs" to "Presa Elétrica",
+        "Revenge Deck" to "Baralho Vingativo",
+        "Portal Pendant" to "Portal Portátil",
+    )
+
+    private val portuguese: Map<String, String> =
+        troops + superTroops + spells + heroes + sieges + pets + equipment
 }

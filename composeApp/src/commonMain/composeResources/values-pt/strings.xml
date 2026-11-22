@@ -76,13 +76,16 @@
     <string name="me_equipment">Equipamentos de herói</string>
     <string name="me_troops">Tropas</string>
     <string name="me_spells_sieges">Feitiços e máquinas</string>
-    <string name="me_maxed_count">%1$d de %2$d no máximo</string>
+    <string name="me_maxed_count">%1$d de %2$d no máximo do CV</string>
+    <string name="me_group_maxed">%1$d de %2$d no máximo</string>
+    <string name="me_equipment_other">Outros</string>
     <string name="me_pets">Pets</string>
     <string name="me_season">Temporada</string>
     <string name="me_donations">Doou</string>
     <string name="me_received">Recebeu</string>
     <string name="me_attack_wins">Ataques vencidos</string>
     <string name="unit_level">%1$d/%2$d</string>
+    <string name="unit_full_th">no máximo do CV</string>
 
     <string name="accounts_title">Suas contas</string>
     <string name="accounts_active">ativa</string>

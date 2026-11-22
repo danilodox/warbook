@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -65,21 +66,29 @@ import io.github.danilodox.warbook.ui.components.grouped
 import io.github.danilodox.warbook.ui.search.label
 import io.github.danilodox.warbook.ui.theme.Spacing
 import io.github.danilodox.warbook.ui.theme.WarbookTheme
+import io.github.danilodox.warbook.ui.units.UnitLevelTable
 import io.github.danilodox.warbook.ui.units.UnitNames
+import io.github.danilodox.warbook.ui.units.rememberUnitLevels
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
  * E1 e T1: [header] (o da conta na aba Eu, o com "Seguir" na tela Jogador), números principais,
- * heróis em lista com barra, o resto em grade com o nível no canto, e a temporada.
+ * heróis em lista com barra, equipamentos agrupados por herói, o resto em grade com o nível no canto,
+ * e a temporada. "No máximo" é sempre o máximo do CV do jogador.
  */
 @Composable
 fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: Modifier = Modifier) {
     val language = Locale.current.language
-    val heroes = player.heroes.map { it.toItem(language) }
+    val levels by rememberUnitLevels()
+    val townHall = player.townHallLevel
+    val heroes = player.heroes.map { it.toItem(language, levels, townHall) }
+    val equipment = player.heroEquipment.map { it.toItem(language, levels, townHall) }
+    val equipmentGroups = groupEquipment(equipment, heroes, levels) { name ->
+        UnitLevelDto(name, 0, 0).toItem(language)
+    }
     val grids = listOf(
-        Res.string.me_equipment to player.heroEquipment,
         Res.string.me_pets to player.pets,
         Res.string.me_troops to player.troops,
         Res.string.me_spells_sieges to player.spells + player.siegeMachines,
@@ -102,8 +111,12 @@ fun ProfileContent(player: PlayerDto, header: @Composable () -> Unit, modifier: 
             item(key = "heroes") { UnitSection(Res.string.me_heroes, heroes) }
             items(heroes, key = { "hero-${it.key}" }) { HeroRow(it) }
         }
+        if (equipment.isNotEmpty()) {
+            item(key = "equipment") { UnitSection(Res.string.me_equipment, equipment) }
+            items(equipmentGroups, key = { "equipment-${it.hero?.key}" }) { EquipmentGroupBlock(it) }
+        }
         grids.forEach { (title, units) ->
-            val list = units.map { it.toItem(language) }
+            val list = units.map { it.toItem(language, levels, townHall) }
             item(key = title.key) {
                 Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     UnitSection(title, list)
@@ -273,6 +286,23 @@ internal fun LeagueLine(player: PlayerDto) {
     }
 }
 
-/** A unidade da API como aparece na tela: [UnitItem.key] é o nome da API, [UnitItem.name] o do idioma. */
-internal fun UnitLevelDto.toItem(language: String = "en"): UnitItem =
-    UnitItem(key = name, name = UnitNames.display(name, language), level = level, maxLevel = maxLevel)
+/**
+ * A unidade da API como aparece na tela: [UnitItem.key] é o nome da API, [UnitItem.name] o do idioma.
+ * Com [levels] e [townHall], o máximo passa a ser o do CV (nunca acima do máximo do jogo).
+ */
+internal fun UnitLevelDto.toItem(
+    language: String = "en",
+    levels: UnitLevelTable? = null,
+    townHall: Int = 0,
+): UnitItem {
+    val forTownHall = levels?.maxForTownHall(name, townHall)?.takeIf { it > 0 }
+    val cap = forTownHall?.let { if (maxLevel > 0) minOf(it, maxLevel) else it } ?: maxLevel
+    return UnitItem(
+        key = name,
+        name = UnitNames.display(name, language),
+        level = level,
+        maxLevel = maxLevel,
+        // Tabela atrasada em relação ao jogo: o nível que o jogador já tem conta como permitido.
+        townHallMax = if (maxLevel > 0) maxOf(cap, minOf(level, maxLevel)) else cap,
+    )
+}
